@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏃 Trek DLUT 50km – Live Run Tracker</title>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <style>
+    :root {
+      --ab: #ffffff; --abl: #f1f3f6; --abm: #e9ecf1;
+      --brl: #e3e6ec; --brd: #cdd2db;
+      --pb: #3559e6; --ph: #0d0f14; --phv: #2442b8;
+      --sel: #eaeefc; --tp: #11141a; --ts: #5c6470;
+      --thl: #e8eefc; --pos: #159a6a; --posbg: #e8f6ee;
+      --neg: #dc4c4c; --negbg: #fdecea;
+      --warn: #d97706; --warnbg: #fef3e8;
+      --live: #10b981;
+    }
+    html[data-theme=dark] {
+      --ab:#0a0b0e;--abl:#121419;--abm:#181b22;
+      --brl:#23262e;--brd:#343844;
+      --pb:#6a92ff;--ph:#f5f7fb;--phv:#88a8ff;
+      --sel:#1a2030;--tp:#eef0f4;--ts:#9aa0ad;
+      --thl:#14213d;--pos:#46d39a;--posbg:#0e2a1d;
+      --neg:#ff6b6b;--negbg:#2a0d0d;
+      --warn:#f5c842;--warnbg:#2a1f0d;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+      font-size:14px;line-height:1.6;background:var(--ab);color:var(--tp);min-height:100vh}
+
+    /* ── TOPBAR ── */
+    .topbar{position:sticky;top:0;z-index:100;background:var(--ab);
+      border-bottom:1px solid var(--brl);padding:0 20px;
+      display:flex;align-items:center;justify-content:space-between;height:54px;gap:12px}
+    .tb-brand{display:flex;align-items:center;gap:8px;min-width:0}
+    .tb-logo{font-size:20px}
+    .tb-name{font-size:14px;font-weight:600;letter-spacing:-.02em;white-space:nowrap}
+    .tb-sub{font-family:monospace;font-size:10px;text-transform:uppercase;
+      letter-spacing:.1em;color:var(--ts)}
+    .tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .conn-badge{display:inline-flex;align-items:center;gap:5px;
+      padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;
+      background:var(--abl);color:var(--ts);border:1px solid var(--brl)}
+    .conn-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--ts)}
+    .conn-badge.live{background:#ecfdf5;color:var(--live);border-color:#a7f3d0}
+    html[data-theme=dark] .conn-badge.live{background:#0a2a1d;border-color:#1f5e3a}
+    .conn-badge.live .dot{background:var(--live);animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .btn{appearance:none;border:1px solid var(--brd);background:var(--abl);
+      color:var(--tp);cursor:pointer;padding:5px 12px;border-radius:6px;
+      font-size:12px;font-family:inherit;font-weight:500;transition:background .15s}
+    .btn:hover{background:var(--abm)}
+    .btn-primary{background:var(--pb);color:#fff;border-color:var(--pb)}
+    .btn-primary:hover{background:var(--phv);border-color:var(--phv)}
+    .theme-btn{appearance:none;border:none;background:transparent;cursor:pointer;
+      font-size:16px;padding:4px 6px;border-radius:4px;color:var(--ts)}
+    .theme-btn:hover{background:var(--abl)}
+
+    /* ── USER PICKER ── */
+    .user-select{appearance:none;background:var(--abl);border:1px solid var(--brd);
+      color:var(--tp);border-radius:6px;padding:5px 10px;font-size:12px;
+      font-family:inherit;cursor:pointer;max-width:130px}
+    .user-select:focus{outline:none;border-color:var(--pb)}
+
+    /* ── SETUP OVERLAY ── */
+    .setup-overlay{display:none;position:fixed;inset:0;background:var(--ab);
+      z-index:500;overflow-y:auto;padding:40px 20px}
+    .setup-overlay.show{display:block}
+    .setup-card{max-width:640px;margin:0 auto;
+      background:var(--abl);border:1px solid var(--brl);border-radius:12px;padding:36px}
+    .setup-title{font-size:1.6rem;font-weight:300;letter-spacing:-.03em;margin-bottom:6px}
+    .setup-sub{color:var(--ts);margin-bottom:28px;font-size:13px}
+    .step{display:flex;gap:14px;margin-bottom:22px}
+    .step-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;
+      background:var(--pb);color:#fff;font-size:12px;font-weight:700;
+      display:flex;align-items:center;justify-content:center}
+    .step-body{flex:1}
+    .step-title{font-weight:600;font-size:13px;margin-bottom:4px}
+    .step-desc{font-size:12px;color:var(--ts);margin-bottom:6px}
+    .step-link{font-size:12px;color:var(--pb);text-decoration:none}
+    .step-link:hover{text-decoration:underline}
+    pre.code-block{background:var(--abm);border:1px solid var(--brl);border-radius:6px;
+      padding:12px;font-size:11px;overflow-x:auto;color:var(--tp);line-height:1.7;
+      font-family:"SF Mono","Consolas",monospace;white-space:pre}
+    .rules-block{background:#fff8e5;border:1px solid #f5c842;border-radius:6px;
+      padding:10px 14px;font-size:12px;color:#7c4a00}
+    html[data-theme=dark] .rules-block{background:#2a1f0d;color:#f5c842;border-color:#7c4a00}
+
+    /* ── MAIN ── */
+    .main{max-width:1100px;margin:0 auto;padding:28px 20px 64px}
+    .hero{margin-bottom:26px}
+    .hero-eye{font-family:monospace;font-size:10px;font-weight:500;letter-spacing:.12em;
+      text-transform:uppercase;color:var(--pb);margin-bottom:4px}
+    .hero-title{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:300;
+      letter-spacing:-.03em;line-height:1.1;margin-bottom:10px}
+    .hero-meta{display:flex;gap:10px;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;gap:5px;background:var(--abl);
+      border:1px solid var(--brl);border-radius:20px;padding:3px 11px;
+      font-size:11px;color:var(--ts)}
+
+    /* ── KPI ── */
+    .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px}
+    .kpi{background:var(--abl);border:1px solid var(--brl);border-radius:8px;padding:16px 18px}
+    .kpi-lbl{font-family:monospace;font-size:10px;font-weight:500;letter-spacing:.1em;
+      text-transform:uppercase;color:var(--ts);margin-bottom:5px}
+    .kpi-val{font-size:1.8rem;font-weight:300;letter-spacing:-.03em;line-height:1;
+      font-variant-numeric:tabular-nums}
+    .kpi-sub{font-size:11px;color:var(--ts);margin-top:3px}
+
+    /* ── SECTION ── */
+    .sec-hdr{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;
+      padding-bottom:8px;border-bottom:1px solid var(--brl)}
+    .sec-title{font-size:14px;font-weight:600;letter-spacing:-.02em}
+    .sec-meta{font-family:monospace;font-size:10px;color:var(--ts)}
+
+    /* ── LEGEND ── */
+    .legend{display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+    .leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ts)}
+
+    /* ── ATTENDANCE TABLE ── */
+    .tbl-wrap{overflow:auto;max-height:70vh;border:1px solid var(--brl);border-radius:8px}
+    .att-tbl{border-collapse:collapse;width:100%;min-width:820px}
+    .att-tbl thead tr{background:var(--abl);position:sticky;top:0;z-index:10}
+    .att-tbl th{font-family:monospace;font-size:10px;font-weight:500;letter-spacing:.08em;
+      text-transform:uppercase;color:var(--ts);padding:9px 10px;text-align:center;
+      border-bottom:1px solid var(--brd);white-space:nowrap}
+    .att-tbl th.col-run{text-align:left;min-width:150px}
+    .att-tbl td{padding:5px 6px;border-bottom:1px solid var(--brl);text-align:center;vertical-align:middle}
+    .att-tbl td.run-lbl{text-align:left;padding:7px 12px;white-space:nowrap}
+    .att-tbl tr:last-child td{border-bottom:none}
+    .att-tbl tbody tr:hover td{background:var(--abl)}
+    .run-num{font-family:monospace;font-size:10px;color:var(--ts);margin-right:3px}
+    .run-date{font-weight:500;font-size:12px}
+    .run-day{font-family:monospace;font-size:10px;margin-left:5px;padding:2px 6px;border-radius:3px}
+    .d-mon{background:var(--thl);color:var(--pb)}
+    .d-wed{background:var(--posbg);color:var(--pos)}
+    .d-fri{background:var(--warnbg);color:var(--warn)}
+
+    /* ── CELL ── */
+    .att-cell{width:36px;height:34px;border-radius:5px;display:inline-flex;
+      align-items:center;justify-content:center;cursor:pointer;
+      transition:transform .1s,opacity .15s;user-select:none;
+      border:1.5px solid transparent;flex-direction:column;gap:1px;
+      position:relative}
+    .att-cell:hover{transform:scale(1.1)}
+    .att-cell.present{background:var(--posbg);border-color:var(--pos)}
+    .att-cell.absent{background:var(--negbg);border-color:var(--neg)}
+    .att-cell.pending{background:var(--abm);border-color:var(--brd)}
+    .cell-icon{font-size:14px;line-height:1}
+    .cell-km{font-size:9px;font-family:monospace;color:var(--pos);font-weight:700;line-height:1}
+    .att-cell.absent .cell-km{color:var(--neg)}
+    /* ripple for live update */
+    @keyframes ripple{0%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}
+    .att-cell.synced::after{content:'';position:absolute;inset:0;border-radius:5px;
+      border:2px solid var(--pb);animation:ripple .6s ease-out forwards;pointer-events:none}
+
+    /* ── KM MODAL ── */
+    .km-modal{display:none;position:fixed;inset:0;z-index:300;
+      align-items:center;justify-content:center;background:rgba(0,0,0,.35)}
+    .km-modal.open{display:flex}
+    .km-box{background:var(--ab);border:1px solid var(--brd);border-radius:10px;
+      padding:24px;width:280px;max-width:90vw}
+    .km-title{font-size:14px;font-weight:600;margin-bottom:6px}
+    .km-sub{font-size:12px;color:var(--ts);margin-bottom:16px}
+    .km-input-row{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+    .km-input{flex:1;appearance:none;background:var(--abl);border:1px solid var(--brd);
+      border-radius:6px;padding:8px 12px;font-size:18px;font-weight:300;
+      color:var(--tp);font-family:inherit;text-align:center}
+    .km-input:focus{outline:none;border-color:var(--pb)}
+    .km-unit{font-size:14px;color:var(--ts);font-weight:500}
+    .km-actions{display:flex;gap:8px;justify-content:flex-end}
+
+    /* ── LEADERBOARD ── */
+    .lb-section{margin-top:32px}
+    .lb-tbl{width:100%;border-collapse:collapse}
+    .lb-tbl th{font-family:monospace;font-size:10px;font-weight:500;letter-spacing:.08em;
+      text-transform:uppercase;color:var(--ts);padding:7px 12px;text-align:left;
+      border-bottom:1px solid var(--brd);cursor:pointer;white-space:nowrap}
+    .lb-tbl th:hover{color:var(--tp)}
+    .lb-tbl th.num,.lb-tbl td.num{text-align:right}
+    .lb-tbl td{padding:9px 12px;border-bottom:1px solid var(--brl);font-size:13px}
+    .lb-tbl tr:last-child td{border-bottom:none}
+    .lb-tbl tbody tr:hover td{background:var(--abl)}
+    .lb-rank{font-family:monospace;font-size:11px;font-weight:700;color:var(--ts)}
+    .lb-rank.gold{color:#d4a017}.lb-rank.silver{color:#8c9bb5}.lb-rank.bronze{color:#a0693a}
+    .lb-bar-bg{width:100px;height:5px;background:var(--abm);border-radius:3px;overflow:hidden;display:inline-block}
+    .lb-bar-fill{height:100%;border-radius:3px;background:var(--pb);transition:width .4s}
+    .lb-bar-fill.hi{background:var(--pos)}
+    .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+    .b-hi{background:var(--posbg);color:var(--pos)}
+    .b-mid{background:var(--thl);color:var(--pb)}
+    .b-lo{background:var(--negbg);color:var(--neg)}
+
+    /* ── EDIT MEMBERS MODAL ── */
+    .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);
+      z-index:200;align-items:center;justify-content:center}
+    .modal-ov.open{display:flex}
+    .modal{background:var(--ab);border:1px solid var(--brd);border-radius:10px;
+      padding:26px;width:330px;max-width:94vw}
+    .modal-title{font-size:15px;font-weight:600;margin-bottom:16px}
+    .modal-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+    .modal-row label{font-family:monospace;font-size:10px;text-transform:uppercase;
+      letter-spacing:.08em;color:var(--ts);min-width:18px;text-align:right}
+    .modal-row input{flex:1;appearance:none;background:var(--abl);border:1px solid var(--brd);
+      border-radius:5px;padding:6px 10px;font-size:13px;color:var(--tp);font-family:inherit}
+    .modal-row input:focus{outline:none;border-color:var(--pb)}
+    .modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+
+    /* ── TOAST ── */
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
+      background:var(--ph);color:var(--ab);padding:9px 20px;border-radius:8px;
+      font-size:12px;font-weight:500;opacity:0;pointer-events:none;
+      transition:opacity .2s,transform .2s;z-index:999;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* ── SYNC INDICATOR ── */
+    .sync-indicator{position:fixed;top:60px;right:16px;z-index:200;
+      background:var(--pb);color:#fff;padding:5px 12px;border-radius:6px;
+      font-size:11px;font-weight:500;opacity:0;pointer-events:none;
+      transition:opacity .2s;display:flex;align-items:center;gap:6px}
+    .sync-indicator.show{opacity:1}
+    .sync-spin{width:10px;height:10px;border:2px solid rgba(255,255,255,.3);
+      border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media print {
+      body{margin:0;padding:.4in .5in;background:#fff;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+      .topbar,.km-modal,.modal-ov,.toast,.sync-indicator,.setup-overlay{display:none!important}
+      .tbl-wrap{max-height:none!important;overflow:visible!important}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ SETUP OVERLAY ══════════════════════════════════════════════════════════ -->
+<div class="setup-overlay" id="setupOverlay">
+  <div class="setup-card">
+    <div class="hero-eye">ONE-TIME SETUP</div>
+    <div class="setup-title">Connect to Firebase 🔥</div>
+    <div class="setup-sub">Follow these 5 steps — takes about 10 minutes. Once done, all 10 members share the same live data.</div>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Create a Firebase project</div>
+        <div class="step-desc">Go to Firebase Console → "Add project" → name it <b>trek-dlut-50km</b> → disable Analytics (optional) → Create.</div>
+        <a class="step-link" href="https://console.firebase.google.com" target="_blank">→ console.firebase.google.com</a>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Enable Realtime Database</div>
+        <div class="step-desc">In your project → Build → Realtime Database → Create Database → choose a region → Start in <b>test mode</b> (for now).</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Register a Web App &amp; get your config</div>
+        <div class="step-desc">Project settings (⚙️) → Your apps → Add app (Web &lt;/&gt;) → name it → Copy the <b>firebaseConfig</b> object.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Paste your config into this file</div>
+        <div class="step-desc">Open <b>running_tracker_firebase.html</b> in a text editor. Find the block below and replace every <code>YOUR_*</code> value:</div>
+        <pre class="code-block">const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyDv90xPQbxhBtZ5j0exJYWcJnmI631lkr0",
+  authDomain:        "trek-dlut-50km.firebaseapp.com",
+  databaseURL:       "https://trek-dlut-50km-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "trek-dlut-50km",
+  storageBucket:     "trek-dlut-50km.firebasestorage.app",
+  messagingSenderId: "842711076233",
+  appId:             "1:842711076233:web:58f7d7b2892518a58ca558"
+};</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Set Realtime Database Rules</div>
+        <div class="step-desc">Realtime Database → Rules tab → replace with this (allows all club members to read/write):</div>
+        <pre class="code-block">{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}</pre>
+        <div class="rules-block" style="margin-top:8px">⚠️ These are open rules — fine for a private club tracker. For production, add auth.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--brl)">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">After setup, share the file</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.8">
+        • Save this HTML file anywhere (USB drive, email, Google Drive)<br>
+        • All 10 members download it &amp; open it in Chrome/Edge/Firefox<br>
+        • Everyone sees the same live data — no server needed beyond Firebase<br>
+        • Or host it free on <a class="step-link" href="https://pages.github.com" target="_blank">GitHub Pages</a> for a permanent URL
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOPBAR ═════════════════════════════════════════════════════════════════ -->
+<div class="topbar">
+  <div class="tb-brand">
+    <span class="tb-logo">🏃</span>
+    <div>
+      <div class="tb-name">Trek DLUT 50km</div>
+      <div class="tb-sub">Live Tracker · Aug 2026</div>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="conn-badge" id="connBadge">
+      <span class="dot"></span>
+      <span id="connText">Connecting…</span>
+    </div>
+    <select class="user-select" id="userSelect" title="Who are you?"></select>
+    <button class="btn" onclick="openMembersModal()">✏️ Members</button>
+    <button class="btn btn-primary" onclick="window.print()">⬇ PDF</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</div>
+
+<!-- ══ SYNC INDICATOR ════════════════════════════════════════════════════════ -->
+<div class="sync-indicator" id="syncInd"><div class="sync-spin"></div> Syncing…</div>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════════════════════ -->
+<div class="main">
+  <div class="hero">
+    <div class="hero-eye">TRAINING LOG · FIREBASE LIVE SYNC</div>
+    <h1 class="hero-title">Running Club<br>Attendance Tracker</h1>
+    <div class="hero-meta">
+      <span class="pill">📅 Mon · Wed · Fri</span>
+      <span class="pill">🕟 4:45 PM</span>
+      <span class="pill">📍 3–5 km</span>
+      <span class="pill">👥 10 members</span>
+      <span class="pill">🎯 DLUT 50km</span>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-lbl">Total Sessions</div><div class="kpi-val">13</div><div class="kpi-sub">August 2026</div></div>
+    <div class="kpi"><div class="kpi-lbl">Runs Logged</div><div class="kpi-val" id="k-logged">0</div><div class="kpi-sub">✅ marked present</div></div>
+    <div class="kpi"><div class="kpi-lbl">Club Avg</div><div class="kpi-val" id="k-avg">0%</div><div class="kpi-sub">attendance rate</div></div>
+    <div class="kpi"><div class="kpi-lbl">Total Distance</div><div class="kpi-val" id="k-dist">0</div><div class="kpi-sub">km tracked</div></div>
+    <div class="kpi"><div class="kpi-lbl">🏆 Top Runner</div><div class="kpi-val" id="k-top" style="font-size:1.1rem;line-height:1.3">—</div><div class="kpi-sub" id="k-top-sub"></div></div>
+  </div>
+
+  <div class="sec-hdr">
+    <div class="sec-title">🗓 Attendance Tracker</div>
+    <div class="sec-meta" id="att-meta"></div>
+  </div>
+  <div class="legend">
+    <div class="leg-item">✅ Present (click once)</div>
+    <div class="leg-item">❌ Absent (click twice)</div>
+    <div class="leg-item">⬜ Pending (click thrice to reset)</div>
+    <div class="leg-item" style="color:var(--pos)">🔢 KM shown below icon · double-click to edit</div>
+  </div>
+  <div class="tbl-wrap">
+    <table class="att-tbl">
+      <thead id="attHead"></thead>
+      <tbody id="attBody"></tbody>
+    </table>
+  </div>
+
+  <div class="lb-section">
+    <div class="sec-hdr">
+      <div class="sec-title">📊 Leaderboard</div>
+      <div class="sec-meta">click headers to sort</div>
+    </div>
+    <table class="lb-tbl">
+      <thead><tr>
+        <th onclick="sortLB('rank')">Rank</th>
+        <th onclick="sortLB('name')">Member</th>
+        <th class="num" onclick="sortLB('runs')">Runs ▾</th>
+        <th class="num" onclick="sortLB('pct')">Att. %</th>
+        <th onclick="sortLB('dist')">Distance</th>
+        <th onclick="sortLB('pct')">Progress</th>
+      </tr></thead>
+      <tbody id="lbBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ KM MODAL ══════════════════════════════════════════════════════════════ -->
+<div class="km-modal" id="kmModal">
+  <div class="km-box">
+    <div class="km-title">📍 How far did you run?</div>
+    <div class="km-sub" id="kmModalSub">Enter the distance for this session</div>
+    <div class="km-input-row">
+      <input class="km-input" type="number" id="kmInput" min="0.1" max="99" step="0.1" value="3">
+      <span class="km-unit">km</span>
+    </div>
+    <div class="km-actions">
+      <button class="btn" onclick="cancelKm()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmKm()">✓ Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MEMBERS MODAL ═════════════════════════════════════════════════════════ -->
+<div class="modal-ov" id="memberModal">
+  <div class="modal">
+    <div class="modal-title">✏️ Edit Member Names</div>
+    <div id="memberInputs"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeMembersModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMembersToFirebase()">Save to Firebase</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ════════════════════════════════════════════════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── FIREBASE CONFIG — replace YOUR_* values ──────────────────────────────────
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyDv90xPQbxhBtZ5j0exJYWcJnmI631lkr0",
+  authDomain:        "trek-dlut-50km.firebaseapp.com",
+  databaseURL:       "https://trek-dlut-50km-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "trek-dlut-50km",
+  storageBucket:     "trek-dlut-50km.firebasestorage.app",
+  messagingSenderId: "842711076233",
+  appId:             "1:842711076233:web:f8db09823a3eb6b28ca558"
+};
+
+const DEFAULT_KM   = 3;
+const IS_CONFIGURED = !FIREBASE_CONFIG.apiKey.startsWith('YOUR_');
+
+// ── STATIC DATA ───────────────────────────────────────────────────────────────
+const RUNS = [
+  {id:'r1', date:'03 Aug', day:'Mon'},{id:'r2', date:'05 Aug', day:'Wed'},
+  {id:'r3', date:'07 Aug', day:'Fri'},{id:'r4', date:'10 Aug', day:'Mon'},
+  {id:'r5', date:'12 Aug', day:'Wed'},{id:'r6', date:'14 Aug', day:'Fri'},
+  {id:'r7', date:'17 Aug', day:'Mon'},{id:'r8', date:'19 Aug', day:'Wed'},
+  {id:'r9', date:'21 Aug', day:'Fri'},{id:'r10',date:'24 Aug', day:'Mon'},
+  {id:'r11',date:'26 Aug', day:'Wed'},{id:'r12',date:'28 Aug', day:'Fri'},
+  {id:'r13',date:'31 Aug', day:'Mon'},
+];
+const DEFAULT_MEMBERS = ['Hai Bui','Chinh Ton','Khoa Vo','Truong Nguyen','Thien Le',
+  'Hoang Tran','Tri Nguyen','Member 8','Member 9','Member 10'];
+const STATES = ['pending','present','absent'];
+const ICONS  = ['⬜','✅','❌'];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let members  = [...DEFAULT_MEMBERS];
+let att      = {};   // key -> state (0/1/2)
+let kmData   = {};   // key -> km number
+let lbSort   = {key:'runs', dir:'desc'};
+let db       = null;
+let currentUser = localStorage.getItem('run_user') || DEFAULT_MEMBERS[0];
+
+// km modal state
+let pendingKmKey = null;
+let pendingKmRunId = null;
+let pendingKmMi = null;
+let pendingKmMode = 'new'; // 'new' | 'edit'
+
+// ── THEME ─────────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? '' : 'dark');
+  document.getElementById('themeBtn').textContent = dark ? '🌙' : '☀️';
+  localStorage.setItem('run_theme', dark ? 'light' : 'dark');
+}
+(function() {
+  const t = localStorage.getItem('run_theme');
+  if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); document.getElementById('themeBtn').textContent = '☀️'; }
+})();
+
+// ── USER SELECT ───────────────────────────────────────────────────────────────
+function buildUserSelect() {
+  const sel = document.getElementById('userSelect');
+  sel.innerHTML = members.map(m => `<option value="${m}" ${m===currentUser?'selected':''}>${m}</option>`).join('');
+}
+document.getElementById('userSelect').addEventListener('change', function() {
+  currentUser = this.value;
+  localStorage.setItem('run_user', currentUser);
+});
+
+// ── FIREBASE INIT ─────────────────────────────────────────────────────────────
+if (!IS_CONFIGURED) {
+  document.getElementById('setupOverlay').classList.add('show');
+} else {
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.database();
+
+  // Connection status
+  db.ref('.info/connected').on('value', snap => {
+    const connected = snap.val() === true;
+    const badge = document.getElementById('connBadge');
+    const txt   = document.getElementById('connText');
+    if (connected) { badge.className='conn-badge live'; txt.textContent='Live'; }
+    else           { badge.className='conn-badge'; txt.textContent='Reconnecting…'; }
+  });
+
+  // Members sync
+  db.ref('trek_dlut_50km/members').on('value', snap => {
+    const data = snap.val();
+    if (data) members = Object.values(data);
+    else { db.ref('trek_dlut_50km/members').set(DEFAULT_MEMBERS); members = [...DEFAULT_MEMBERS]; }
+    buildUserSelect();
+    buildAttTable();
+    buildLeaderboard();
+  });
+
+  // Attendance sync
+  db.ref('trek_dlut_50km/attendance').on('value', snap => {
+    const data = snap.val() || {};
+    att = {}; kmData = {};
+    Object.keys(data).forEach(k => {
+      att[k]    = data[k].state   !== undefined ? data[k].state   : 0;
+      kmData[k] = data[k].km      !== undefined ? data[k].km      : DEFAULT_KM;
+    });
+    renderAllCells();
+    updateKPIs();
+    buildLeaderboard();
+  });
+}
+
+// ── BUILD ATTENDANCE TABLE ────────────────────────────────────────────────────
+function dayClass(d) { return d==='Mon'?'d-mon':d==='Wed'?'d-wed':'d-fri'; }
+
+function buildAttTable() {
+  const head = document.getElementById('attHead');
+  head.innerHTML = '<tr><th class="col-run">Run</th>' +
+    members.map(m=>`<th>${m.split(' ')[0]}</th>`).join('') + '</tr>';
+
+  const body = document.getElementById('attBody');
+  let html = '';
+  RUNS.forEach((run, ri) => {
+    html += `<tr><td class="run-lbl">
+      <span class="run-num">#${ri+1}</span>
+      <span class="run-date">${run.date}</span>
+      <span class="run-day ${dayClass(run.day)}">${run.day}</span>
+    </td>`;
+    members.forEach((m,mi) => {
+      const key   = `${run.id}_${mi}`;
+      const state = att[key] || 0;
+      const km    = kmData[key] || DEFAULT_KM;
+      html += `<td><div class="att-cell ${STATES[state]}"
+        id="cell_${run.id}_${mi}"
+        onclick="onCellClick('${run.id}',${mi})"
+        ondblclick="onCellDblClick('${run.id}',${mi},event)"
+        title="${m}">${cellInner(state,km)}</div></td>`;
+    });
+    html += '</tr>';
+  });
+  body.innerHTML = html;
+  document.getElementById('att-meta').textContent =
+    `${RUNS.length} sessions × ${members.length} members`;
+}
+
+function cellInner(state, km) {
+  if (state === 1) return `<span class="cell-icon">✅</span><span class="cell-km">${km}km</span>`;
+  if (state === 2) return `<span class="cell-icon">❌</span>`;
+  return `<span class="cell-icon">⬜</span>`;
+}
+
+function renderAllCells() {
+  RUNS.forEach(run => {
+    members.forEach((_,mi) => {
+      const key  = `${run.id}_${mi}`;
+      const cell = document.getElementById(`cell_${run.id}_${mi}`);
+      if (!cell) return;
+      const state = att[key] || 0;
+      const km    = kmData[key] || DEFAULT_KM;
+      cell.className = `att-cell ${STATES[state]}`;
+      cell.innerHTML = cellInner(state, km);
+    });
+  });
+}
+
+// ── CELL INTERACTION ──────────────────────────────────────────────────────────
+function onCellClick(runId, mi) {
+  const key  = `${runId}_${mi}`;
+  const cur  = att[key] || 0;
+  const next = (cur + 1) % 3;
+  if (next === 1) {
+    // Becoming present — ask for KM
+    openKmModal(runId, mi, key, 'new');
+  } else {
+    writeToFirebase(runId, mi, next, kmData[key] || DEFAULT_KM);
+  }
+}
+
+function onCellDblClick(runId, mi, e) {
+  e.stopPropagation();
+  const key = `${runId}_${mi}`;
+  if ((att[key] || 0) !== 1) return; // only edit km when present
+  openKmModal(runId, mi, key, 'edit');
+}
+
+// ── KM MODAL ──────────────────────────────────────────────────────────────────
+function openKmModal(runId, mi, key, mode) {
+  pendingKmKey = key; pendingKmRunId = runId; pendingKmMi = mi; pendingKmMode = mode;
+  const run = RUNS.find(r => r.id === runId);
+  document.getElementById('kmModalSub').textContent =
+    `${members[mi]} · ${run.date} (${run.day})`;
+  document.getElementById('kmInput').value = kmData[key] || DEFAULT_KM;
+  document.getElementById('kmModal').classList.add('open');
+  setTimeout(() => document.getElementById('kmInput').select(), 50);
+}
+function cancelKm() {
+  document.getElementById('kmModal').classList.remove('open');
+  pendingKmKey = null;
+}
+function confirmKm() {
+  const km = parseFloat(document.getElementById('kmInput').value) || DEFAULT_KM;
+  document.getElementById('kmModal').classList.remove('open');
+  writeToFirebase(pendingKmRunId, pendingKmMi, 1, km);
+  pendingKmKey = null;
+}
+document.getElementById('kmInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmKm();
+  if (e.key === 'Escape') cancelKm();
+});
+document.getElementById('kmModal').addEventListener('click', function(e) {
+  if (e.target === this) cancelKm();
+});
+
+// ── FIREBASE WRITE ────────────────────────────────────────────────────────────
+function writeToFirebase(runId, mi, state, km) {
+  const key = `${runId}_${mi}`;
+  showSync();
+  if (db) {
+    db.ref(`trek_dlut_50km/attendance/${key}`).set({
+      state, km, updatedBy: currentUser, updatedAt: Date.now()
+    });
+  } else {
+    // Offline fallback (demo mode)
+    att[key] = state; kmData[key] = km;
+    const cell = document.getElementById(`cell_${runId}_${mi}`);
+    if (cell) { cell.className = `att-cell ${STATES[state]}`; cell.innerHTML = cellInner(state,km); flashCell(cell); }
+    updateKPIs(); buildLeaderboard();
+  }
+  hideSync();
+}
+
+function flashCell(cell) {
+  cell.classList.remove('synced');
+  void cell.offsetWidth;
+  cell.classList.add('synced');
+  setTimeout(() => cell.classList.remove('synced'), 700);
+}
+
+// ── SYNC INDICATOR ────────────────────────────────────────────────────────────
+let syncTimer;
+function showSync() { document.getElementById('syncInd').classList.add('show'); }
+function hideSync() { clearTimeout(syncTimer); syncTimer = setTimeout(() => document.getElementById('syncInd').classList.remove('show'), 600); }
+
+// ── KPIs ─────────────────────────────────────────────────────────────────────
+function getMemberStats() {
+  return members.map((m,mi) => {
+    let runs=0,absent=0,totalKm=0;
+    RUNS.forEach(run => {
+      const k = `${run.id}_${mi}`;
+      const s = att[k]||0;
+      if(s===1){runs++;totalKm+=(kmData[k]||DEFAULT_KM);}
+      if(s===2) absent++;
+    });
+    const logged=runs+absent;
+    const pct=logged>0?Math.round(runs/logged*100):0;
+    return {name:m,runs,absent,logged,pct,dist:Math.round(totalKm*10)/10};
+  });
+}
+
+function updateKPIs() {
+  const stats = getMemberStats();
+  const totalPresent = stats.reduce((s,x)=>s+x.runs,0);
+  const totalDist    = Math.round(stats.reduce((s,x)=>s+x.dist,0)*10)/10;
+  const avgPct = stats.length && stats.reduce((s,x)=>s+(x.logged>0?x.runs/x.logged:0),0)/members.length;
+  const top    = [...stats].sort((a,b)=>b.runs-a.runs)[0];
+  document.getElementById('k-logged').textContent = totalPresent;
+  document.getElementById('k-avg').textContent    = Math.round(avgPct*100)+'%';
+  document.getElementById('k-dist').textContent   = totalDist;
+  document.getElementById('k-top').textContent     = top&&top.runs>0?top.name:'—';
+  document.getElementById('k-top-sub').textContent = top&&top.runs>0?`${top.runs} runs · ${top.dist} km`:'';
+}
+
+// ── LEADERBOARD ───────────────────────────────────────────────────────────────
+function buildLeaderboard() {
+  const stats   = getMemberStats();
+  const maxRuns = Math.max(...stats.map(s=>s.runs),1);
+  const sorted  = [...stats].sort((a,b)=>{
+    const v = lbSort.key==='name' ? (a.name>b.name?1:-1) : (b[lbSort.key]-a[lbSort.key]);
+    return lbSort.dir==='asc'?-v:v;
+  });
+  const body = document.getElementById('lbBody');
+  body.innerHTML = sorted.map((s,i)=>{
+    const r=i+1;
+    const rankLabel = r===1?'🥇':r===2?'🥈':r===3?'🥉':`<span class="lb-rank">#${r}</span>`;
+    const bar = Math.round(s.runs/maxRuns*100);
+    const badge = s.logged===0?'<span class="badge b-mid">No runs yet</span>'
+      :s.pct>=80?'<span class="badge b-hi">🔥 Consistent</span>'
+      :s.pct>=50?'<span class="badge b-mid">💪 On track</span>'
+      :'<span class="badge b-lo">⚠️ Needs effort</span>';
+    return `<tr>
+      <td>${rankLabel}</td><td>${s.name}</td>
+      <td class="num">${s.runs}</td>
+      <td class="num">${s.logged>0?s.pct+'%':'—'}</td>
+      <td>${s.dist} km</td>
+      <td style="display:flex;align-items:center;gap:8px">
+        <div class="lb-bar-bg"><div class="lb-bar-fill ${s.pct>=80?'hi':''}" style="width:${bar}%"></div></div>
+        ${badge}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function sortLB(key) {
+  lbSort.dir = lbSort.key===key&&lbSort.dir==='desc'?'asc':'desc';
+  lbSort.key = key;
+  buildLeaderboard();
+}
+
+// ── MEMBERS MODAL ─────────────────────────────────────────────────────────────
+function openMembersModal() {
+  document.getElementById('memberInputs').innerHTML = members.map((m,i)=>
+    `<div class="modal-row"><label>${i+1}</label>
+     <input type="text" value="${m}" data-idx="${i}" placeholder="${DEFAULT_MEMBERS[i]}"></div>`
+  ).join('');
+  document.getElementById('memberModal').classList.add('open');
+}
+function closeMembersModal() { document.getElementById('memberModal').classList.remove('open'); }
+function saveMembersToFirebase() {
+  const names = Array.from(document.querySelectorAll('#memberInputs input'))
+    .map((el,i) => el.value.trim() || DEFAULT_MEMBERS[i]);
+  if (db) { db.ref('trek_dlut_50km/members').set(names); }
+  else { members = names; buildAttTable(); buildLeaderboard(); }
+  closeMembersModal(); showToast('Members updated!');
+}
+document.getElementById('memberModal').addEventListener('click', function(e) {
+  if(e.target===this) closeMembersModal();
+});
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── INIT (non-Firebase fallback) ──────────────────────────────────────────────
+if (!IS_CONFIGURED) {
+  buildUserSelect(); buildAttTable(); buildLeaderboard(); updateKPIs();
+}
+</script>
+
+<script>
+  if (window.GleanBridge) {
+    window.GleanBridge.postMessage({ actionId:'export-pdf', type:'glean-add-menu', metadata:{ label:'Export as PDF', icon:'export' } });
+    window.GleanBridge.onMessage('action', d => { if(d.actionId==='export-pdf') window.print(); });
+  }
+  window.addEventListener('beforeprint',()=>{});
+  window.addEventListener('afterprint',()=>{});
+</script>
+</body>
+</html>
