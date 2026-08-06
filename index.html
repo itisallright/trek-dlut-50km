@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>🏁 TREK DLUT 50KM – Running Tracker</title>
 <script>window.APP_DATA = {"metadata": {"title": "TREK DLUT 50KM \u2013 Running Tracker", "generated_at": "2026-08-06T06:59:03.333259+00:00", "year": 2026, "month": 8, "month_name": "August", "app_dir": "/home/user/output/running_tracker_firebase"}, "config": {"target_km": 36, "default_km": 3, "weekly_min": 9, "session_time": "4:45 PM"}, "members": [{"index": 0, "name": "Hai Bui", "animal": "\ud83d\udc2f", "color": "#3b82f6"}, {"index": 1, "name": "Chinh Ton", "animal": "\ud83e\udd8a", "color": "#ef4444"}, {"index": 2, "name": "Khoa Vo", "animal": "\ud83d\udc38", "color": "#22c55e"}, {"index": 3, "name": "Truong Nguyen", "animal": "\ud83d\udc3c", "color": "#a855f7"}, {"index": 4, "name": "Thien Le", "animal": "\ud83d\udc31", "color": "#eab308"}, {"index": 5, "name": "Hoang Tran", "animal": "\ud83d\udc3b", "color": "#78716c"}, {"index": 6, "name": "Tri Nguyen", "animal": "\ud83e\udd81", "color": "#f97316"}, {"index": 7, "name": "Member 8", "animal": "\ud83d\udc28", "color": "#ec4899"}, {"index": 8, "name": "Member 9", "animal": "\ud83d\udc2e", "color": "#06b6d4"}, {"index": 9, "name": "Member 10", "animal": "\ud83d\udc36", "color": "#8b5cf6"}], "schedule": [{"id": "r2026-08-03", "date": "2026-08-03", "day": "Mon", "label": "Mon 3 Aug", "num": 1}, {"id": "r2026-08-05", "date": "2026-08-05", "day": "Wed", "label": "Wed 5 Aug", "num": 2}, {"id": "r2026-08-07", "date": "2026-08-07", "day": "Fri", "label": "Fri 7 Aug", "num": 3}, {"id": "r2026-08-10", "date": "2026-08-10", "day": "Mon", "label": "Mon 10 Aug", "num": 4}, {"id": "r2026-08-12", "date": "2026-08-12", "day": "Wed", "label": "Wed 12 Aug", "num": 5}, {"id": "r2026-08-14", "date": "2026-08-14", "day": "Fri", "label": "Fri 14 Aug", "num": 6}, {"id": "r2026-08-17", "date": "2026-08-17", "day": "Mon", "label": "Mon 17 Aug", "num": 7}, {"id": "r2026-08-19", "date": "2026-08-19", "day": "Wed", "label": "Wed 19 Aug", "num": 8}, {"id": "r2026-08-21", "date": "2026-08-21", "day": "Fri", "label": "Fri 21 Aug", "num": 9}, {"id": "r2026-08-24", "date": "2026-08-24", "day": "Mon", "label": "Mon 24 Aug", "num": 10}, {"id": "r2026-08-26", "date": "2026-08-26", "day": "Wed", "label": "Wed 26 Aug", "num": 11}, {"id": "r2026-08-28", "date": "2026-08-28", "day": "Fri", "label": "Fri 28 Aug", "num": 12}, {"id": "r2026-08-31", "date": "2026-08-31", "day": "Mon", "label": "Mon 31 Aug", "num": 13}]};</script>
 <style>
@@ -31,7 +31,7 @@ html[data-theme=dark] {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--artifact-background); color: var(--artifact-text-primary);
        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
-button { cursor: pointer; font-family: inherit; }
+button { cursor: pointer; font-family: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 input  { font-family: inherit; }
 
 /* TOPBAR */
@@ -94,6 +94,37 @@ input  { font-family: inherit; }
 /* RACER ROW */
 .racer-row  { display: flex; align-items: center; gap: 8px; padding-top: 34px; margin-bottom: 2px; }
 .racer-info { width: 172px; flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
+
+
+/* ── ANIMAL PICKER ───────────────────────────── */
+.animal-pick-btn {
+  font-size: 22px; background: none; border: 2px solid transparent;
+  border-radius: 8px; cursor: pointer; padding: 2px 5px; transition: border .15s, transform .15s;
+  line-height: 1;
+}
+.animal-pick-btn:hover { border-color: var(--accent); transform: scale(1.15); }
+.animal-picker-overlay {
+  position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: center;
+}
+.animal-picker-overlay.hidden { display: none; }
+.animal-picker-box {
+  background: var(--card-bg, #fff); border-radius: 14px; padding: 18px 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.28); min-width: 300px; max-width: 360px;
+}
+.ap-title { font-weight: 700; font-size: 14px; margin-bottom: 12px; color: var(--text); }
+.ap-grid {
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin-bottom: 14px;
+}
+.ap-cell {
+  font-size: 22px; text-align: center; cursor: pointer; padding: 4px;
+  border-radius: 8px; border: 2px solid transparent; transition: all .12s;
+  user-select: none;
+}
+.ap-cell:hover  { background: var(--row-hover, #f0f4ff); border-color: var(--accent); transform: scale(1.2); }
+.ap-cell.chosen { background: var(--accent-light, #dce7ff); border-color: var(--accent); }
+.ap-close { font-size: 12px; color: var(--text-muted); cursor: pointer; text-align: right; }
+.ap-close:hover { text-decoration: underline; }
 
 /* AVATAR: body = animal emoji, face = photo overlay */
 .avatar-wrap { position: relative; cursor: pointer; flex-shrink: 0; }
@@ -331,6 +362,123 @@ td.name-cell   { text-align: left; font-weight: 600; font-size: 11px; white-spac
 .month-label { font-size: 13px; font-weight: 700; min-width: 100px; text-align: center; }
 .no-data { padding: 40px; text-align: center; color: var(--artifact-text-secondary); font-size: 14px; }
 
+
+/* ═══════════════════════════════════════════════
+   MOBILE RESPONSIVE  (≤ 640 px)
+   ═══════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  /* ── Topbar ── */
+  .topbar { padding: 0 12px; height: 52px; }
+  .topbar-sub   { display: none; }
+  .topbar-title { font-size: 13px; }
+  .topbar-right { gap: 4px; }
+  .btn    { padding: 5px 9px; font-size: 11px; }
+  .btn-sm { padding: 5px 9px; }
+  .month-label  { min-width: 72px; font-size: 12px; }
+  .month-nav button { width: 26px; height: 26px; }
+
+  /* ── Tabs → fixed bottom bar ── */
+  .tabs {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 101;
+    border-top: 1px solid var(--artifact-border-light); border-bottom: none;
+    padding: 0 0 env(safe-area-inset-bottom,0px);
+    box-shadow: 0 -2px 12px rgba(0,0,0,.08);
+  }
+  .tab {
+    flex: 1; padding: 10px 4px 8px; font-size: 11px;
+    border-bottom: none; border-top: 2px solid transparent;
+    margin-bottom: 0; margin-top: -1px;
+  }
+  .tab.active { border-top-color: var(--artifact-primary-brand); border-bottom-color: transparent; }
+
+  /* ── Main: pad bottom for fixed tab bar ── */
+  .main { padding: 12px 10px 76px; }
+
+  /* ── KPIs: 2-column ── */
+  .kpi-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi     { padding: 10px 12px; }
+  .kpi-val { font-size: 20px; }
+
+  /* ── Race section ── */
+  .race-header  { padding: 12px 14px; gap: 6px; }
+  .race-title   { font-size: 14px; }
+  .race-badge   { font-size: 10px; padding: 3px 8px; }
+  .race-track   { padding: 8px 10px; }
+  .race-milestones { padding-left: 10px; padding-right: 44px; }
+  .milestone    { font-size: 9px; }
+
+  /* ── Racer row: info left, road full-width below ── */
+  .racer-row  { flex-wrap: wrap; padding-top: 28px; gap: 4px; }
+  .racer-rank { width: 18px; font-size: 10px; }
+  .racer-info { width: calc(100% - 26px); flex: none; }
+  .road-wrap  { width: 100%; padding-right: 40px; margin-left: 0; }
+  .racer-name { max-width: unset; font-size: 11px; }
+  .racer-km   { font-size: 10px; }
+  .lt-info    { max-width: unset; font-size: 9px; }
+  .lt-pbar    { max-width: 100%; }
+  .road       { height: 40px; }
+  .sprite-body-wrap .animal { font-size: 18px; }
+  .thought-bubble {
+    font-size: 8px; padding: 3px 6px;
+    max-width: 110px; white-space: normal;
+    text-align: center; line-height: 1.3;
+  }
+  .km-tag { font-size: 8px; padding: 1px 4px; }
+  .finish-flag { font-size: 18px; right: -46px; }
+  .finish-label { font-size: 8px; }
+
+  /* ── Attendance table ── */
+  .table-header { padding: 10px 14px; flex-wrap: wrap; gap: 4px; }
+  .table-wrap   { -webkit-overflow-scrolling: touch; }
+  th  { padding: 6px 7px; font-size: 9px; }
+  td  { padding: 5px 6px; }
+  td.name-cell { font-size: 10px; min-width: 100px; }
+  .run-cell { min-width: 34px; }
+  .status-icon { font-size: 13px; }
+  .km-val { font-size: 8px; }
+  .total-cell { font-size: 11px; }
+  .km-total   { font-size: 9px; }
+
+  /* ── KM Modal ── */
+  .overlay { align-items: flex-end; padding: 0; }
+  .modal {
+    width: 100%; border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+    border-radius: 18px 18px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom,0px));
+  }
+  .modal h3    { font-size: 15px; }
+  .modal-row   { gap: 8px; }
+  .modal-row label { width: 90px; font-size: 11px; }
+  .modal-row input { font-size: 16px; padding: 10px; } /* 16px prevents iOS zoom */
+  .modal-btns button { padding: 12px 8px; font-size: 13px; min-height: 44px; }
+
+  /* ── Member modal ── */
+  .member-modal { width: 100%; border-radius: 18px 18px 0 0; max-height: 90vh; overflow-y: auto; }
+  .member-editor-header { flex-wrap: wrap; gap: 6px; }
+  .member-col-hdr  { grid-template-columns: 26px 1fr 60px 86px; font-size: 9px; }
+  .member-edit-row { grid-template-columns: 26px 1fr 60px 86px; }
+  .member-edit-row input { font-size: 13px; padding: 6px; }
+  .member-edit-rows { max-height: 50vh; }
+
+  /* ── Animal picker ── */
+  .animal-picker-box { min-width: unset; width: calc(100vw - 24px); max-height: 80vh; overflow-y: auto; }
+  .ap-grid { grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .ap-cell { font-size: 20px; padding: 5px 3px; }
+
+  /* ── Setup overlay ── */
+  .setup-box { padding: 20px 16px; }
+  .setup-box h2 { font-size: 17px; }
+
+  /* ── Misc ── */
+  .dark-btn { width: 36px; height: 36px; }
+}
+
+/* ── Tablet (641–900px) ── */
+@media (min-width: 641px) and (max-width: 900px) {
+  .main { padding: 16px; }
+  .kpi-row { grid-template-columns: repeat(3, 1fr); }
+  .racer-info { width: 150px; }
+}
+
 @media print {
   body { margin: 0; padding: .4in .6in; background: #fff; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .topbar, .tabs, .overlay, .setup-overlay { display: none !important; }
@@ -395,7 +543,7 @@ td.name-cell   { text-align: left; font-weight: 600; font-size: 11px; white-spac
     </div>
     <!-- Column headers -->
     <div class="member-col-hdr">
-      <span></span><span>Name</span><span>LT Target km</span><span>Target Date</span>
+      <span>Animal</span><span>Name</span><span>LT Target km</span><span>Target Date</span>
     </div>
     <div class="member-edit-rows" id="memberEditRows"></div>
     <div class="modal-btns" style="margin-top:16px">
@@ -486,16 +634,23 @@ const MBRS     = window.APP_DATA.members;
 const META     = window.APP_DATA.metadata;
 const TARGET_KM  = CFG.target_km;
 const DEFAULT_KM = CFG.default_km;
-const ANIMALS    = MBRS.map(m => m.animal);
+let ANIMALS = (()=>{
+  try { const s=localStorage.getItem('trek_animals'); if(s){ const a=JSON.parse(s); if(Array.isArray(a)&&a.length===10) return a; } } catch(e){}
+  return MBRS.map(m => m.animal);
+})();
 const LANE_CLR   = MBRS.map(m => m.color);
 document.getElementById('appTitle').textContent = META.title.split('–')[0].trim();
 
 // ── FIREBASE CONFIG ───────────────────────────────────────
 const FIREBASE_CONFIG = {
-  apiKey:      "AIzaSyDv90xPQbxhBtZ5j0exJYWcJnmI631lkr0",
-  databaseURL: "https://trek-dlut-50km-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:   "1:842711076233:web:f8db09823a3eb6b28ca558",
-  authDomain:  "trek-dlut-50km.firebaseapp.com",
+  apiKey:            "AIzaSyDv90xPQbxhBtZ5j0exJYWcJnmI631lkr0",
+  authDomain:        "trek-dlut-50km.firebaseapp.com",
+  databaseURL:       "https://trek-dlut-50km-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "trek-dlut-50km",
+  storageBucket:     "trek-dlut-50km.firebasestorage.app",
+  messagingSenderId: "842711076233",
+  appId:             "1:842711076233:web:f8db09823a3eb6b28ca558",
+  measurementId:     "G-8C13P5H088"
 };
 
 // ── STATE ─────────────────────────────────────────────────
@@ -666,6 +821,7 @@ function saveLocal() {
   localStorage.setItem('trek_members',      JSON.stringify(MEMBERS));
   localStorage.setItem('trek_lt_targets',   JSON.stringify(ltTargets));
   localStorage.setItem('trek_active_count', String(activeCount));
+  localStorage.setItem('trek_animals',      JSON.stringify(ANIMALS));
 }
 function loadLocal() {
   att     = JSON.parse(localStorage.getItem('trek_att')     || '{}');
@@ -901,7 +1057,7 @@ window.openMemberEditor = function() {
     const lt = ltTargets[i] || {};
     const inactive = i >= activeCount;
     return `<div class="member-edit-row ${inactive?'inactive':''}" id="mer_${i}">
-      <span style="font-size:18px">${ANIMALS[i]}</span>
+      <button type="button" class="animal-pick-btn" id="apb_${i}" onclick="openAnimalPicker(${i})" title="Click to change animal">${ANIMALS[i]}</button>
       <input id="mi_${i}" value="${m}" placeholder="Member ${i+1}" type="text"/>
       <input type="number" id="lt_km_${i}" value="${lt.km||''}" placeholder="e.g. 50" min="0" step="1"/>
       <input type="date"   id="lt_dt_${i}" value="${lt.date||''}"/>
@@ -938,6 +1094,7 @@ window.saveMembers = async function() {
     await window._fbSet(window._fbRef(db, 'trek_dlut_50km/members'),     MEMBERS);
     await window._fbSet(window._fbRef(db, 'trek_dlut_50km/ltTargets'),   ltTargets);
     await window._fbSet(window._fbRef(db, 'trek_dlut_50km/activeCount'), activeCount);
+    await window._fbSet(window._fbRef(db, 'trek_dlut_50km/animals'), ANIMALS);
   } else { saveLocal(); }
   document.getElementById('memberOverlay').classList.remove('open');
   renderAll();
@@ -991,6 +1148,36 @@ window.toggleDark = function() {
     if (!ok) renderAll();
   }
 })();
+
+// ── SWIPE GESTURES (mobile month nav) ─────────────────────
+(function() {
+  let startX = 0, startY = 0;
+  document.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    // Only horizontal swipe on main area
+    if (Math.abs(dx) > 55 && Math.abs(dy) < 40) {
+      const overlay = document.getElementById('kmOverlay');
+      const memberOverlay = document.getElementById('memberOverlay');
+      if (!overlay.classList.contains('open') && !memberOverlay.classList.contains('open')) {
+        window.changeMonth(dx < 0 ? 1 : -1);
+      }
+    }
+  }, { passive: true });
+})();
+
+// ── CLOSE MODALS BY TAPPING BACKDROP ──────────────────────
+document.getElementById('kmOverlay').addEventListener('click', function(e) {
+  if (e.target === this) window.closeKm();
+});
+document.getElementById('memberOverlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
 </script>
 
 <script>
@@ -1003,5 +1190,63 @@ window.toggleDark = function() {
     if (data.actionId === 'export-pdf') window.print();
   });
 </script>
+
+<!-- ANIMAL PICKER OVERLAY -->
+<div class="animal-picker-overlay hidden" id="animalPickerOverlay">
+  <div class="animal-picker-box">
+    <div class="ap-title">🐾 Pick an animal for <span id="apMemberName">Member</span></div>
+    <div class="ap-grid" id="apGrid"></div>
+    <div class="ap-close" onclick="closeAnimalPicker()">✕ Cancel</div>
+  </div>
+</div>
+
+<script>
+// ── ANIMAL PICKER ──────────────────────────────────────────
+const ALL_ANIMALS = [
+  '🐯','🦊','🐸','🐼','🐱','🐻','🦁','🐨','🐮','🐶',
+  '🐺','🦝','🐭','🐹','🐰','🦋','🐯','🦄','🐧','🦅',
+  '🐬','🦈','🐊','🦖','🐉','🦊','🐔','🦜','🦓','🦒',
+  '🐘','🦏','🦛','🐃','🦬','🐗','🦌','🐿️','🦔','🦦',
+  '🦥','🦘','🦙','🐪','🐫','🦙','🐓','🦃','🕊️','🦢',
+  '🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🦕','🦖',
+  '🏃','🚴','🧗','🏊','🤸','🚵','⚡','🔥','💪','🥷'
+];
+let apTargetIndex = -1;
+
+window.openAnimalPicker = function(idx) {
+  apTargetIndex = idx;
+  document.getElementById('apMemberName').textContent = MEMBERS[idx] || `Member ${idx+1}`;
+  const grid = document.getElementById('apGrid');
+  const current = ANIMALS[idx];
+  grid.innerHTML = ALL_ANIMALS.map(e =>
+    `<div class="ap-cell ${e===current?'chosen':''}" onclick="selectAnimal('${e}')" title="${e}">${e}</div>`
+  ).join('');
+  document.getElementById('animalPickerOverlay').classList.remove('hidden');
+};
+
+window.selectAnimal = function(emoji) {
+  if (apTargetIndex < 0) return;
+  ANIMALS[apTargetIndex] = emoji;
+  // Update the button immediately
+  const btn = document.getElementById(`apb_${apTargetIndex}`);
+  if (btn) btn.textContent = emoji;
+  // Highlight chosen
+  document.querySelectorAll('.ap-cell').forEach(c => {
+    c.classList.toggle('chosen', c.textContent === emoji);
+  });
+  closeAnimalPicker();
+};
+
+window.closeAnimalPicker = function() {
+  document.getElementById('animalPickerOverlay').classList.add('hidden');
+  apTargetIndex = -1;
+};
+
+// Close on backdrop click
+document.getElementById('animalPickerOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeAnimalPicker();
+});
+</script>
+
 </body>
 </html>
