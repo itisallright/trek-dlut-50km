@@ -563,6 +563,10 @@ td.name-cell   { text-align: left; font-weight: 600; font-size: 11px; white-spac
     </div>
   </div>
   <div class="topbar-right">
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;">
+        <span id="fbStatusDot" style="width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block;transition:background .4s;" title="Connecting..."></span>
+        <span id="fbStatusLbl" style="color:var(--artifact-text-secondary)">Connecting…</span>
+      </div>
     <div class="month-nav">
       <button type="button" onclick="changeMonth(-1)">◀</button>
       <span class="month-label" id="monthLabel">—</span>
@@ -764,13 +768,22 @@ function genRuns(y, m) {
   RUNS = runs;
 }
 
+// ── CONNECTION STATUS ────────────────────────────────────
+function updateStatus(online) {
+  const dot = document.getElementById('fbStatusDot');
+  const lbl = document.getElementById('fbStatusLbl');
+  if (!dot) return;
+  dot.style.background = online ? '#22c55e' : '#ef4444';
+  lbl.textContent = online ? 'Live' : 'Offline';
+  dot.title = online ? '🟢 Firebase connected — real-time sync active' : '🔴 Not connected to Firebase';
+}
+
 // ── FIREBASE ─────────────────────────────────────────────
 async function initFirebase() {
-  const cfg = loadConfig() || {};   // use hardcoded FIREBASE_CONFIG as fallback
   try {
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
     const { getDatabase, ref, onValue, set } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
-    const app = initializeApp({ ...FIREBASE_CONFIG, ...cfg });
+    const app = initializeApp(FIREBASE_CONFIG);
     db = getDatabase(app);
     window._fbRef = ref; window._fbSet = set;
     const rootRef = ref(db, 'trek_dlut_50km');
@@ -781,10 +794,18 @@ async function initFirebase() {
       if (v.members)     MEMBERS     = [...v.members];
       if (v.ltTargets)   ltTargets   = {...v.ltTargets};
       if (v.activeCount) activeCount = v.activeCount;
+      if (Array.isArray(v.animals) && v.animals.length) ANIMALS = [...v.animals];
+      if (v.photos) {
+        Object.entries(v.photos).forEach(([k, url]) => {
+          localStorage.setItem('trek_photo_' + k, url);
+        });
+      }
+      updateStatus(true);
       renderAll();
     });
+    window._fbOn = true;
     return true;
-  } catch(e) { console.warn('Firebase init failed', e); return false; }
+  } catch(e) { console.warn('Firebase init failed', e); updateStatus(false); return false; }
 }
 function loadConfig() {
   const s = localStorage.getItem('trek_fb_cfg');
@@ -807,10 +828,14 @@ window.useLocalMode = function() {
   renderAll();
 };
 async function writeData(key, val, type='att') {
+  // Always update local state immediately (optimistic UI)
+  if (type === 'att') att[key] = val; else kmData[key] = val;
   if (db) {
-    await window._fbSet(window._fbRef(db, `trek_dlut_50km/${type}/${key}`), val);
+    // Write to Firebase — onValue will re-render for all OTHER users
+    window._fbSet(window._fbRef(db, `trek_dlut_50km/${type}/${key}`), val);
+    // Also render locally right away (don't wait for round-trip)
+    renderAll();
   } else {
-    if (type === 'att') att[key] = val; else kmData[key] = val;
     saveLocal(); renderAll();
   }
 }
@@ -842,10 +867,15 @@ window.uploadPhoto = function(mi) {
     canvas.width = canvas.height = 80;
     const ctx = canvas.getContext('2d');
     const img = new Image();
-    img.onload = () => {
+    img.onload = async () => {
       const size = Math.min(img.width, img.height);
       ctx.drawImage(img, (img.width-size)/2, (img.height-size)/2, size, size, 0, 0, 80, 80);
-      savePhoto(mi, canvas.toDataURL('image/jpeg', .85));
+      const dataUrl = canvas.toDataURL('image/jpeg', .7);
+      savePhoto(mi, dataUrl);
+      if (db) {
+        // Store compressed photo in Firebase so all users see it
+        window._fbSet(window._fbRef(db, `trek_dlut_50km/photos/${mi}`), dataUrl);
+      }
       renderAll();
     };
     img.src = URL.createObjectURL(file);
@@ -1137,13 +1167,13 @@ window.toggleDark = function() {
   const th = localStorage.getItem('trek_theme');
   if (th) document.documentElement.dataset.theme = th;
   loadLocal();
+  renderAll(); // render immediately with local data while Firebase connects
   const isDefault = FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY';
   if (isDefault) {
     document.getElementById('setupOverlay').classList.add('open');
-    renderAll();
   } else {
     const ok = await initFirebase();
-    if (!ok) renderAll();
+    if (!ok) { updateStatus(false); }
   }
 })();
 
@@ -1222,16 +1252,24 @@ window.openAnimalPicker = function(idx) {
   document.getElementById('animalPickerOverlay').classList.remove('hidden');
 };
 
-window.selectAnimal = function(emoji) {
+window.selectAnimal = async function(emoji) {
   if (apTargetIndex < 0) return;
   ANIMALS[apTargetIndex] = emoji;
-  // Update the button immediately
+  // Update the picker button in modal immediately
   const btn = document.getElementById(`apb_${apTargetIndex}`);
   if (btn) btn.textContent = emoji;
-  // Highlight chosen
+  // Highlight chosen cell
   document.querySelectorAll('.ap-cell').forEach(c => {
     c.classList.toggle('chosen', c.textContent === emoji);
   });
+  // Save to Firebase immediately so all users see the change
+  if (db) {
+    await window._fbSet(window._fbRef(db, 'trek_dlut_50km/animals'), ANIMALS);
+  } else {
+    localStorage.setItem('trek_animals', JSON.stringify(ANIMALS));
+  }
+  // Re-render race track + left column right away
+  renderAll();
   closeAnimalPicker();
 };
 
