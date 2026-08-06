@@ -766,8 +766,7 @@ function genRuns(y, m) {
 
 // ── FIREBASE ─────────────────────────────────────────────
 async function initFirebase() {
-  const cfg = loadConfig();
-  if (!cfg) return false;
+  const cfg = loadConfig() || {};   // use hardcoded FIREBASE_CONFIG as fallback
   try {
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
     const { getDatabase, ref, onValue, set } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
@@ -1138,9 +1137,8 @@ window.toggleDark = function() {
   const th = localStorage.getItem('trek_theme');
   if (th) document.documentElement.dataset.theme = th;
   loadLocal();
-  const cfg       = loadConfig();
   const isDefault = FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY';
-  if (isDefault && !cfg) {
+  if (isDefault) {
     document.getElementById('setupOverlay').classList.add('open');
     renderAll();
   } else {
