@@ -1,770 +1,1007 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🏃 Trek DLUT 50km – Live Run Tracker</title>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-  <style>
-    :root {
-      --ab: #ffffff; --abl: #f1f3f6; --abm: #e9ecf1;
-      --brl: #e3e6ec; --brd: #cdd2db;
-      --pb: #3559e6; --ph: #0d0f14; --phv: #2442b8;
-      --sel: #eaeefc; --tp: #11141a; --ts: #5c6470;
-      --thl: #e8eefc; --pos: #159a6a; --posbg: #e8f6ee;
-      --neg: #dc4c4c; --negbg: #fdecea;
-      --warn: #d97706; --warnbg: #fef3e8;
-      --live: #10b981;
-    }
-    html[data-theme=dark] {
-      --ab:#0a0b0e;--abl:#121419;--abm:#181b22;
-      --brl:#23262e;--brd:#343844;
-      --pb:#6a92ff;--ph:#f5f7fb;--phv:#88a8ff;
-      --sel:#1a2030;--tp:#eef0f4;--ts:#9aa0ad;
-      --thl:#14213d;--pos:#46d39a;--posbg:#0e2a1d;
-      --neg:#ff6b6b;--negbg:#2a0d0d;
-      --warn:#f5c842;--warnbg:#2a1f0d;
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-      font-size:14px;line-height:1.6;background:var(--ab);color:var(--tp);min-height:100vh}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏁 TREK DLUT 50KM – Running Tracker</title>
+<script>window.APP_DATA = {"metadata": {"title": "TREK DLUT 50KM \u2013 Running Tracker", "generated_at": "2026-08-06T06:59:03.333259+00:00", "year": 2026, "month": 8, "month_name": "August", "app_dir": "/home/user/output/running_tracker_firebase"}, "config": {"target_km": 36, "default_km": 3, "weekly_min": 9, "session_time": "4:45 PM"}, "members": [{"index": 0, "name": "Hai Bui", "animal": "\ud83d\udc2f", "color": "#3b82f6"}, {"index": 1, "name": "Chinh Ton", "animal": "\ud83e\udd8a", "color": "#ef4444"}, {"index": 2, "name": "Khoa Vo", "animal": "\ud83d\udc38", "color": "#22c55e"}, {"index": 3, "name": "Truong Nguyen", "animal": "\ud83d\udc3c", "color": "#a855f7"}, {"index": 4, "name": "Thien Le", "animal": "\ud83d\udc31", "color": "#eab308"}, {"index": 5, "name": "Hoang Tran", "animal": "\ud83d\udc3b", "color": "#78716c"}, {"index": 6, "name": "Tri Nguyen", "animal": "\ud83e\udd81", "color": "#f97316"}, {"index": 7, "name": "Member 8", "animal": "\ud83d\udc28", "color": "#ec4899"}, {"index": 8, "name": "Member 9", "animal": "\ud83d\udc2e", "color": "#06b6d4"}, {"index": 9, "name": "Member 10", "animal": "\ud83d\udc36", "color": "#8b5cf6"}], "schedule": [{"id": "r2026-08-03", "date": "2026-08-03", "day": "Mon", "label": "Mon 3 Aug", "num": 1}, {"id": "r2026-08-05", "date": "2026-08-05", "day": "Wed", "label": "Wed 5 Aug", "num": 2}, {"id": "r2026-08-07", "date": "2026-08-07", "day": "Fri", "label": "Fri 7 Aug", "num": 3}, {"id": "r2026-08-10", "date": "2026-08-10", "day": "Mon", "label": "Mon 10 Aug", "num": 4}, {"id": "r2026-08-12", "date": "2026-08-12", "day": "Wed", "label": "Wed 12 Aug", "num": 5}, {"id": "r2026-08-14", "date": "2026-08-14", "day": "Fri", "label": "Fri 14 Aug", "num": 6}, {"id": "r2026-08-17", "date": "2026-08-17", "day": "Mon", "label": "Mon 17 Aug", "num": 7}, {"id": "r2026-08-19", "date": "2026-08-19", "day": "Wed", "label": "Wed 19 Aug", "num": 8}, {"id": "r2026-08-21", "date": "2026-08-21", "day": "Fri", "label": "Fri 21 Aug", "num": 9}, {"id": "r2026-08-24", "date": "2026-08-24", "day": "Mon", "label": "Mon 24 Aug", "num": 10}, {"id": "r2026-08-26", "date": "2026-08-26", "day": "Wed", "label": "Wed 26 Aug", "num": 11}, {"id": "r2026-08-28", "date": "2026-08-28", "day": "Fri", "label": "Fri 28 Aug", "num": 12}, {"id": "r2026-08-31", "date": "2026-08-31", "day": "Mon", "label": "Mon 31 Aug", "num": 13}]};</script>
+<style>
+:root {
+  --artifact-background: var(--theme-background, #f4f4f5);
+  --artifact-background-light: var(--theme-background-light, #ffffff);
+  --artifact-background-subtle: var(--theme-background-subtle, #f0f0f2);
+  --artifact-border-light: var(--theme-border-light, #e4e4e7);
+  --artifact-text-primary: var(--theme-text-primary, #18181b);
+  --artifact-text-secondary: var(--theme-text-secondary, #71717a);
+  --artifact-primary-brand: var(--theme-primary-brand, #3559e6);
+  --artifact-pos: #16a34a; --artifact-posbg: #dcfce7;
+  --artifact-neg: #dc2626; --artifact-negbg: #fee2e2;
+  --artifact-warn: #d97706; --artifact-warnbg: #fef3c7;
+  --artifact-road: #4b5563; --artifact-grass: #86efac;
+  --artifact-shadow: 0 2px 12px rgba(0,0,0,.08);
+  --r: 10px;
+  font-size: 14px;
+}
+html[data-theme=dark] {
+  --artifact-pos: #4ade80; --artifact-posbg: #052e16;
+  --artifact-neg: #f87171; --artifact-negbg: #450a0a;
+  --artifact-warn: #fbbf24; --artifact-warnbg: #451a03;
+  --artifact-road: #374151; --artifact-grass: #166534;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--artifact-background); color: var(--artifact-text-primary);
+       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+button { cursor: pointer; font-family: inherit; }
+input  { font-family: inherit; }
 
-    /* ── TOPBAR ── */
-    .topbar{position:sticky;top:0;z-index:100;background:var(--ab);
-      border-bottom:1px solid var(--brl);padding:0 20px;
-      display:flex;align-items:center;justify-content:space-between;height:54px;gap:12px}
-    .tb-brand{display:flex;align-items:center;gap:8px;min-width:0}
-    .tb-logo{font-size:20px}
-    .tb-name{font-size:14px;font-weight:600;letter-spacing:-.02em;white-space:nowrap}
-    .tb-sub{font-family:monospace;font-size:10px;text-transform:uppercase;
-      letter-spacing:.1em;color:var(--ts)}
-    .tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-    .conn-badge{display:inline-flex;align-items:center;gap:5px;
-      padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;
-      background:var(--abl);color:var(--ts);border:1px solid var(--brl)}
-    .conn-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--ts)}
-    .conn-badge.live{background:#ecfdf5;color:var(--live);border-color:#a7f3d0}
-    html[data-theme=dark] .conn-badge.live{background:#0a2a1d;border-color:#1f5e3a}
-    .conn-badge.live .dot{background:var(--live);animation:pulse 1.5s infinite}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-    .btn{appearance:none;border:1px solid var(--brd);background:var(--abl);
-      color:var(--tp);cursor:pointer;padding:5px 12px;border-radius:6px;
-      font-size:12px;font-family:inherit;font-weight:500;transition:background .15s}
-    .btn:hover{background:var(--abm)}
-    .btn-primary{background:var(--pb);color:#fff;border-color:var(--pb)}
-    .btn-primary:hover{background:var(--phv);border-color:var(--phv)}
-    .theme-btn{appearance:none;border:none;background:transparent;cursor:pointer;
-      font-size:16px;padding:4px 6px;border-radius:4px;color:var(--ts)}
-    .theme-btn:hover{background:var(--abl)}
+/* TOPBAR */
+.topbar { background: var(--artifact-background-light); border-bottom: 1px solid var(--artifact-border-light);
+          padding: 0 20px; height: 52px; display: flex; align-items: center;
+          justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo  { font-size: 20px; }
+.topbar-title { font-weight: 700; font-size: 15px; letter-spacing: -.3px; }
+.topbar-sub   { font-size: 11px; color: var(--artifact-text-secondary); margin-top: 1px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--artifact-border-light);
+       background: var(--artifact-background-subtle); color: var(--artifact-text-primary);
+       font-size: 12px; font-weight: 600; transition: .15s; }
+.btn:hover { background: var(--artifact-border-light); }
+.btn-accent { background: var(--artifact-primary-brand); color: #fff; border-color: var(--artifact-primary-brand); }
+.btn-accent:hover { opacity: .9; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-danger { background: var(--artifact-negbg); color: var(--artifact-neg); border-color: var(--artifact-neg); }
 
-    /* ── USER PICKER ── */
-    .user-select{appearance:none;background:var(--abl);border:1px solid var(--brd);
-      color:var(--tp);border-radius:6px;padding:5px 10px;font-size:12px;
-      font-family:inherit;cursor:pointer;max-width:130px}
-    .user-select:focus{outline:none;border-color:var(--pb)}
+/* TABS */
+.tabs { display: flex; border-bottom: 1px solid var(--artifact-border-light);
+        background: var(--artifact-background-light); padding: 0 20px; }
+.tab { padding: 10px 18px; font-size: 13px; font-weight: 600; border: none; background: none;
+       color: var(--artifact-text-secondary); cursor: pointer; border-bottom: 2px solid transparent;
+       margin-bottom: -1px; transition: .15s; }
+.tab.active { color: var(--artifact-primary-brand); border-bottom-color: var(--artifact-primary-brand); }
 
-    /* ── SETUP OVERLAY ── */
-    .setup-overlay{display:none;position:fixed;inset:0;background:var(--ab);
-      z-index:500;overflow-y:auto;padding:40px 20px}
-    .setup-overlay.show{display:block}
-    .setup-card{max-width:640px;margin:0 auto;
-      background:var(--abl);border:1px solid var(--brl);border-radius:12px;padding:36px}
-    .setup-title{font-size:1.6rem;font-weight:300;letter-spacing:-.03em;margin-bottom:6px}
-    .setup-sub{color:var(--ts);margin-bottom:28px;font-size:13px}
-    .step{display:flex;gap:14px;margin-bottom:22px}
-    .step-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;
-      background:var(--pb);color:#fff;font-size:12px;font-weight:700;
-      display:flex;align-items:center;justify-content:center}
-    .step-body{flex:1}
-    .step-title{font-weight:600;font-size:13px;margin-bottom:4px}
-    .step-desc{font-size:12px;color:var(--ts);margin-bottom:6px}
-    .step-link{font-size:12px;color:var(--pb);text-decoration:none}
-    .step-link:hover{text-decoration:underline}
-    pre.code-block{background:var(--abm);border:1px solid var(--brl);border-radius:6px;
-      padding:12px;font-size:11px;overflow-x:auto;color:var(--tp);line-height:1.7;
-      font-family:"SF Mono","Consolas",monospace;white-space:pre}
-    .rules-block{background:#fff8e5;border:1px solid #f5c842;border-radius:6px;
-      padding:10px 14px;font-size:12px;color:#7c4a00}
-    html[data-theme=dark] .rules-block{background:#2a1f0d;color:#f5c842;border-color:#7c4a00}
+/* MAIN */
+.main { max-width: 1100px; margin: 0 auto; padding: 20px; }
 
-    /* ── MAIN ── */
-    .main{max-width:1100px;margin:0 auto;padding:28px 20px 64px}
-    .hero{margin-bottom:26px}
-    .hero-eye{font-family:monospace;font-size:10px;font-weight:500;letter-spacing:.12em;
-      text-transform:uppercase;color:var(--pb);margin-bottom:4px}
-    .hero-title{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:300;
-      letter-spacing:-.03em;line-height:1.1;margin-bottom:10px}
-    .hero-meta{display:flex;gap:10px;flex-wrap:wrap}
-    .pill{display:inline-flex;align-items:center;gap:5px;background:var(--abl);
-      border:1px solid var(--brl);border-radius:20px;padding:3px 11px;
-      font-size:11px;color:var(--ts)}
+/* KPIS */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+           gap: 10px; margin-bottom: 20px; }
+.kpi { background: var(--artifact-background-light); border: 1px solid var(--artifact-border-light);
+       border-radius: var(--r); padding: 14px 16px; }
+.kpi-val   { font-size: 24px; font-weight: 800; letter-spacing: -1px; }
+.kpi-label { font-size: 11px; color: var(--artifact-text-secondary); margin-top: 2px;
+             text-transform: uppercase; letter-spacing: .05em; }
+.kpi-icon  { font-size: 18px; margin-bottom: 4px; }
 
-    /* ── KPI ── */
-    .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px}
-    .kpi{background:var(--abl);border:1px solid var(--brl);border-radius:8px;padding:16px 18px}
-    .kpi-lbl{font-family:monospace;font-size:10px;font-weight:500;letter-spacing:.1em;
-      text-transform:uppercase;color:var(--ts);margin-bottom:5px}
-    .kpi-val{font-size:1.8rem;font-weight:300;letter-spacing:-.03em;line-height:1;
-      font-variant-numeric:tabular-nums}
-    .kpi-sub{font-size:11px;color:var(--ts);margin-top:3px}
+/* RACE SECTION */
+.race-section { background: var(--artifact-background-light); border: 1px solid var(--artifact-border-light);
+                border-radius: var(--r); overflow: hidden; margin-bottom: 20px; }
+.race-header  { padding: 16px 20px; border-bottom: 1px solid var(--artifact-border-light);
+                display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.race-title   { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.race-meta    { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.race-badge   { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+                background: var(--artifact-warnbg); color: var(--artifact-warn); }
+.race-badge.green { background: var(--artifact-posbg); color: var(--artifact-pos); }
+.race-track   { padding: 16px 20px; display: flex; flex-direction: column; gap: 0; }
+.race-milestones { display: flex; position: relative; margin-bottom: 6px;
+                   padding-left: 180px; padding-right: 64px; height: 20px; }
+.milestone { position: absolute; transform: translateX(-50%); text-align: center;
+             font-size: 10px; font-weight: 700; color: var(--artifact-text-secondary); }
+.milestone::before { content: ''; position: absolute; top: -4px; left: 50%;
+                     width: 1px; height: 4px; background: var(--artifact-border-light); }
 
-    /* ── SECTION ── */
-    .sec-hdr{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;
-      padding-bottom:8px;border-bottom:1px solid var(--brl)}
-    .sec-title{font-size:14px;font-weight:600;letter-spacing:-.02em}
-    .sec-meta{font-family:monospace;font-size:10px;color:var(--ts)}
+/* RACER ROW */
+.racer-row  { display: flex; align-items: center; gap: 8px; padding-top: 34px; margin-bottom: 2px; }
+.racer-info { width: 172px; flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
 
-    /* ── LEGEND ── */
-    .legend{display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap}
-    .leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ts)}
+/* AVATAR: body = animal emoji, face = photo overlay */
+.avatar-wrap { position: relative; cursor: pointer; flex-shrink: 0; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid var(--artifact-border-light);
+  background: var(--artifact-background-subtle);
+  position: relative; overflow: hidden;
+  transition: transform .2s;
+}
+.avatar:hover { transform: scale(1.08); }
+.av-body {
+  position: absolute;
+  bottom: -3px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px; line-height: 1;
+  user-select: none;
+}
+.av-face {
+  position: absolute;
+  top: 2px; left: 50%;
+  transform: translateX(-50%);
+  width: 24px; height: 24px;
+  border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--artifact-background-light);
+  z-index: 2;
+}
 
-    /* ── ATTENDANCE TABLE ── */
-    .tbl-wrap{overflow:auto;max-height:70vh;border:1px solid var(--brl);border-radius:8px}
-    .att-tbl{border-collapse:collapse;width:100%;min-width:820px}
-    .att-tbl thead tr{background:var(--abl);position:sticky;top:0;z-index:10}
-    .att-tbl th{font-family:monospace;font-size:10px;font-weight:500;letter-spacing:.08em;
-      text-transform:uppercase;color:var(--ts);padding:9px 10px;text-align:center;
-      border-bottom:1px solid var(--brd);white-space:nowrap}
-    .att-tbl th.col-run{text-align:left;min-width:150px}
-    .att-tbl td{padding:5px 6px;border-bottom:1px solid var(--brl);text-align:center;vertical-align:middle}
-    .att-tbl td.run-lbl{text-align:left;padding:7px 12px;white-space:nowrap}
-    .att-tbl tr:last-child td{border-bottom:none}
-    .att-tbl tbody tr:hover td{background:var(--abl)}
-    .run-num{font-family:monospace;font-size:10px;color:var(--ts);margin-right:3px}
-    .run-date{font-weight:500;font-size:12px}
-    .run-day{font-family:monospace;font-size:10px;margin-left:5px;padding:2px 6px;border-radius:3px}
-    .d-mon{background:var(--thl);color:var(--pb)}
-    .d-wed{background:var(--posbg);color:var(--pos)}
-    .d-fri{background:var(--warnbg);color:var(--warn)}
+.racer-name { font-size: 12px; font-weight: 700; color: var(--artifact-text-primary);
+              white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+.racer-km   { font-size: 10px; color: var(--artifact-text-secondary); }
 
-    /* ── CELL ── */
-    .att-cell{width:36px;height:34px;border-radius:5px;display:inline-flex;
-      align-items:center;justify-content:center;cursor:pointer;
-      transition:transform .1s,opacity .15s;user-select:none;
-      border:1.5px solid transparent;flex-direction:column;gap:1px;
-      position:relative}
-    .att-cell:hover{transform:scale(1.1)}
-    .att-cell.present{background:var(--posbg);border-color:var(--pos)}
-    .att-cell.absent{background:var(--negbg);border-color:var(--neg)}
-    .att-cell.pending{background:var(--abm);border-color:var(--brd)}
-    .cell-icon{font-size:14px;line-height:1}
-    .cell-km{font-size:9px;font-family:monospace;color:var(--pos);font-weight:700;line-height:1}
-    .att-cell.absent .cell-km{color:var(--neg)}
-    /* ripple for live update */
-    @keyframes ripple{0%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}
-    .att-cell.synced::after{content:'';position:absolute;inset:0;border-radius:5px;
-      border:2px solid var(--pb);animation:ripple .6s ease-out forwards;pointer-events:none}
+/* LONG TERM */
+.lt-info  { font-size: 9px; color: var(--artifact-primary-brand); margin-top: 2px; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+.lt-pbar  { height: 3px; background: var(--artifact-border-light); border-radius: 2px; margin-top: 2px;
+            overflow: hidden; max-width: 100px; }
+.lt-pfill { height: 100%; background: var(--artifact-primary-brand); border-radius: 2px; transition: width .6s; }
 
-    /* ── KM MODAL ── */
-    .km-modal{display:none;position:fixed;inset:0;z-index:300;
-      align-items:center;justify-content:center;background:rgba(0,0,0,.35)}
-    .km-modal.open{display:flex}
-    .km-box{background:var(--ab);border:1px solid var(--brd);border-radius:10px;
-      padding:24px;width:280px;max-width:90vw}
-    .km-title{font-size:14px;font-weight:600;margin-bottom:6px}
-    .km-sub{font-size:12px;color:var(--ts);margin-bottom:16px}
-    .km-input-row{display:flex;gap:8px;align-items:center;margin-bottom:16px}
-    .km-input{flex:1;appearance:none;background:var(--abl);border:1px solid var(--brd);
-      border-radius:6px;padding:8px 12px;font-size:18px;font-weight:300;
-      color:var(--tp);font-family:inherit;text-align:center}
-    .km-input:focus{outline:none;border-color:var(--pb)}
-    .km-unit{font-size:14px;color:var(--ts);font-weight:500}
-    .km-actions{display:flex;gap:8px;justify-content:flex-end}
+.road-wrap  { flex: 1; position: relative; padding-right: 64px; }
+.road       { height: 46px; background: var(--artifact-road); border-radius: 6px;
+              position: relative; overflow: visible; }
+.road-line  { position: absolute; top: 50%; left: 0; right: 0;
+              border-top: 2px dashed rgba(255,255,255,.2); pointer-events: none; }
+.road-shoulder { position: absolute; left: 0; right: 0; height: 4px; background: var(--artifact-grass); }
+.road-shoulder.top    { top: -4px; border-radius: 3px 3px 0 0; }
+.road-shoulder.bottom { bottom: -4px; border-radius: 0 0 3px 3px; }
+.road-progress { position: absolute; left: 0; top: 0; height: 100%; border-radius: 6px;
+                 opacity: .25; transition: width 1s ease; }
+.racer-sprite { position: absolute; top: 50%; transform: translate(-50%, -50%);
+                transition: left 1s cubic-bezier(.34,1.56,.64,1);
+                display: flex; flex-direction: column; align-items: center; gap: 1px; z-index: 10; }
 
-    /* ── LEADERBOARD ── */
-    .lb-section{margin-top:32px}
-    .lb-tbl{width:100%;border-collapse:collapse}
-    .lb-tbl th{font-family:monospace;font-size:10px;font-weight:500;letter-spacing:.08em;
-      text-transform:uppercase;color:var(--ts);padding:7px 12px;text-align:left;
-      border-bottom:1px solid var(--brd);cursor:pointer;white-space:nowrap}
-    .lb-tbl th:hover{color:var(--tp)}
-    .lb-tbl th.num,.lb-tbl td.num{text-align:right}
-    .lb-tbl td{padding:9px 12px;border-bottom:1px solid var(--brl);font-size:13px}
-    .lb-tbl tr:last-child td{border-bottom:none}
-    .lb-tbl tbody tr:hover td{background:var(--abl)}
-    .lb-rank{font-family:monospace;font-size:11px;font-weight:700;color:var(--ts)}
-    .lb-rank.gold{color:#d4a017}.lb-rank.silver{color:#8c9bb5}.lb-rank.bronze{color:#a0693a}
-    .lb-bar-bg{width:100px;height:5px;background:var(--abm);border-radius:3px;overflow:hidden;display:inline-block}
-    .lb-bar-fill{height:100%;border-radius:3px;background:var(--pb);transition:width .4s}
-    .lb-bar-fill.hi{background:var(--pos)}
-    .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
-    .b-hi{background:var(--posbg);color:var(--pos)}
-    .b-mid{background:var(--thl);color:var(--pb)}
-    .b-lo{background:var(--negbg);color:var(--neg)}
+/* THOUGHT BUBBLE */
+.thought-bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--artifact-background-light);
+  border: 1.5px solid var(--artifact-border-light);
+  border-radius: 10px;
+  padding: 4px 9px;
+  font-size: 9px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--artifact-text-primary);
+  box-shadow: 0 3px 10px rgba(0,0,0,.1);
+  z-index: 30;
+  pointer-events: none;
+  animation: float-thought 3s ease-in-out infinite;
+}
+.thought-bubble::after {
+  content: '';
+  position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0;
+  border: 5px solid transparent;
+  border-top-color: var(--artifact-background-light);
+  margin-top: -1px; z-index: 2;
+}
+.thought-bubble::before {
+  content: '';
+  position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0;
+  border: 6px solid transparent;
+  border-top-color: var(--artifact-border-light);
+  z-index: 1;
+}
+@keyframes float-thought {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(-3px); }
+}
 
-    /* ── EDIT MEMBERS MODAL ── */
-    .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);
-      z-index:200;align-items:center;justify-content:center}
-    .modal-ov.open{display:flex}
-    .modal{background:var(--ab);border:1px solid var(--brd);border-radius:10px;
-      padding:26px;width:330px;max-width:94vw}
-    .modal-title{font-size:15px;font-weight:600;margin-bottom:16px}
-    .modal-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
-    .modal-row label{font-family:monospace;font-size:10px;text-transform:uppercase;
-      letter-spacing:.08em;color:var(--ts);min-width:18px;text-align:right}
-    .modal-row input{flex:1;appearance:none;background:var(--abl);border:1px solid var(--brd);
-      border-radius:5px;padding:6px 10px;font-size:13px;color:var(--tp);font-family:inherit}
-    .modal-row input:focus{outline:none;border-color:var(--pb)}
-    .modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+/* SPRITE */
+.sprite-body-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+.sprite-body-wrap .animal { font-size: 22px; display: block; animation: run-bounce .35s infinite ease-in-out; }
+.sprite-face {
+  position: absolute; top: -3px; left: 50%; transform: translateX(-50%);
+  width: 15px; height: 15px;
+  border-radius: 50%; object-fit: cover;
+  border: 1.5px solid #fff;
+  z-index: 5;
+}
+.racer-sprite .km-tag  { font-size: 9px; font-weight: 800; background: rgba(0,0,0,.75);
+                          color: #fff; border-radius: 10px; padding: 1px 5px; white-space: nowrap; }
+.racer-sprite .speed-lines { position: absolute; right: 22px; top: 50%; transform: translateY(-50%);
+                               display: flex; flex-direction: column; gap: 3px; opacity: 0; transition: .3s; }
+.racer-sprite.leader .speed-lines { opacity: 1; }
+.speed-line   { height: 2px; background: linear-gradient(to right, transparent, rgba(255,215,0,.7)); border-radius: 1px; }
+.finish-flag  { position: absolute; right: -56px; top: 50%; transform: translateY(-50%);
+                font-size: 22px; display: flex; flex-direction: column; align-items: center; }
+.finish-label { font-size: 9px; font-weight: 800; color: var(--artifact-text-primary); }
+.status-badge { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 14px; }
+.racer-rank   { width: 20px; flex-shrink: 0; font-size: 11px; font-weight: 800;
+                color: var(--artifact-text-secondary); text-align: right; }
 
-    /* ── TOAST ── */
-    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
-      background:var(--ph);color:var(--ab);padding:9px 20px;border-radius:8px;
-      font-size:12px;font-weight:500;opacity:0;pointer-events:none;
-      transition:opacity .2s,transform .2s;z-index:999;white-space:nowrap}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ANIMATIONS */
+@keyframes run-bounce { 0%,100%{transform:translateY(0) scaleX(1);}50%{transform:translateY(-4px) scaleX(.96);} }
+@keyframes zzz        { 0%,100%{opacity:1;transform:translateY(0) scale(1);}50%{opacity:.5;transform:translateY(-4px) scale(.9);} }
+@keyframes winner-glow{ 0%,100%{filter:drop-shadow(0 0 4px gold);}50%{filter:drop-shadow(0 0 12px gold);} }
+.sleeping .animal { animation: zzz 1.2s infinite !important; }
+.winner .animal   { animation: run-bounce .22s infinite ease-in-out, winner-glow 1s infinite !important; }
 
-    /* ── SYNC INDICATOR ── */
-    .sync-indicator{position:fixed;top:60px;right:16px;z-index:200;
-      background:var(--pb);color:#fff;padding:5px 12px;border-radius:6px;
-      font-size:11px;font-weight:500;opacity:0;pointer-events:none;
-      transition:opacity .2s;display:flex;align-items:center;gap:6px}
-    .sync-indicator.show{opacity:1}
-    .sync-spin{width:10px;height:10px;border:2px solid rgba(255,255,255,.3);
-      border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
+/* ATTENDANCE TABLE */
+.table-section { background: var(--artifact-background-light); border: 1px solid var(--artifact-border-light);
+                 border-radius: var(--r); overflow: hidden; }
+.table-header  { padding: 14px 20px; border-bottom: 1px solid var(--artifact-border-light);
+                 display: flex; align-items: center; justify-content: space-between; }
+.table-title   { font-size: 14px; font-weight: 700; }
+.table-wrap    { overflow-x: auto; }
+table          { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead tr       { background: var(--artifact-background-subtle); }
+th  { padding: 8px 10px; text-align: center; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; color: var(--artifact-text-secondary);
+      border-bottom: 1px solid var(--artifact-border-light); white-space: nowrap; }
+th.member-col  { text-align: left; min-width: 140px; }
+td  { padding: 6px 8px; text-align: center; border-bottom: 1px solid var(--artifact-border-light); vertical-align: middle; }
+td.name-cell   { text-align: left; font-weight: 600; font-size: 11px; white-space: nowrap; }
+.run-cell      { cursor: pointer; user-select: none; border-radius: 4px; transition: .1s; min-width: 38px; }
+.run-cell:hover{ background: var(--artifact-background-subtle); }
+.status-icon   { font-size: 14px; display: block; }
+.km-val        { font-size: 9px; font-weight: 700; color: var(--artifact-text-secondary); margin-top: 1px; }
+.run-hdate     { font-size: 9px; font-weight: 800; }
+.run-hday      { font-size: 9px; color: var(--artifact-text-secondary); }
+.day-Mon       { color: #3b82f6; } .day-Wed { color: #16a34a; } .day-Fri { color: #f97316; }
+.total-cell    { font-weight: 800; color: var(--artifact-primary-brand); }
+.km-total      { font-size: 10px; color: var(--artifact-pos); font-weight: 700; }
 
-    @media print {
-      body{margin:0;padding:.4in .5in;background:#fff;print-color-adjust:exact;-webkit-print-color-adjust:exact}
-      .topbar,.km-modal,.modal-ov,.toast,.sync-indicator,.setup-overlay{display:none!important}
-      .tbl-wrap{max-height:none!important;overflow:visible!important}
-    }
-  </style>
+/* KM MODAL */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
+           z-index: 200; align-items: center; justify-content: center; }
+.overlay.open { display: flex; }
+.modal  { background: var(--artifact-background-light); border-radius: 12px; padding: 24px;
+          width: 320px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.modal h3     { font-size: 16px; font-weight: 800; margin-bottom: 16px; }
+.modal-animal { text-align: center; font-size: 40px; margin-bottom: 8px; }
+.modal-name   { text-align: center; font-weight: 700; font-size: 14px; margin-bottom: 16px;
+                color: var(--artifact-text-secondary); }
+.modal-row    { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.modal-row label { font-size: 12px; font-weight: 600; width: 100px; }
+.modal-row input { flex: 1; padding: 8px 10px; border: 1px solid var(--artifact-border-light);
+                   border-radius: 6px; background: var(--artifact-background-subtle);
+                   color: var(--artifact-text-primary); font-size: 14px; }
+.modal-btns   { display: flex; gap: 8px; margin-top: 16px; }
+.modal-btns button { flex: 1; }
+
+/* MEMBER EDITOR MODAL */
+.member-modal { width: 580px; max-width: 95vw; }
+.member-editor-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--artifact-background-subtle);
+  border: 1px solid var(--artifact-border-light);
+  border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;
+}
+.member-editor-header label { font-size: 13px; font-weight: 700; }
+.count-adj { display: flex; align-items: center; gap: 8px; }
+.count-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--artifact-border-light);
+  background: var(--artifact-background-light);
+  color: var(--artifact-text-primary);
+  font-size: 16px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.count-val { font-size: 18px; font-weight: 800; min-width: 22px; text-align: center;
+             color: var(--artifact-primary-brand); }
+.member-col-hdr {
+  display: grid; grid-template-columns: 24px 1fr 78px 106px;
+  gap: 6px; padding: 0 4px 6px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  color: var(--artifact-text-secondary); letter-spacing: .04em;
+}
+.member-edit-row {
+  display: grid; grid-template-columns: 24px 1fr 78px 106px;
+  gap: 6px; align-items: center; padding: 4px;
+  border-radius: 6px; transition: background .15s;
+}
+.member-edit-row.inactive { opacity: .4; }
+.member-edit-row input {
+  padding: 6px 8px; border: 1px solid var(--artifact-border-light);
+  border-radius: 6px; background: var(--artifact-background-subtle);
+  color: var(--artifact-text-primary); font-size: 12px; width: 100%;
+}
+.member-edit-rows { max-height: 340px; overflow-y: auto; }
+
+/* SETUP OVERLAY */
+.setup-overlay { display: none; position: fixed; inset: 0; background: var(--artifact-background);
+                 z-index: 300; align-items: center; justify-content: center; padding: 20px; }
+.setup-overlay.open { display: flex; }
+.setup-box    { background: var(--artifact-background-light); border: 1px solid var(--artifact-border-light);
+                border-radius: 16px; padding: 32px; max-width: 480px; width: 100%; }
+.setup-box h2 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+.setup-box p  { color: var(--artifact-text-secondary); font-size: 13px; margin-bottom: 20px; }
+.setup-field  { margin-bottom: 14px; }
+.setup-field label { display: block; font-size: 11px; font-weight: 700;
+                     text-transform: uppercase; color: var(--artifact-text-secondary); margin-bottom: 4px; }
+.setup-field input { width: 100%; padding: 10px 12px; border: 1px solid var(--artifact-border-light);
+                     border-radius: 8px; background: var(--artifact-background-subtle);
+                     color: var(--artifact-text-primary); font-size: 13px; }
+.setup-note   { background: var(--artifact-warnbg); color: var(--artifact-warn);
+                border-radius: 8px; padding: 10px 14px; font-size: 12px; margin-bottom: 16px; }
+.setup-step   { display: flex; gap: 10px; margin-bottom: 10px; font-size: 12px; }
+.setup-num    { width: 20px; height: 20px; border-radius: 50%; background: var(--artifact-primary-brand);
+                color: #fff; display: flex; align-items: center; justify-content: center;
+                font-size: 10px; font-weight: 800; flex-shrink: 0; }
+.dark-btn { background: none; border: 1px solid var(--artifact-border-light); border-radius: 6px;
+            width: 30px; height: 30px; font-size: 14px; color: var(--artifact-text-secondary);
+            display: flex; align-items: center; justify-content: center; }
+.month-nav { display: flex; align-items: center; gap: 8px; }
+.month-nav button { width: 28px; height: 28px; border-radius: 50%;
+                    border: 1px solid var(--artifact-border-light); background: var(--artifact-background-subtle);
+                    color: var(--artifact-text-primary); font-size: 14px;
+                    display: flex; align-items: center; justify-content: center; }
+.month-label { font-size: 13px; font-weight: 700; min-width: 100px; text-align: center; }
+.no-data { padding: 40px; text-align: center; color: var(--artifact-text-secondary); font-size: 14px; }
+
+@media print {
+  body { margin: 0; padding: .4in .6in; background: #fff; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .topbar, .tabs, .overlay, .setup-overlay { display: none !important; }
+  .main { max-width: 100% !important; padding: 0; }
+  .kpi-row, .kpi, .race-section, .table-section { break-inside: avoid; }
+  .kpi, .race-section, .table-section { box-shadow: none !important; border: 1px solid rgba(0,0,0,.08); }
+  button { display: none !important; }
+}
+</style>
 </head>
 <body>
 
-<!-- ══ SETUP OVERLAY ══════════════════════════════════════════════════════════ -->
+<!-- SETUP OVERLAY -->
 <div class="setup-overlay" id="setupOverlay">
-  <div class="setup-card">
-    <div class="hero-eye">ONE-TIME SETUP</div>
-    <div class="setup-title">Connect to Firebase 🔥</div>
-    <div class="setup-sub">Follow these 5 steps — takes about 10 minutes. Once done, all 10 members share the same live data.</div>
-
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <div class="step-title">Create a Firebase project</div>
-        <div class="step-desc">Go to Firebase Console → "Add project" → name it <b>trek-dlut-50km</b> → disable Analytics (optional) → Create.</div>
-        <a class="step-link" href="https://console.firebase.google.com" target="_blank">→ console.firebase.google.com</a>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-body">
-        <div class="step-title">Enable Realtime Database</div>
-        <div class="step-desc">In your project → Build → Realtime Database → Create Database → choose a region → Start in <b>test mode</b> (for now).</div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-body">
-        <div class="step-title">Register a Web App &amp; get your config</div>
-        <div class="step-desc">Project settings (⚙️) → Your apps → Add app (Web &lt;/&gt;) → name it → Copy the <b>firebaseConfig</b> object.</div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-body">
-        <div class="step-title">Paste your config into this file</div>
-        <div class="step-desc">Open <b>running_tracker_firebase.html</b> in a text editor. Find the block below and replace every <code>YOUR_*</code> value:</div>
-        <pre class="code-block">const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyDv90xPQbxhBtZ5j0exJYWcJnmI631lkr0",
-  authDomain:        "trek-dlut-50km.firebaseapp.com",
-  databaseURL:       "https://trek-dlut-50km-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:         "trek-dlut-50km",
-  storageBucket:     "trek-dlut-50km.firebasestorage.app",
-  messagingSenderId: "842711076233",
-  appId:             "1:842711076233:web:58f7d7b2892518a58ca558"
-};</pre>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">5</div>
-      <div class="step-body">
-        <div class="step-title">Set Realtime Database Rules</div>
-        <div class="step-desc">Realtime Database → Rules tab → replace with this (allows all club members to read/write):</div>
-        <pre class="code-block">{
-  "rules": {
-    ".read": true,
-    ".write": true
-  }
-}</pre>
-        <div class="rules-block" style="margin-top:8px">⚠️ These are open rules — fine for a private club tracker. For production, add auth.</div>
-      </div>
-    </div>
-
-    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--brl)">
-      <div style="font-size:13px;font-weight:600;margin-bottom:8px">After setup, share the file</div>
-      <div style="font-size:12px;color:var(--ts);line-height:1.8">
-        • Save this HTML file anywhere (USB drive, email, Google Drive)<br>
-        • All 10 members download it &amp; open it in Chrome/Edge/Firefox<br>
-        • Everyone sees the same live data — no server needed beyond Firebase<br>
-        • Or host it free on <a class="step-link" href="https://pages.github.com" target="_blank">GitHub Pages</a> for a permanent URL
-      </div>
+  <div class="setup-box">
+    <h2>🔥 Firebase Setup</h2>
+    <p>Paste your Firebase Realtime Database config to enable real-time sync for all members.</p>
+    <div class="setup-note">⚠️ Go to <strong>console.firebase.google.com</strong> → your project → Project Settings → Web App → copy config</div>
+    <div class="setup-step"><div class="setup-num">1</div><span>Create project at <strong>console.firebase.google.com</strong></span></div>
+    <div class="setup-step"><div class="setup-num">2</div><span>Build → Realtime Database → Create database (test mode)</span></div>
+    <div class="setup-step"><div class="setup-num">3</div><span>Project Settings ⚙️ → Add Web App → copy config below</span></div>
+    <div class="setup-field"><label>API Key</label><input id="cfg_apiKey" placeholder="AIzaSy..."/></div>
+    <div class="setup-field"><label>Database URL</label><input id="cfg_dbUrl" placeholder="https://your-project-default-rtdb.firebaseio.com"/></div>
+    <div class="setup-field"><label>Project ID</label><input id="cfg_projectId" placeholder="your-project-id"/></div>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button class="btn btn-accent" style="flex:1" type="button" onclick="saveConfig()">💾 Save &amp; Connect</button>
+      <button class="btn" style="flex:1" type="button" onclick="useLocalMode()">💻 Use Local Mode</button>
     </div>
   </div>
 </div>
 
-<!-- ══ TOPBAR ═════════════════════════════════════════════════════════════════ -->
-<div class="topbar">
-  <div class="tb-brand">
-    <span class="tb-logo">🏃</span>
-    <div>
-      <div class="tb-name">Trek DLUT 50km</div>
-      <div class="tb-sub">Live Tracker · Aug 2026</div>
-    </div>
-  </div>
-  <div class="tb-right">
-    <div class="conn-badge" id="connBadge">
-      <span class="dot"></span>
-      <span id="connText">Connecting…</span>
-    </div>
-    <select class="user-select" id="userSelect" title="Who are you?"></select>
-    <button class="btn" onclick="openMembersModal()">✏️ Members</button>
-    <button class="btn btn-primary" onclick="window.print()">⬇ PDF</button>
-    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
-  </div>
-</div>
-
-<!-- ══ SYNC INDICATOR ════════════════════════════════════════════════════════ -->
-<div class="sync-indicator" id="syncInd"><div class="sync-spin"></div> Syncing…</div>
-
-<!-- ══ MAIN ══════════════════════════════════════════════════════════════════ -->
-<div class="main">
-  <div class="hero">
-    <div class="hero-eye">TRAINING LOG · FIREBASE LIVE SYNC</div>
-    <h1 class="hero-title">Running Club<br>Attendance Tracker</h1>
-    <div class="hero-meta">
-      <span class="pill">📅 Mon · Wed · Fri</span>
-      <span class="pill">🕟 4:45 PM</span>
-      <span class="pill">📍 3–5 km</span>
-      <span class="pill">👥 10 members</span>
-      <span class="pill">🎯 DLUT 50km</span>
-    </div>
-  </div>
-
-  <div class="kpi-row">
-    <div class="kpi"><div class="kpi-lbl">Total Sessions</div><div class="kpi-val">13</div><div class="kpi-sub">August 2026</div></div>
-    <div class="kpi"><div class="kpi-lbl">Runs Logged</div><div class="kpi-val" id="k-logged">0</div><div class="kpi-sub">✅ marked present</div></div>
-    <div class="kpi"><div class="kpi-lbl">Club Avg</div><div class="kpi-val" id="k-avg">0%</div><div class="kpi-sub">attendance rate</div></div>
-    <div class="kpi"><div class="kpi-lbl">Total Distance</div><div class="kpi-val" id="k-dist">0</div><div class="kpi-sub">km tracked</div></div>
-    <div class="kpi"><div class="kpi-lbl">🏆 Top Runner</div><div class="kpi-val" id="k-top" style="font-size:1.1rem;line-height:1.3">—</div><div class="kpi-sub" id="k-top-sub"></div></div>
-  </div>
-
-  <div class="sec-hdr">
-    <div class="sec-title">🗓 Attendance Tracker</div>
-    <div class="sec-meta" id="att-meta"></div>
-  </div>
-  <div class="legend">
-    <div class="leg-item">✅ Present (click once)</div>
-    <div class="leg-item">❌ Absent (click twice)</div>
-    <div class="leg-item">⬜ Pending (click thrice to reset)</div>
-    <div class="leg-item" style="color:var(--pos)">🔢 KM shown below icon · double-click to edit</div>
-  </div>
-  <div class="tbl-wrap">
-    <table class="att-tbl">
-      <thead id="attHead"></thead>
-      <tbody id="attBody"></tbody>
-    </table>
-  </div>
-
-  <div class="lb-section">
-    <div class="sec-hdr">
-      <div class="sec-title">📊 Leaderboard</div>
-      <div class="sec-meta">click headers to sort</div>
-    </div>
-    <table class="lb-tbl">
-      <thead><tr>
-        <th onclick="sortLB('rank')">Rank</th>
-        <th onclick="sortLB('name')">Member</th>
-        <th class="num" onclick="sortLB('runs')">Runs ▾</th>
-        <th class="num" onclick="sortLB('pct')">Att. %</th>
-        <th onclick="sortLB('dist')">Distance</th>
-        <th onclick="sortLB('pct')">Progress</th>
-      </tr></thead>
-      <tbody id="lbBody"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- ══ KM MODAL ══════════════════════════════════════════════════════════════ -->
-<div class="km-modal" id="kmModal">
-  <div class="km-box">
-    <div class="km-title">📍 How far did you run?</div>
-    <div class="km-sub" id="kmModalSub">Enter the distance for this session</div>
-    <div class="km-input-row">
-      <input class="km-input" type="number" id="kmInput" min="0.1" max="99" step="0.1" value="3">
-      <span class="km-unit">km</span>
-    </div>
-    <div class="km-actions">
-      <button class="btn" onclick="cancelKm()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmKm()">✓ Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ MEMBERS MODAL ═════════════════════════════════════════════════════════ -->
-<div class="modal-ov" id="memberModal">
+<!-- KM MODAL -->
+<div class="overlay" id="kmOverlay">
   <div class="modal">
-    <div class="modal-title">✏️ Edit Member Names</div>
-    <div id="memberInputs"></div>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeMembersModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveMembersToFirebase()">Save to Firebase</button>
+    <div class="modal-animal" id="kmAnimal">🐯</div>
+    <div class="modal-name"   id="kmName">Member</div>
+    <h3>📍 Log this Run</h3>
+    <div class="modal-row">
+      <label>Distance (km)</label>
+      <input type="number" id="kmInput" min="0" max="100" step="0.1" value="3"/>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-danger btn-sm" type="button" onclick="setStatus(0)">❌ Absent</button>
+      <button class="btn btn-sm"            type="button" onclick="closeKm()">Cancel</button>
+      <button class="btn btn-accent btn-sm" type="button" onclick="confirmKm()">✅ Present</button>
     </div>
   </div>
 </div>
 
-<!-- ══ TOAST ════════════════════════════════════════════════════════════════ -->
-<div class="toast" id="toast"></div>
+<!-- MEMBER EDIT MODAL -->
+<div class="overlay" id="memberOverlay">
+  <div class="modal member-modal">
+    <h3>👥 Team Settings</h3>
+    <!-- Count adjuster -->
+    <div class="member-editor-header">
+      <label>Active Members (shown in race &amp; table)</label>
+      <div class="count-adj">
+        <button class="count-btn" type="button" onclick="adjustCount(-1)">−</button>
+        <span class="count-val" id="countDisplay">10</span>
+        <button class="count-btn" type="button" onclick="adjustCount(1)">+</button>
+      </div>
+    </div>
+    <!-- Column headers -->
+    <div class="member-col-hdr">
+      <span></span><span>Name</span><span>LT Target km</span><span>Target Date</span>
+    </div>
+    <div class="member-edit-rows" id="memberEditRows"></div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn" type="button" onclick="document.getElementById('memberOverlay').classList.remove('open')">Cancel</button>
+      <button class="btn btn-accent" type="button" onclick="saveMembers()">💾 Save</button>
+    </div>
+  </div>
+</div>
 
-<script>
-// ── FIREBASE CONFIG — replace YOUR_* values ──────────────────────────────────
+<!-- TOPBAR -->
+<div class="topbar" data-glean-id="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">🏁</div>
+    <div>
+      <div class="topbar-title" id="appTitle">TREK DLUT 50KM</div>
+      <div class="topbar-sub">Running Club Tracker</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="month-nav">
+      <button type="button" onclick="changeMonth(-1)">◀</button>
+      <span class="month-label" id="monthLabel">—</span>
+      <button type="button" onclick="changeMonth(1)">▶</button>
+    </div>
+    <button class="btn btn-sm" type="button" id="membersBtn" onclick="openMemberEditor()">👥 Members</button>
+    <button class="btn btn-sm" type="button" onclick="resetData()">🗑 Reset</button>
+    <button class="dark-btn"   type="button" onclick="toggleDark()">🌙</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" type="button" onclick="switchTab('race',this)">🏁 Race</button>
+  <button class="tab"        type="button" onclick="switchTab('attendance',this)">📋 Attendance</button>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="app">
+  <div class="kpi-row" data-glean-id="kpi-row">
+    <div class="kpi" data-glean-id="kpi-sessions"><div class="kpi-icon">🏃</div><div class="kpi-val" id="kpiRuns">0</div><div class="kpi-label">Sessions Logged</div></div>
+    <div class="kpi" data-glean-id="kpi-km"><div class="kpi-icon">📏</div><div class="kpi-val" id="kpiKm">0 km</div><div class="kpi-label">Club Total KM</div></div>
+    <div class="kpi" data-glean-id="kpi-avg"><div class="kpi-icon">📊</div><div class="kpi-val" id="kpiAvg">0%</div><div class="kpi-label">Avg Attendance</div></div>
+    <div class="kpi" data-glean-id="kpi-top"><div class="kpi-icon">🏆</div><div class="kpi-val" id="kpiTop">–</div><div class="kpi-label">Top Runner</div></div>
+    <div class="kpi" data-glean-id="kpi-target"><div class="kpi-icon">🎯</div><div class="kpi-val" id="kpiTarget">0/10</div><div class="kpi-label">On Track (36 km)</div></div>
+  </div>
+
+  <!-- RACE TAB -->
+  <div id="tab-race" data-glean-id="race-track-section">
+    <div class="race-section">
+      <div class="race-header">
+        <div class="race-title">🏁 Monthly Race Track</div>
+        <div class="race-meta">
+          <span class="race-badge green">🎯 Short-term: 36 km / month</span>
+          <span class="race-badge">⚡ Min: 9 km / week</span>
+          <span style="font-size:11px;color:var(--artifact-text-secondary)">Click avatar to upload face photo</span>
+        </div>
+      </div>
+      <div class="race-track">
+        <div class="race-milestones" id="raceMilestones"></div>
+        <div id="raceRows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTENDANCE TAB -->
+  <div id="tab-attendance" style="display:none" data-glean-id="attendance-section">
+    <div class="table-section">
+      <div class="table-header">
+        <div class="table-title">📋 Attendance &amp; KM Log</div>
+        <div style="font-size:11px;color:var(--artifact-text-secondary)">Click a cell to mark ✅ Present / ❌ Absent</div>
+      </div>
+      <div class="table-wrap">
+        <table id="attTable"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// ── LOAD APP DATA ─────────────────────────────────────────
+if (!window.APP_DATA || window.APP_DATA.error) {
+  document.getElementById('app').innerHTML = '<div class="no-data">⚠️ Data unavailable. Please refresh.</div>';
+  throw new Error('APP_DATA missing');
+}
+const CFG      = window.APP_DATA.config;
+const SCHEDULE = window.APP_DATA.schedule;
+const MBRS     = window.APP_DATA.members;
+const META     = window.APP_DATA.metadata;
+const TARGET_KM  = CFG.target_km;
+const DEFAULT_KM = CFG.default_km;
+const ANIMALS    = MBRS.map(m => m.animal);
+const LANE_CLR   = MBRS.map(m => m.color);
+document.getElementById('appTitle').textContent = META.title.split('–')[0].trim();
+
+// ── FIREBASE CONFIG ───────────────────────────────────────
 const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyDv90xPQbxhBtZ5j0exJYWcJnmI631lkr0",
-  authDomain:        "trek-dlut-50km.firebaseapp.com",
-  databaseURL:       "https://trek-dlut-50km-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:         "trek-dlut-50km",
-  storageBucket:     "trek-dlut-50km.firebasestorage.app",
-  messagingSenderId: "842711076233",
-  appId:             "1:842711076233:web:f8db09823a3eb6b28ca558"
+  apiKey:      "YOUR_API_KEY",
+  databaseURL: "YOUR_DATABASE_URL",
+  projectId:   "YOUR_PROJECT_ID",
+  authDomain:  "YOUR_PROJECT_ID.firebaseapp.com",
 };
 
-const DEFAULT_KM   = 3;
-const IS_CONFIGURED = !FIREBASE_CONFIG.apiKey.startsWith('YOUR_');
+// ── STATE ─────────────────────────────────────────────────
+let db = null;
+let att     = {};
+let kmData  = {};
+let MEMBERS = MBRS.map(m => m.name);
+let activeCount = 10;
+let ltTargets   = {};  // ltTargets[mi] = { km, date }
+let curYear  = META.year;
+let curMonth = META.month - 1;
+let RUNS = [...SCHEDULE];
 
-// ── STATIC DATA ───────────────────────────────────────────────────────────────
-const RUNS = [
-  {id:'r1', date:'03 Aug', day:'Mon'},{id:'r2', date:'05 Aug', day:'Wed'},
-  {id:'r3', date:'07 Aug', day:'Fri'},{id:'r4', date:'10 Aug', day:'Mon'},
-  {id:'r5', date:'12 Aug', day:'Wed'},{id:'r6', date:'14 Aug', day:'Fri'},
-  {id:'r7', date:'17 Aug', day:'Mon'},{id:'r8', date:'19 Aug', day:'Wed'},
-  {id:'r9', date:'21 Aug', day:'Fri'},{id:'r10',date:'24 Aug', day:'Mon'},
-  {id:'r11',date:'26 Aug', day:'Wed'},{id:'r12',date:'28 Aug', day:'Fri'},
-  {id:'r13',date:'31 Aug', day:'Mon'},
-];
-const DEFAULT_MEMBERS = ['Hai Bui','Chinh Ton','Khoa Vo','Truong Nguyen','Thien Le',
-  'Hoang Tran','Tri Nguyen','Member 8','Member 9','Member 10'];
-const STATES = ['pending','present','absent'];
-const ICONS  = ['⬜','✅','❌'];
+// ── QUOTE ENGINE ──────────────────────────────────────────
+const QUOTES = {
+  sleeping: [
+    "Zzz... did someone say run? 💤",
+    "My shoes are still in the box 📦",
+    "Running... in my dreams 🌙",
+    "Error 404: Motivation not found 😴",
+    "Loading... please wait... 🔄",
+    "I'll start Monday. Again. 📅",
+    "GPS needs a nap too 🛌",
+  ],
+  done: [
+    "36km done. Carry me home 🏆",
+    "I'm basically a car now 🏎️",
+    "Call an ambulance. NOT FOR ME 💪",
+    "Target reached. Trophies welcome 🥇",
+    "BEAST MODE: activated ✅",
+    "Too easy. Doing it again. 😤",
+  ],
+  leader: [
+    "Footsteps? Just my echo 👑",
+    "Gap is growing & so is my ego 😈",
+    "Fear me, mortals! 🔥",
+    "Sponsored by 'No Days Off' ⚡",
+    "Lapped them. Twice. Oops. 🚀",
+    "This road belongs to me 🛣️",
+  ],
+  close: [
+    "Almost there... or am I? 🤔",
+    "Pain is temporary, glory lasts 💪",
+    "36km = 36×1km. Easy math! 📐",
+    "I can smell the finish line 👃",
+    "Final boss approaching 😤",
+  ],
+  mid: [
+    "Pacing myself. Very slowly. 😅",
+    "Saving energy for the sprint 🧠",
+    "Rome wasn't built in a day 🏛️",
+    "Slow and steady... ish 🐢",
+    "My legs filed a complaint 📝",
+  ],
+  behind: [
+    "The road misses me. Probably. 🛣️",
+    "Running mentally. Does that count? 🧠",
+    "Great personality though 😅",
+    "In a very long warm-up phase 🤷",
+    "Starting soon™ ⏳",
+  ],
+  lt_urgent: [
+    "LT deadline coming! No more excuses! 🎯",
+    "PANIC RUN ACTIVATED! 😱",
+    "Clock is ticking! GO GO GO! 🕐",
+  ],
+  lt_on_track: [
+    "Long game winner right here 📈",
+    "On track for the big goal! 🎯",
+  ],
+};
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let members  = [...DEFAULT_MEMBERS];
-let att      = {};   // key -> state (0/1/2)
-let kmData   = {};   // key -> km number
-let lbSort   = {key:'runs', dir:'desc'};
-let db       = null;
-let currentUser = localStorage.getItem('run_user') || DEFAULT_MEMBERS[0];
-
-// km modal state
-let pendingKmKey = null;
-let pendingKmRunId = null;
-let pendingKmMi = null;
-let pendingKmMode = 'new'; // 'new' | 'edit'
-
-// ── THEME ─────────────────────────────────────────────────────────────────────
-function toggleTheme() {
-  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.documentElement.setAttribute('data-theme', dark ? '' : 'dark');
-  document.getElementById('themeBtn').textContent = dark ? '🌙' : '☀️';
-  localStorage.setItem('run_theme', dark ? 'light' : 'dark');
-}
-(function() {
-  const t = localStorage.getItem('run_theme');
-  if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); document.getElementById('themeBtn').textContent = '☀️'; }
-})();
-
-// ── USER SELECT ───────────────────────────────────────────────────────────────
-function buildUserSelect() {
-  const sel = document.getElementById('userSelect');
-  sel.innerHTML = members.map(m => `<option value="${m}" ${m===currentUser?'selected':''}>${m}</option>`).join('');
-}
-document.getElementById('userSelect').addEventListener('change', function() {
-  currentUser = this.value;
-  localStorage.setItem('run_user', currentUser);
-});
-
-// ── FIREBASE INIT ─────────────────────────────────────────────────────────────
-if (!IS_CONFIGURED) {
-  document.getElementById('setupOverlay').classList.add('show');
-} else {
-  firebase.initializeApp(FIREBASE_CONFIG);
-  db = firebase.database();
-
-  // Connection status
-  db.ref('.info/connected').on('value', snap => {
-    const connected = snap.val() === true;
-    const badge = document.getElementById('connBadge');
-    const txt   = document.getElementById('connText');
-    if (connected) { badge.className='conn-badge live'; txt.textContent='Live'; }
-    else           { badge.className='conn-badge'; txt.textContent='Reconnecting…'; }
-  });
-
-  // Members sync
-  db.ref('trek_dlut_50km/members').on('value', snap => {
-    const data = snap.val();
-    if (data) members = Object.values(data);
-    else { db.ref('trek_dlut_50km/members').set(DEFAULT_MEMBERS); members = [...DEFAULT_MEMBERS]; }
-    buildUserSelect();
-    buildAttTable();
-    buildLeaderboard();
-  });
-
-  // Attendance sync
-  db.ref('trek_dlut_50km/attendance').on('value', snap => {
-    const data = snap.val() || {};
-    att = {}; kmData = {};
-    Object.keys(data).forEach(k => {
-      att[k]    = data[k].state   !== undefined ? data[k].state   : 0;
-      kmData[k] = data[k].km      !== undefined ? data[k].km      : DEFAULT_KM;
-    });
-    renderAllCells();
-    updateKPIs();
-    buildLeaderboard();
-  });
-}
-
-// ── BUILD ATTENDANCE TABLE ────────────────────────────────────────────────────
-function dayClass(d) { return d==='Mon'?'d-mon':d==='Wed'?'d-wed':'d-fri'; }
-
-function buildAttTable() {
-  const head = document.getElementById('attHead');
-  head.innerHTML = '<tr><th class="col-run">Run</th>' +
-    members.map(m=>`<th>${m.split(' ')[0]}</th>`).join('') + '</tr>';
-
-  const body = document.getElementById('attBody');
-  let html = '';
-  RUNS.forEach((run, ri) => {
-    html += `<tr><td class="run-lbl">
-      <span class="run-num">#${ri+1}</span>
-      <span class="run-date">${run.date}</span>
-      <span class="run-day ${dayClass(run.day)}">${run.day}</span>
-    </td>`;
-    members.forEach((m,mi) => {
-      const key   = `${run.id}_${mi}`;
-      const state = att[key] || 0;
-      const km    = kmData[key] || DEFAULT_KM;
-      html += `<td><div class="att-cell ${STATES[state]}"
-        id="cell_${run.id}_${mi}"
-        onclick="onCellClick('${run.id}',${mi})"
-        ondblclick="onCellDblClick('${run.id}',${mi},event)"
-        title="${m}">${cellInner(state,km)}</div></td>`;
-    });
-    html += '</tr>';
-  });
-  body.innerHTML = html;
-  document.getElementById('att-meta').textContent =
-    `${RUNS.length} sessions × ${members.length} members`;
-}
-
-function cellInner(state, km) {
-  if (state === 1) return `<span class="cell-icon">✅</span><span class="cell-km">${km}km</span>`;
-  if (state === 2) return `<span class="cell-icon">❌</span>`;
-  return `<span class="cell-icon">⬜</span>`;
-}
-
-function renderAllCells() {
-  RUNS.forEach(run => {
-    members.forEach((_,mi) => {
-      const key  = `${run.id}_${mi}`;
-      const cell = document.getElementById(`cell_${run.id}_${mi}`);
-      if (!cell) return;
-      const state = att[key] || 0;
-      const km    = kmData[key] || DEFAULT_KM;
-      cell.className = `att-cell ${STATES[state]}`;
-      cell.innerHTML = cellInner(state, km);
-    });
-  });
-}
-
-// ── CELL INTERACTION ──────────────────────────────────────────────────────────
-function onCellClick(runId, mi) {
-  const key  = `${runId}_${mi}`;
-  const cur  = att[key] || 0;
-  const next = (cur + 1) % 3;
-  if (next === 1) {
-    // Becoming present — ask for KM
-    openKmModal(runId, mi, key, 'new');
-  } else {
-    writeToFirebase(runId, mi, next, kmData[key] || DEFAULT_KM);
+function getQuote(s, rank, ltTotalKm) {
+  const lt = ltTargets[s.mi];
+  const monthPct   = TARGET_KM > 0 ? s.km / TARGET_KM : 0;
+  const isDone     = s.km >= TARGET_KM;
+  const isSleeping = s.km === 0;
+  const isLeader   = rank === 0 && s.km > 0;
+  // LT urgency
+  if (lt && lt.date && lt.km > 0) {
+    const daysLeft = Math.ceil((new Date(lt.date) - new Date()) / 86400000);
+    const ltPct    = ltTotalKm / lt.km;
+    if (daysLeft <= 30 && ltPct < 0.8)
+      return QUOTES.lt_urgent[s.mi % QUOTES.lt_urgent.length];
+    if (ltPct >= 0.9 && !isDone)
+      return QUOTES.lt_on_track[s.mi % QUOTES.lt_on_track.length];
   }
+  if (isSleeping) return QUOTES.sleeping[s.mi % QUOTES.sleeping.length];
+  if (isDone)     return QUOTES.done[s.mi % QUOTES.done.length];
+  if (isLeader)   return QUOTES.leader[s.mi % QUOTES.leader.length];
+  if (monthPct > 0.75) return QUOTES.close[s.mi % QUOTES.close.length];
+  if (monthPct > 0.25) return QUOTES.mid[s.mi % QUOTES.mid.length];
+  return QUOTES.behind[s.mi % QUOTES.behind.length];
 }
 
-function onCellDblClick(runId, mi, e) {
-  e.stopPropagation();
-  const key = `${runId}_${mi}`;
-  if ((att[key] || 0) !== 1) return; // only edit km when present
-  openKmModal(runId, mi, key, 'edit');
+// ── RUN GENERATION ────────────────────────────────────────
+function genRuns(y, m) {
+  const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const TARGET_DAYS = {0:'Mon', 2:'Wed', 4:'Fri'};
+  const runs = []; let n = 1;
+  const d = new Date(y, m, 1);
+  while (d.getMonth() === m) {
+    const wd = d.getDay() === 0 ? 6 : d.getDay() - 1;
+    if (wd in TARGET_DAYS) {
+      const dstr = `${y}-${String(m+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      runs.push({ id:`r${dstr}`, date:dstr, day:TARGET_DAYS[wd],
+                  label:`${TARGET_DAYS[wd]} ${d.getDate()} ${MONTH_NAMES[m]}`, num:n++ });
+    }
+    d.setDate(d.getDate() + 1);
+  }
+  RUNS = runs;
 }
 
-// ── KM MODAL ──────────────────────────────────────────────────────────────────
-function openKmModal(runId, mi, key, mode) {
-  pendingKmKey = key; pendingKmRunId = runId; pendingKmMi = mi; pendingKmMode = mode;
-  const run = RUNS.find(r => r.id === runId);
-  document.getElementById('kmModalSub').textContent =
-    `${members[mi]} · ${run.date} (${run.day})`;
-  document.getElementById('kmInput').value = kmData[key] || DEFAULT_KM;
-  document.getElementById('kmModal').classList.add('open');
-  setTimeout(() => document.getElementById('kmInput').select(), 50);
+// ── FIREBASE ─────────────────────────────────────────────
+async function initFirebase() {
+  const cfg = loadConfig();
+  if (!cfg) return false;
+  try {
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
+    const { getDatabase, ref, onValue, set } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
+    const app = initializeApp({ ...FIREBASE_CONFIG, ...cfg });
+    db = getDatabase(app);
+    window._fbRef = ref; window._fbSet = set;
+    const rootRef = ref(db, 'trek_dlut_50km');
+    onValue(rootRef, snap => {
+      const v = snap.val() || {};
+      att     = v.att        || {};
+      kmData  = v.km         || {};
+      if (v.members)     MEMBERS     = [...v.members];
+      if (v.ltTargets)   ltTargets   = {...v.ltTargets};
+      if (v.activeCount) activeCount = v.activeCount;
+      renderAll();
+    });
+    return true;
+  } catch(e) { console.warn('Firebase init failed', e); return false; }
 }
-function cancelKm() {
-  document.getElementById('kmModal').classList.remove('open');
-  pendingKmKey = null;
+function loadConfig() {
+  const s = localStorage.getItem('trek_fb_cfg');
+  return s ? JSON.parse(s) : null;
 }
-function confirmKm() {
-  const km = parseFloat(document.getElementById('kmInput').value) || DEFAULT_KM;
-  document.getElementById('kmModal').classList.remove('open');
-  writeToFirebase(pendingKmRunId, pendingKmMi, 1, km);
-  pendingKmKey = null;
-}
-document.getElementById('kmInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') confirmKm();
-  if (e.key === 'Escape') cancelKm();
-});
-document.getElementById('kmModal').addEventListener('click', function(e) {
-  if (e.target === this) cancelKm();
-});
-
-// ── FIREBASE WRITE ────────────────────────────────────────────────────────────
-function writeToFirebase(runId, mi, state, km) {
-  const key = `${runId}_${mi}`;
-  showSync();
+window.saveConfig = function() {
+  const cfg = {
+    apiKey:      document.getElementById('cfg_apiKey').value.trim(),
+    databaseURL: document.getElementById('cfg_dbUrl').value.trim(),
+    projectId:   document.getElementById('cfg_projectId').value.trim(),
+  };
+  if (!cfg.apiKey || !cfg.databaseURL || !cfg.projectId) { alert('Please fill all fields'); return; }
+  cfg.authDomain = cfg.projectId + '.firebaseapp.com';
+  localStorage.setItem('trek_fb_cfg', JSON.stringify(cfg));
+  document.getElementById('setupOverlay').classList.remove('open');
+  location.reload();
+};
+window.useLocalMode = function() {
+  document.getElementById('setupOverlay').classList.remove('open');
+  renderAll();
+};
+async function writeData(key, val, type='att') {
   if (db) {
-    db.ref(`trek_dlut_50km/attendance/${key}`).set({
-      state, km, updatedBy: currentUser, updatedAt: Date.now()
-    });
+    await window._fbSet(window._fbRef(db, `trek_dlut_50km/${type}/${key}`), val);
   } else {
-    // Offline fallback (demo mode)
-    att[key] = state; kmData[key] = km;
-    const cell = document.getElementById(`cell_${runId}_${mi}`);
-    if (cell) { cell.className = `att-cell ${STATES[state]}`; cell.innerHTML = cellInner(state,km); flashCell(cell); }
-    updateKPIs(); buildLeaderboard();
+    if (type === 'att') att[key] = val; else kmData[key] = val;
+    saveLocal(); renderAll();
   }
-  hideSync();
+}
+function saveLocal() {
+  localStorage.setItem('trek_att',          JSON.stringify(att));
+  localStorage.setItem('trek_km',           JSON.stringify(kmData));
+  localStorage.setItem('trek_members',      JSON.stringify(MEMBERS));
+  localStorage.setItem('trek_lt_targets',   JSON.stringify(ltTargets));
+  localStorage.setItem('trek_active_count', String(activeCount));
+}
+function loadLocal() {
+  att     = JSON.parse(localStorage.getItem('trek_att')     || '{}');
+  kmData  = JSON.parse(localStorage.getItem('trek_km')      || '{}');
+  const m = localStorage.getItem('trek_members');   if (m)  MEMBERS     = JSON.parse(m);
+  const lt= localStorage.getItem('trek_lt_targets'); if (lt) ltTargets   = JSON.parse(lt);
+  const ac= localStorage.getItem('trek_active_count'); if (ac) activeCount = parseInt(ac);
 }
 
-function flashCell(cell) {
-  cell.classList.remove('synced');
-  void cell.offsetWidth;
-  cell.classList.add('synced');
-  setTimeout(() => cell.classList.remove('synced'), 700);
-}
+// ── PHOTO ────────────────────────────────────────────────
+function getPhoto(mi) { return localStorage.getItem(`trek_photo_${mi}`) || null; }
+function savePhoto(mi, url) { localStorage.setItem(`trek_photo_${mi}`, url); }
+window.uploadPhoto = function(mi) {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 80;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.onload = () => {
+      const size = Math.min(img.width, img.height);
+      ctx.drawImage(img, (img.width-size)/2, (img.height-size)/2, size, size, 0, 0, 80, 80);
+      savePhoto(mi, canvas.toDataURL('image/jpeg', .85));
+      renderAll();
+    };
+    img.src = URL.createObjectURL(file);
+  };
+  input.click();
+};
 
-// ── SYNC INDICATOR ────────────────────────────────────────────────────────────
-let syncTimer;
-function showSync() { document.getElementById('syncInd').classList.add('show'); }
-function hideSync() { clearTimeout(syncTimer); syncTimer = setTimeout(() => document.getElementById('syncInd').classList.remove('show'), 600); }
-
-// ── KPIs ─────────────────────────────────────────────────────────────────────
+// ── STATS ─────────────────────────────────────────────────
 function getMemberStats() {
-  return members.map((m,mi) => {
-    let runs=0,absent=0,totalKm=0;
-    RUNS.forEach(run => {
-      const k = `${run.id}_${mi}`;
-      const s = att[k]||0;
-      if(s===1){runs++;totalKm+=(kmData[k]||DEFAULT_KM);}
-      if(s===2) absent++;
+  const ac = Math.min(activeCount, MEMBERS.length);
+  return MEMBERS.slice(0, ac).map((name, mi) => {
+    let runs = 0, km = 0, total = 0;
+    RUNS.forEach(r => {
+      const k = `${r.id}_${mi}`; total++;
+      if (att[k] === 1) { runs++; km += kmData[k] ?? DEFAULT_KM; }
     });
-    const logged=runs+absent;
-    const pct=logged>0?Math.round(runs/logged*100):0;
-    return {name:m,runs,absent,logged,pct,dist:Math.round(totalKm*10)/10};
+    return { mi, name, runs, km: Math.round(km*10)/10, total,
+             pct: total > 0 ? Math.round(runs/total*100) : 0 };
+  });
+}
+function getMemberTotalKm(mi) {
+  let total = 0;
+  Object.keys(att).forEach(k => {
+    if (k.endsWith(`_${mi}`) && att[k] === 1)
+      total += (kmData[k] ?? DEFAULT_KM);
+  });
+  return Math.round(total * 10) / 10;
+}
+
+// ── RENDER KPIs ──────────────────────────────────────────
+function renderKPIs(stats) {
+  const totalRuns = RUNS.filter(r => stats.some(s => att[`${r.id}_${s.mi}`] === 1)).length;
+  const clubKm    = stats.reduce((a, s) => a + s.km, 0);
+  const avgPct    = stats.length ? Math.round(stats.reduce((a,s) => a+s.pct, 0) / stats.length) : 0;
+  const top       = stats.reduce((a, b) => b.km > a.km ? b : a, stats[0] || {name:'–', km:0});
+  const onTrack   = stats.filter(s => s.km >= TARGET_KM).length;
+  document.getElementById('kpiRuns').textContent   = totalRuns;
+  document.getElementById('kpiKm').textContent     = Math.round(clubKm*10)/10 + ' km';
+  document.getElementById('kpiAvg').textContent    = avgPct + '%';
+  document.getElementById('kpiTop').textContent    = top.name?.split(' ')[0] || '–';
+  document.getElementById('kpiTarget').textContent = `${onTrack}/${stats.length}`;
+  document.getElementById('membersBtn').textContent = `👥 ${stats.length} Members`;
+}
+
+// ── RENDER RACE ───────────────────────────────────────────
+function renderRace(stats) {
+  const milBox = document.getElementById('raceMilestones');
+  const rowBox = document.getElementById('raceRows');
+  milBox.innerHTML = ''; rowBox.innerHTML = '';
+  [0, 9, 18, 27, 36].forEach(km => {
+    const span = document.createElement('span');
+    span.className = 'milestone';
+    span.style.left = (km / TARGET_KM * 100) + '%';
+    span.textContent = km === 0 ? '🚩' : km === 36 ? '🏁 36km' : `${km}km`;
+    milBox.appendChild(span);
+  });
+  const sorted = [...stats].sort((a, b) => b.km - a.km);
+  sorted.forEach((s, rank) => {
+    const pct        = Math.min(s.km / TARGET_KM * 100, 100);
+    const photo      = getPhoto(s.mi);
+    const animal     = ANIMALS[s.mi % ANIMALS.length];
+    const color      = LANE_CLR[s.mi % LANE_CLR.length];
+    const isLeader   = rank === 0 && s.km > 0;
+    const isDone     = s.km >= TARGET_KM;
+    const isSleeping = s.km === 0;
+    const ltTotalKm  = getMemberTotalKm(s.mi);
+    const quote      = getQuote(s, rank, ltTotalKm);
+    const rankIcon   = rank===0&&s.km>0?'🥇':rank===1&&s.km>0?'🥈':rank===2&&s.km>0?'🥉':rank+1;
+    const lt         = ltTargets[s.mi];
+
+    // Long-term target display
+    let ltHtml = '';
+    if (lt && lt.km > 0 && lt.date) {
+      const ltPct   = Math.min(Math.round(ltTotalKm / lt.km * 100), 100);
+      const ltDate  = new Date(lt.date);
+      const ltLabel = ltDate.toLocaleDateString('en', {month:'short', year:'numeric'});
+      ltHtml = `
+        <div class="lt-info" title="Long-term: ${ltTotalKm}/${lt.km}km by ${ltLabel}">🎯 ${ltTotalKm}/${lt.km}km · ${ltLabel} (${ltPct}%)</div>
+        <div class="lt-pbar"><div class="lt-pfill" style="width:${ltPct}%"></div></div>`;
+    }
+
+    // Avatar: body = animal (bottom), face = photo (top)
+    const avatarInner = `
+      <span class="av-body">${animal}</span>
+      ${photo ? `<img class="av-face" src="${photo}" alt="${s.name}"/>` : ''}`;
+
+    // Sprite: animal body + face overlay
+    const spriteInner = `
+      <span class="animal">${animal}</span>
+      ${photo ? `<img class="sprite-face" src="${photo}" alt=""/>` : ''}`;
+
+    const row = document.createElement('div');
+    row.className = 'racer-row';
+    row.dataset.gleanId = `racer-row-${s.mi}`;
+    row.innerHTML = `
+      <div class="racer-rank">${rankIcon}</div>
+      <div class="racer-info">
+        <div class="avatar-wrap" onclick="uploadPhoto(${s.mi})" title="Click to upload face photo">
+          <div class="avatar" style="border-color:${color}">${avatarInner}</div>
+        </div>
+        <div style="min-width:0;flex:1">
+          <div class="racer-name">${s.name}</div>
+          <div class="racer-km">${s.km}/${TARGET_KM} km this month</div>
+          ${ltHtml}
+        </div>
+      </div>
+      <div class="road-wrap">
+        <div class="road">
+          <div class="road-shoulder top"></div>
+          <div class="road-shoulder bottom"></div>
+          <div class="road-line"></div>
+          <div class="road-progress" style="background:${color};width:${pct}%"></div>
+          ${[9,18,27].map(km=>`<div style="position:absolute;left:${km/TARGET_KM*100}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.15);z-index:1"></div>`).join('')}
+          <div class="racer-sprite ${isLeader?'leader':''} ${isDone?'winner':''} ${isSleeping?'sleeping':''}"
+               style="left:${Math.max(pct,2)}%">
+            <div class="thought-bubble">${quote}</div>
+            <div class="speed-lines">
+              <div class="speed-line" style="width:20px"></div>
+              <div class="speed-line" style="width:14px"></div>
+              <div class="speed-line" style="width:8px"></div>
+            </div>
+            <div class="sprite-body-wrap">${spriteInner}</div>
+            <div class="km-tag">${s.km} km</div>
+          </div>
+          ${isDone?'<div class="status-badge">🎉</div>':isSleeping?'<div class="status-badge">💤</div>':''}
+          <div class="finish-flag">🏁<span class="finish-label">36</span></div>
+        </div>
+      </div>`;
+    rowBox.appendChild(row);
   });
 }
 
-function updateKPIs() {
+// ── RENDER TABLE ─────────────────────────────────────────
+function renderTable() {
+  const tbl = document.getElementById('attTable');
+  const ac  = Math.min(activeCount, MEMBERS.length);
+  let html = `<thead><tr><th class="member-col">Member</th>`;
+  RUNS.forEach(r => {
+    html += `<th><span class="run-hdate day-${r.day}">${r.day} ${r.date.slice(8)}</span></th>`;
+  });
+  html += `<th>Runs</th><th>Total KM</th></tr></thead><tbody>`;
+  MEMBERS.slice(0, ac).forEach((name, mi) => {
+    const animal = ANIMALS[mi % ANIMALS.length];
+    const photo  = getPhoto(mi);
+    const avatarHtml = `<span style="font-size:16px;position:relative;display:inline-block;width:22px;height:22px;vertical-align:middle">
+      <span style="position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);font-size:18px">${animal}</span>
+      ${photo?`<img style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:13px;height:13px;border-radius:50%;object-fit:cover;border:1.5px solid var(--artifact-background-light);z-index:2" src="${photo}" alt=""/>`:''}
+    </span>`;
+    html += `<tr><td class="name-cell">${avatarHtml} ${name}</td>`;
+    let runs = 0, km = 0;
+    RUNS.forEach(r => {
+      const k = `${r.id}_${mi}`;
+      const s  = att[k] || 0;
+      const kv = kmData[k] ?? DEFAULT_KM;
+      if (s === 1) { runs++; km += kv; }
+      const icon   = s===1?'✅':s===2?'❌':'⬜';
+      const kmShow = s===1 ? `<div class="km-val">${kv}km</div>` : '';
+      html += `<td class="run-cell" onclick="openKm('${r.id}',${mi})" data-glean-id="cell-${r.id}-${mi}">
+                 <span class="status-icon">${icon}</span>${kmShow}</td>`;
+    });
+    html += `<td class="total-cell">${runs}</td><td class="km-total">${Math.round(km*10)/10} km</td></tr>`;
+  });
+  html += '</tbody>';
+  tbl.innerHTML = html;
+}
+
+function renderAll() {
   const stats = getMemberStats();
-  const totalPresent = stats.reduce((s,x)=>s+x.runs,0);
-  const totalDist    = Math.round(stats.reduce((s,x)=>s+x.dist,0)*10)/10;
-  const avgPct = stats.length && stats.reduce((s,x)=>s+(x.logged>0?x.runs/x.logged:0),0)/members.length;
-  const top    = [...stats].sort((a,b)=>b.runs-a.runs)[0];
-  document.getElementById('k-logged').textContent = totalPresent;
-  document.getElementById('k-avg').textContent    = Math.round(avgPct*100)+'%';
-  document.getElementById('k-dist').textContent   = totalDist;
-  document.getElementById('k-top').textContent     = top&&top.runs>0?top.name:'—';
-  document.getElementById('k-top-sub').textContent = top&&top.runs>0?`${top.runs} runs · ${top.dist} km`:'';
+  renderKPIs(stats);
+  renderRace(stats);
+  renderTable();
+  const MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('monthLabel').textContent = `${MNAMES[curMonth]} ${curYear}`;
 }
 
-// ── LEADERBOARD ───────────────────────────────────────────────────────────────
-function buildLeaderboard() {
-  const stats   = getMemberStats();
-  const maxRuns = Math.max(...stats.map(s=>s.runs),1);
-  const sorted  = [...stats].sort((a,b)=>{
-    const v = lbSort.key==='name' ? (a.name>b.name?1:-1) : (b[lbSort.key]-a[lbSort.key]);
-    return lbSort.dir==='asc'?-v:v;
-  });
-  const body = document.getElementById('lbBody');
-  body.innerHTML = sorted.map((s,i)=>{
-    const r=i+1;
-    const rankLabel = r===1?'🥇':r===2?'🥈':r===3?'🥉':`<span class="lb-rank">#${r}</span>`;
-    const bar = Math.round(s.runs/maxRuns*100);
-    const badge = s.logged===0?'<span class="badge b-mid">No runs yet</span>'
-      :s.pct>=80?'<span class="badge b-hi">🔥 Consistent</span>'
-      :s.pct>=50?'<span class="badge b-mid">💪 On track</span>'
-      :'<span class="badge b-lo">⚠️ Needs effort</span>';
-    return `<tr>
-      <td>${rankLabel}</td><td>${s.name}</td>
-      <td class="num">${s.runs}</td>
-      <td class="num">${s.logged>0?s.pct+'%':'—'}</td>
-      <td>${s.dist} km</td>
-      <td style="display:flex;align-items:center;gap:8px">
-        <div class="lb-bar-bg"><div class="lb-bar-fill ${s.pct>=80?'hi':''}" style="width:${bar}%"></div></div>
-        ${badge}
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-function sortLB(key) {
-  lbSort.dir = lbSort.key===key&&lbSort.dir==='desc'?'asc':'desc';
-  lbSort.key = key;
-  buildLeaderboard();
-}
-
-// ── MEMBERS MODAL ─────────────────────────────────────────────────────────────
-function openMembersModal() {
-  document.getElementById('memberInputs').innerHTML = members.map((m,i)=>
-    `<div class="modal-row"><label>${i+1}</label>
-     <input type="text" value="${m}" data-idx="${i}" placeholder="${DEFAULT_MEMBERS[i]}"></div>`
-  ).join('');
-  document.getElementById('memberModal').classList.add('open');
-}
-function closeMembersModal() { document.getElementById('memberModal').classList.remove('open'); }
-function saveMembersToFirebase() {
-  const names = Array.from(document.querySelectorAll('#memberInputs input'))
-    .map((el,i) => el.value.trim() || DEFAULT_MEMBERS[i]);
-  if (db) { db.ref('trek_dlut_50km/members').set(names); }
-  else { members = names; buildAttTable(); buildLeaderboard(); }
-  closeMembersModal(); showToast('Members updated!');
-}
-document.getElementById('memberModal').addEventListener('click', function(e) {
-  if(e.target===this) closeMembersModal();
+// ── KM MODAL ─────────────────────────────────────────────
+let kmModal_run = null, kmModal_mi = null;
+window.openKm = function(runId, mi) {
+  kmModal_run = runId; kmModal_mi = mi;
+  document.getElementById('kmAnimal').textContent = ANIMALS[mi % ANIMALS.length];
+  document.getElementById('kmName').textContent   = MEMBERS[mi];
+  const k = `${runId}_${mi}`;
+  document.getElementById('kmInput').value = kmData[k] ?? DEFAULT_KM;
+  document.getElementById('kmOverlay').classList.add('open');
+};
+window.closeKm = function() { document.getElementById('kmOverlay').classList.remove('open'); };
+window.confirmKm = async function() {
+  const km = parseFloat(document.getElementById('kmInput').value) || DEFAULT_KM;
+  const k  = `${kmModal_run}_${kmModal_mi}`;
+  await writeData(k, 1,  'att');
+  await writeData(k, km, 'km');
+  closeKm();
+};
+window.setStatus = async function(s) {
+  const k = `${kmModal_run}_${kmModal_mi}`;
+  await writeData(k, s, 'att');
+  closeKm();
+};
+document.getElementById('kmInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); window.confirmKm(); }
 });
 
-// ── TOAST ─────────────────────────────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
-}
+// ── MEMBER EDITOR ─────────────────────────────────────────
+window.openMemberEditor = function() {
+  document.getElementById('countDisplay').textContent = activeCount;
+  const rows = document.getElementById('memberEditRows');
+  rows.innerHTML = MEMBERS.map((m, i) => {
+    const lt = ltTargets[i] || {};
+    const inactive = i >= activeCount;
+    return `<div class="member-edit-row ${inactive?'inactive':''}" id="mer_${i}">
+      <span style="font-size:18px">${ANIMALS[i]}</span>
+      <input id="mi_${i}" value="${m}" placeholder="Member ${i+1}" type="text"/>
+      <input type="number" id="lt_km_${i}" value="${lt.km||''}" placeholder="e.g. 50" min="0" step="1"/>
+      <input type="date"   id="lt_dt_${i}" value="${lt.date||''}"/>
+    </div>`;
+  }).join('');
+  document.getElementById('memberOverlay').classList.add('open');
+};
 
-// ── INIT (non-Firebase fallback) ──────────────────────────────────────────────
-if (!IS_CONFIGURED) {
-  buildUserSelect(); buildAttTable(); buildLeaderboard(); updateKPIs();
-}
+window.adjustCount = function(dir) {
+  activeCount = Math.max(1, Math.min(10, activeCount + dir));
+  document.getElementById('countDisplay').textContent = activeCount;
+  MEMBERS.forEach((_, i) => {
+    const row = document.getElementById(`mer_${i}`);
+    if (row) row.className = `member-edit-row ${i >= activeCount ? 'inactive' : ''}`;
+  });
+};
+
+window.saveMembers = async function() {
+  MEMBERS = MEMBERS.map((_, i) => {
+    const el = document.getElementById(`mi_${i}`);
+    return el ? (el.value.trim() || `Member ${i+1}`) : `Member ${i+1}`;
+  });
+  MEMBERS.forEach((_, i) => {
+    const kmEl   = document.getElementById(`lt_km_${i}`);
+    const dateEl = document.getElementById(`lt_dt_${i}`);
+    const ltKm   = kmEl   ? parseFloat(kmEl.value)   : 0;
+    const ltDate = dateEl ? dateEl.value              : '';
+    if (ltKm > 0 && ltDate) ltTargets[i] = { km: ltKm, date: ltDate };
+    else delete ltTargets[i];
+  });
+  localStorage.setItem('trek_lt_targets',   JSON.stringify(ltTargets));
+  localStorage.setItem('trek_active_count', String(activeCount));
+  if (db) {
+    await window._fbSet(window._fbRef(db, 'trek_dlut_50km/members'),     MEMBERS);
+    await window._fbSet(window._fbRef(db, 'trek_dlut_50km/ltTargets'),   ltTargets);
+    await window._fbSet(window._fbRef(db, 'trek_dlut_50km/activeCount'), activeCount);
+  } else { saveLocal(); }
+  document.getElementById('memberOverlay').classList.remove('open');
+  renderAll();
+};
+
+// ── TABS ──────────────────────────────────────────────────
+window.switchTab = function(t, btn) {
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-race').style.display       = t === 'race'       ? '' : 'none';
+  document.getElementById('tab-attendance').style.display = t === 'attendance' ? '' : 'none';
+};
+
+// ── MONTH NAV ─────────────────────────────────────────────
+window.changeMonth = function(dir) {
+  curMonth += dir;
+  if (curMonth > 11) { curMonth = 0; curYear++; }
+  if (curMonth <  0) { curMonth = 11; curYear--; }
+  genRuns(curYear, curMonth);
+  renderAll();
+};
+
+// ── MISC ─────────────────────────────────────────────────
+window.resetData = function() {
+  if (!confirm('Reset ALL attendance data? This cannot be undone.')) return;
+  att = {}; kmData = {};
+  if (db) {
+    window._fbSet(window._fbRef(db, 'trek_dlut_50km/att'), {});
+    window._fbSet(window._fbRef(db, 'trek_dlut_50km/km'),  {});
+  } else { saveLocal(); }
+  renderAll();
+};
+window.toggleDark = function() {
+  const h = document.documentElement;
+  h.dataset.theme = h.dataset.theme === 'dark' ? '' : 'dark';
+  localStorage.setItem('trek_theme', h.dataset.theme);
+};
+
+// ── BOOT ─────────────────────────────────────────────────
+(async () => {
+  const th = localStorage.getItem('trek_theme');
+  if (th) document.documentElement.dataset.theme = th;
+  loadLocal();
+  const cfg       = loadConfig();
+  const isDefault = FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY';
+  if (isDefault && !cfg) {
+    document.getElementById('setupOverlay').classList.add('open');
+    renderAll();
+  } else {
+    const ok = await initFirebase();
+    if (!ok) renderAll();
+  }
+})();
 </script>
 
 <script>
-  if (window.GleanBridge) {
-    window.GleanBridge.postMessage({ actionId:'export-pdf', type:'glean-add-menu', metadata:{ label:'Export as PDF', icon:'export' } });
-    window.GleanBridge.onMessage('action', d => { if(d.actionId==='export-pdf') window.print(); });
-  }
-  window.addEventListener('beforeprint',()=>{});
-  window.addEventListener('afterprint',()=>{});
+  window.GleanBridge.postMessage({
+    actionId: 'export-pdf',
+    type: 'glean-add-menu',
+    metadata: { label: 'Export as PDF', icon: 'export' }
+  });
+  window.GleanBridge.onMessage('action', function(data) {
+    if (data.actionId === 'export-pdf') window.print();
+  });
 </script>
 </body>
 </html>
