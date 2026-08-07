@@ -1006,11 +1006,8 @@ async function initFirebase() {
       if (v.activeCount) activeCount = v.activeCount;
       if (Array.isArray(v.animals) && v.animals.length) ANIMALS = [...v.animals];
       if (v.customIcons && typeof v.customIcons === 'object') customIcons = {...v.customIcons};
-      if (v.photos) {
-        Object.entries(v.photos).forEach(([k, url]) => {
-          localStorage.setItem('trek_photo_' + k, url);
-        });
-      }
+      // Always overwrite photosCache from Firebase — this is what syncs all devices
+      photosCache = (v.photos && typeof v.photos === 'object') ? {...v.photos} : {};
       updateStatus(true);
       renderAll();
     });
@@ -1066,20 +1063,22 @@ function loadLocal() {
   const ac= localStorage.getItem('trek_active_count'); if (ac) activeCount = parseInt(ac);
 }
 
-// ── PHOTO ────────────────────────────────────────────────
-function getPhoto(mi) { return localStorage.getItem(`trek_photo_${mi}`) || null; }
-function savePhoto(mi, url) { localStorage.setItem(`trek_photo_${mi}`, url); }
+// ── PHOTO & ICON — Firebase only, in-memory cache ────────
+function getPhoto(mi) { return photosCache[mi] || null; }
+function savePhoto(mi, url) {
+  photosCache[mi] = url;
+  // Firebase write → onValue fires → all other devices update instantly
+  try { window._fbSet(window._fbRef(db, `trek_dlut_50km/photos/${mi}`), url); } catch(e) {}
+}
 window.clearPhoto = function clearPhoto(mi) {
-  localStorage.removeItem(`trek_photo_${mi}`);
+  delete photosCache[mi];
   try { window._fbSet(window._fbRef(db, `trek_dlut_50km/photos/${mi}`), null); } catch(e) {}
   renderAll();
 }
 window.clearCustomIcon = function clearCustomIcon(mi) {
   delete customIcons[mi];
-  localStorage.setItem('trek_custom_icons', JSON.stringify(customIcons));
   try { window._fbSet(window._fbRef(db, `trek_dlut_50km/customIcons`), customIcons); } catch(e) {}
   renderAll();
-  // refresh picker if open
   const ov = document.getElementById('apOverlay');
   if (ov && ov.style.display !== 'none') openApModal(mi);
 }
@@ -1101,11 +1100,7 @@ window.uploadPhoto = function(mi) {
       const size = Math.min(img.width, img.height);
       ctx.drawImage(img, (img.width-size)/2, (img.height-size)/2, size, size, 0, 0, 80, 80);
       const dataUrl = canvas.toDataURL('image/jpeg', .7);
-      savePhoto(mi, dataUrl);
-      if (db) {
-        // Store compressed photo in Firebase so all users see it
-        window._fbSet(window._fbRef(db, `trek_dlut_50km/photos/${mi}`), dataUrl);
-      }
+      savePhoto(mi, dataUrl); // writes photosCache + Firebase in one call
       renderAll();
     };
     img.src = URL.createObjectURL(file);
@@ -1450,15 +1445,22 @@ window.bsUploadPhoto = function() {
     const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = async (ev) => {
-      const dataUrl = ev.target.result;
-      savePhoto(window._bsMi, dataUrl);
-      try { await window._fbSet(window._fbRef(db, `trek_dlut_50km/photos/${window._bsMi}`), dataUrl); } catch(err) {}
-      renderAll();
-      // refresh bottom sheet avatar
-      const avatarEl = document.getElementById('bsAvatar');
-      if (avatarEl) avatarEl.innerHTML = `<img src="${dataUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-      const clearPhotoBtn = document.getElementById('bsClearPhoto');
-      if (clearPhotoBtn) clearPhotoBtn.style.display = 'block';
+      // Compress to 80×80 JPEG — keeps Firebase write tiny & fast
+      const img = new Image();
+      img.onload = async () => {
+        const cv = document.createElement('canvas'); cv.width = cv.height = 80;
+        const ct = cv.getContext('2d');
+        const s = Math.min(img.width, img.height);
+        ct.drawImage(img, (img.width-s)/2, (img.height-s)/2, s, s, 0, 0, 80, 80);
+        const dataUrl = cv.toDataURL('image/jpeg', .7);
+        savePhoto(window._bsMi, dataUrl); // photosCache + Firebase
+        renderAll();
+        const avatarEl = document.getElementById('bsAvatar');
+        if (avatarEl) avatarEl.innerHTML = `<img src="${dataUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+        const clearPhotoBtn = document.getElementById('bsClearPhoto');
+        if (clearPhotoBtn) clearPhotoBtn.style.display = 'block';
+      };
+      img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   };
@@ -1692,9 +1694,9 @@ const ALL_ANIMALS = [
   '🏃','🚴','🧗','🏊','🤸','🚵','⚡','🔥','💪','🥷',
 ];
 // Custom uploaded icons per member (base64 / data URL)
-let customIcons = (() => {
-  try { const s = localStorage.getItem('trek_custom_icons'); return s ? JSON.parse(s) : {}; } catch(e) { return {}; }
-})();
+// photos & customIcons use Firebase as single source of truth (no localStorage)
+let photosCache = {};   // updated ONLY by Firebase onValue
+let customIcons = {};   // updated ONLY by Firebase onValue
 
 function getIcon(mi) {
   return customIcons[mi] || ANIMALS[mi % ANIMALS.length];
@@ -1752,8 +1754,7 @@ async function apSelectEmoji(emoji) {
   const idx = apTargetIdx;
   delete customIcons[idx]; // remove custom image if any
   ANIMALS[idx] = emoji;
-  localStorage.setItem('trek_animals', JSON.stringify(ANIMALS));
-  localStorage.setItem('trek_custom_icons', JSON.stringify(customIcons));
+  // localStorage NOT used for animals/icons — Firebase is source of truth
   closeApModal();
   updateMemberBtn(idx);
   renderAll();
@@ -1766,13 +1767,13 @@ async function apSelectCustom(dataUrl) {
   if (apTargetIdx < 0) return;
   const idx = apTargetIdx;
   customIcons[idx] = dataUrl;
-  localStorage.setItem('trek_custom_icons', JSON.stringify(customIcons));
-  closeApModal();
-  updateMemberBtn(idx);
-  renderAll();
+  // Firebase is the only source of truth — no localStorage for icons
   if (db) {
     try { await window._fbSet(window._fbRef(db, 'trek_dlut_50km/customIcons'), customIcons); } catch(e) {}
   }
+  closeApModal();
+  updateMemberBtn(idx);
+  renderAll();
 }
 
 function updateMemberBtn(idx) {
@@ -1801,10 +1802,30 @@ document.getElementById('apOverlay').addEventListener('click', (e) => {
 document.getElementById('apFileInput').addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
+  const isGif = file.type === 'image/gif';
+  if (isGif && file.size > 400*1024) {
+    alert('⚠️ GIF is ' + (file.size/1024).toFixed(0) + 'KB — max 400KB recommended for Firebase sync. Please use a smaller GIF.');
+    e.target.value = ''; return;
+  }
   const reader = new FileReader();
-  reader.onload = (ev) => { apSelectCustom(ev.target.result); };
+  reader.onload = (ev) => {
+    if (isGif) {
+      apSelectCustom(ev.target.result); // keep animated GIF as-is
+    } else {
+      // Compress to 120×120 PNG — keeps Firebase fast
+      const img = new Image();
+      img.onload = () => {
+        const cv = document.createElement('canvas'); cv.width = cv.height = 120;
+        const ct = cv.getContext('2d');
+        const s = Math.min(img.width, img.height);
+        ct.drawImage(img, (img.width-s)/2, (img.height-s)/2, s, s, 0, 0, 120, 120);
+        apSelectCustom(cv.toDataURL('image/png'));
+      };
+      img.src = ev.target.result;
+    }
+  };
   reader.readAsDataURL(file);
-  e.target.value = ''; // reset so same file can be re-selected
+  e.target.value = '';
 });
 
 // Wire up all .ap-open-btn buttons via event delegation on document
