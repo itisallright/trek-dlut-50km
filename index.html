@@ -1065,11 +1065,22 @@ window.uploadPhoto = function(mi) {
 // ── STATS ─────────────────────────────────────────────────
 function getMemberStats() {
   const ac = Math.min(activeCount, MEMBERS.length);
+  const todayStr = new Date().toISOString().slice(0,10);
   return MEMBERS.slice(0, ac).map((name, mi) => {
-    let runs = 0, km = 0, total = 0;
-    RUNS.forEach(r => {
-      const k = `${r.id}_${mi}`; total++;
+    let runs = 0, km = 0;
+    // Only count scheduled runs up to today
+    const pastRuns = RUNS.filter(r => r.date <= todayStr);
+    const total = pastRuns.length;
+    pastRuns.forEach(r => {
+      const k = `${r.id}_${mi}`;
       if (att[k] === 1) { runs++; km += kmData[k] ?? DEFAULT_KM; }
+    });
+    // Also count free-day entries up to today
+    Object.keys(att).forEach(key => {
+      if (!key.startsWith('free_') || !key.endsWith('_'+mi)) return;
+      const parts = key.split('_'); const dateStr = parts[1] || '';
+      if (!dateStr || dateStr > todayStr) return;
+      if (att[key] === 1) { runs++; km += kmData[key] ?? DEFAULT_KM; }
     });
     return { mi, name, runs, km: Math.round(km*10)/10, total,
              pct: total > 0 ? Math.round(runs/total*100) : 0 };
@@ -1137,14 +1148,14 @@ function renderRace(stats) {
     }
 
     // Avatar: body = animal (bottom), face = photo (top)
-    const avatarInner = `
-      <span class="av-body">${animal}</span>
-      ${photo ? `<img class="av-face" src="${photo}" alt="${s.name}"/>` : ''}`;
+    const avatarInner = isCustomIcon(s.mi)
+      ? `<img class="av-body" src="${animal}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;top:0;left:0">${photo ? `<img class="av-face" src="${photo}" alt="${s.name}"/>` : ''}`
+      : `<span class="av-body">${animal}</span>${photo ? `<img class="av-face" src="${photo}" alt="${s.name}"/>` : ''}`;
 
     // Sprite: animal body + face overlay
-    const spriteInner = `
-      <span class="animal">${animal}</span>
-      ${photo ? `<img class="sprite-face" src="${photo}" alt=""/>` : ''}`;
+    const spriteInner = isCustomIcon(s.mi)
+      ? `<img class="animal" src="${animal}" style="width:28px;height:28px;object-fit:cover;border-radius:50%;display:block;animation:run-bounce .35s infinite ease-in-out">${photo ? `<img class="sprite-face" src="${photo}" alt=""/>` : ''}`
+      : `<span class="animal">${animal}</span>${photo ? `<img class="sprite-face" src="${photo}" alt=""/>` : ''}`;
 
     const row = document.createElement('div');
     row.className = 'racer-row';
@@ -1230,7 +1241,9 @@ function renderMatrix() {
     const photo  = getPhoto(mi);
     const av = photo
       ? `<img src="${photo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">`
-      : `<span style="font-size:15px;vertical-align:middle;margin-right:3px">${animal}</span>`;
+      : isCustomIcon(mi)
+        ? `<img src="${animal}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">`
+        : `<span style="font-size:15px;vertical-align:middle;margin-right:3px">${animal}</span>`;
     h += `<tr><td class="m-member-cell">${av}${MEMBERS[mi]}</td>`;
     for (let d=1; d<=daysInMonth; d++) {
       const dd = String(d).padStart(2,'0');
@@ -1264,16 +1277,29 @@ function renderMatrix() {
 
 function renderSummary(ac) {
   const tbl=document.getElementById('sumTable'); if(!tbl) return;
+  const todayStr = new Date().toISOString().slice(0,10);
   let h=`<thead><tr><th class="left">Member</th><th>Runs</th><th>Total KM</th><th>Progress</th><th>Avg KM/Run</th></tr></thead><tbody>`;
   for(let mi=0;mi<ac;mi++){
     const animal=getIcon(mi), photo=getPhoto(mi);
-    const av=`<span style="font-size:15px;position:relative;display:inline-block;width:20px;height:20px;vertical-align:middle"><span style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);font-size:16px">${animal}</span>${photo?`<img style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;object-fit:cover;border:1px solid var(--artifact-background-light);z-index:2" src="${photo}" alt=""/>`:''}</span>`;
+    const avIcon = isCustomIcon(mi)
+      ? `<img src="${animal}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;vertical-align:middle;position:absolute;bottom:-2px;left:50%;transform:translateX(-50%)">`
+      : `<span style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);font-size:16px">${animal}</span>`;
+    const av=`<span style="position:relative;display:inline-block;width:20px;height:20px;vertical-align:middle">${avIcon}${photo?`<img style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;object-fit:cover;border:1px solid var(--artifact-background-light);z-index:2" src="${photo}" alt=""/>`:''}</span>`;
     let runs=0,km=0;
-    RUNS.forEach(r=>{const k=`${r.id}_${mi}`,s=att[k]||0,kv=kmData[k]??DEFAULT_KM;if(s===1){runs++;km+=kv;}});
+    // Count all cells (scheduled + free) up to today only
+    Object.keys(att).forEach(key=>{
+      if(!key.endsWith('_'+mi)) return;
+      let dateStr='';
+      if(key.startsWith('free_')){const p=key.split('_');dateStr=p[1]||'';}
+      else{const runId=key.split('_')[0];dateStr=runId.substring(1);}
+      if(!dateStr||dateStr>todayStr) return;
+      const s=att[key]||0,kv=kmData[key]??DEFAULT_KM;
+      if(s===1){runs++;km+=kv;}
+    });
     const pct=Math.min(100,Math.round(km/TARGET_KM*100));
     const avg=runs>0?Math.round(km/runs*10)/10:0;
     const bc=pct>=100?'#22c55e':pct>=66?'#3b82f6':pct>=33?'#f97316':'#ef4444';
-    h+=`<tr><td class="name-cell">${av} ${MEMBERS[mi]}</td><td class="total-cell">${runs}/${RUNS.length}</td><td class="km-total">${Math.round(km*10)/10} km</td><td><div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%;background:${bc}"></div></div><div style="font-size:9px;color:var(--artifact-text-secondary);margin-top:2px">${pct}% of ${TARGET_KM}km</div></td><td style="font-size:11px">${avg>0?avg+'km':'—'}</td></tr>`;
+    h+=`<tr><td class="name-cell">${av} ${MEMBERS[mi]}</td><td class="total-cell">${runs}</td><td class="km-total">${Math.round(km*10)/10} km</td><td><div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%;background:${bc}"></div></div><div style="font-size:9px;color:var(--artifact-text-secondary);margin-top:2px">${pct}% of ${TARGET_KM}km (up to today)</div></td><td style="font-size:11px">${avg>0?avg+'km':'—'}</td></tr>`;
   }
   tbl.innerHTML=h+'</tbody>';
 }
@@ -1323,7 +1349,9 @@ function openBs(cellKey, mi) {
   // Avatar
   const avatarEl = document.getElementById('bsAvatar');
   if (photo) {
-    avatarEl.innerHTML = `<img src="${photo}" alt="${name}"><span style="position:absolute;bottom:0;right:0;font-size:16px">${animal}</span>`;
+    avatarEl.innerHTML = `<img src="${photo}" alt="${name}"><span style="position:absolute;bottom:0;right:0;font-size:16px">${isCustomIcon(mi)?''  :animal}</span>`;
+  } else if (isCustomIcon(mi)) {
+    avatarEl.innerHTML = `<img src="${animal}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
   } else {
     avatarEl.textContent = animal;
   }
