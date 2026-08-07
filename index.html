@@ -103,29 +103,7 @@ input  { font-family: inherit; }
   line-height: 1;
 }
 .animal-pick-btn:hover { border-color: var(--accent); transform: scale(1.15); }
-.animal-picker-overlay {
-  position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,.55);
-  display: flex; align-items: center; justify-content: center;
-}
-.animal-picker-overlay.hidden { display: none; }
-.animal-picker-box {
-  background: var(--artifact-background-light, #f6f6f6); border-radius: 14px; padding: 18px 20px;
-  box-shadow: 0 8px 40px rgba(0,0,0,.40); min-width: 300px; max-width: 380px;
-  border: 1px solid var(--artifact-border-light, #e5e5e5);
-}
-.ap-title { font-weight: 700; font-size: 14px; margin-bottom: 12px; color: var(--text); }
-.ap-grid {
-  display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin-bottom: 14px;
-}
-.ap-cell {
-  font-size: 22px; text-align: center; cursor: pointer; padding: 4px;
-  border-radius: 8px; border: 2px solid transparent; transition: all .12s;
-  user-select: none;
-}
-.ap-cell:hover  { background: var(--row-hover, #f0f4ff); border-color: var(--accent); transform: scale(1.2); }
-.ap-cell.chosen { background: var(--accent-light, #dce7ff); border-color: var(--accent); }
-.ap-close { font-size: 12px; color: var(--text-muted); cursor: pointer; text-align: right; }
-.ap-close:hover { text-decoration: underline; }
+
 
 /* AVATAR: body = animal emoji, face = photo overlay */
 .avatar-wrap { position: relative; cursor: pointer; flex-shrink: 0; }
@@ -267,29 +245,161 @@ input  { font-family: inherit; }
 .winner .animal   { animation: run-bounce .22s infinite ease-in-out, winner-glow 1s infinite !important; }
 
 /* ATTENDANCE TABLE */
-.table-section { background: var(--artifact-background-light); border: 1px solid var(--artifact-border-light);
-                 border-radius: var(--r); overflow: hidden; }
-.table-header  { padding: 14px 20px; border-bottom: 1px solid var(--artifact-border-light);
-                 display: flex; align-items: center; justify-content: space-between; }
-.table-title   { font-size: 14px; font-weight: 700; }
-.table-wrap    { overflow-x: auto; }
-table          { width: 100%; border-collapse: collapse; font-size: 12px; }
-thead tr       { background: var(--artifact-background-subtle); }
-th  { padding: 8px 10px; text-align: center; font-size: 10px; font-weight: 700;
-      text-transform: uppercase; color: var(--artifact-text-secondary);
-      border-bottom: 1px solid var(--artifact-border-light); white-space: nowrap; }
-th.member-col  { text-align: left; min-width: 140px; }
-td  { padding: 6px 8px; text-align: center; border-bottom: 1px solid var(--artifact-border-light); vertical-align: middle; }
-td.name-cell   { text-align: left; font-weight: 600; font-size: 11px; white-space: nowrap; }
-.run-cell      { cursor: pointer; user-select: none; border-radius: 4px; transition: .1s; min-width: 38px; }
-.run-cell:hover{ background: var(--artifact-background-subtle); }
-.status-icon   { font-size: 14px; display: block; }
-.km-val        { font-size: 9px; font-weight: 700; color: var(--artifact-text-secondary); margin-top: 1px; }
-.run-hdate     { font-size: 9px; font-weight: 800; }
-.run-hday      { font-size: 9px; color: var(--artifact-text-secondary); }
-.day-Mon       { color: #3b82f6; } .day-Wed { color: #16a34a; } .day-Fri { color: #f97316; }
-.total-cell    { font-weight: 800; color: var(--artifact-primary-brand); }
-.km-total      { font-size: 10px; color: var(--artifact-pos); font-weight: 700; }
+/* ── CALENDAR ── */
+.cal-section { background: var(--artifact-background-light); border: 1px solid var(--artifact-border-light);
+               border-radius: var(--r); overflow: hidden; }
+.cal-header  { padding: 14px 20px; border-bottom: 1px solid var(--artifact-border-light);
+               display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.cal-title   { font-size: 14px; font-weight: 700; }
+.cal-legend  { display: flex; gap: 10px; font-size: 11px; color: var(--artifact-text-secondary); align-items: center; }
+.leg-dot     { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 3px; }
+/* ── MATRIX CALENDAR ── */
+.matrix-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.matrix-table  { border-collapse: collapse; font-size: 11px; min-width: 100%; }
+.matrix-table thead th { position: sticky; top: 0; z-index: 3;
+  background: var(--artifact-background-subtle);
+  border: 1px solid var(--artifact-border-light);
+  padding: 4px 2px; text-align: center; white-space: nowrap; }
+.m-member-hdr  { min-width: 130px; text-align: left !important; left: 0; z-index: 4 !important;
+  padding: 6px 8px !important; font-size: 10px; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--artifact-text-secondary); }
+.m-day-hdr     { min-width: 36px; width: 36px; }
+.m-day-hdr .dh-dow { font-size: 8px; color: var(--artifact-text-secondary); }
+.m-day-hdr .dh-num { font-size: 12px; font-weight: 700; }
+.m-day-hdr .dh-run { font-size: 7px; font-weight: 800; border-radius: 3px;
+  padding: 0 3px; display: inline-block; margin-top: 1px; }
+.hdr-mon { background: #dbeafe !important; border-top: 3px solid #3b82f6 !important; }
+.hdr-wed { background: #dcfce7 !important; border-top: 3px solid #16a34a !important; }
+.hdr-fri { background: #ffedd5 !important; border-top: 3px solid #f97316 !important; }
+.hdr-today { outline: 2px solid var(--artifact-primary-brand); outline-offset: -2px; }
+.hdr-weekend { opacity: .55; }
+html[data-theme=dark] .hdr-mon { background: #1e3a5f !important; }
+html[data-theme=dark] .hdr-wed { background: #14532d !important; }
+html[data-theme=dark] .hdr-fri { background: #431407 !important; }
+.m-run-r { background: #dbeafe; color: #1d4ed8; }
+.m-run-g { background: #dcfce7; color: #15803d; }
+.m-run-o { background: #ffedd5; color: #c2410c; }
+html[data-theme=dark] .m-run-r { background: #1e3a5f; color: #93c5fd; }
+html[data-theme=dark] .m-run-g { background: #14532d; color: #86efac; }
+html[data-theme=dark] .m-run-o { background: #431407; color: #fdba74; }
+.m-member-cell { position: sticky; left: 0; z-index: 2;
+  background: var(--artifact-background-light);
+  border: 1px solid var(--artifact-border-light);
+  padding: 5px 8px; white-space: nowrap; font-weight: 600; font-size: 11px; min-width: 130px; }
+.m-cell { border: 1px solid var(--artifact-border-light); text-align: center;
+  padding: 2px 1px; cursor: pointer; transition: background .1s; vertical-align: middle;
+  min-width: 36px; user-select: none; }
+.m-cell:hover { filter: brightness(.92); }
+.m-cell.cell-run-mon { background: #eff6ff; }
+.m-cell.cell-run-wed { background: #f0fdf4; }
+.m-cell.cell-run-fri { background: #fff7ed; }
+html[data-theme=dark] .m-cell.cell-run-mon { background: #0f1f33; }
+html[data-theme=dark] .m-cell.cell-run-wed { background: #0a1f0a; }
+html[data-theme=dark] .m-cell.cell-run-fri { background: #1f0f00; }
+.m-cell.cell-today { outline: 2px solid var(--artifact-primary-brand); outline-offset: -2px; }
+.m-cell.cell-weekend { background: var(--artifact-background-subtle); }
+.m-cell-icon { font-size: 13px; line-height: 1.4; display: block; }
+.m-cell-km   { font-size: 8px; color: #16a34a; font-weight: 700; line-height: 1; display: block; }
+/* ── BOTTOM SHEET ── */
+.bs-overlay {
+  display: none; position: fixed; inset: 0; z-index: 100000;
+  background: rgba(0,0,0,.45); align-items: flex-end; justify-content: center;
+}
+.bs-overlay.open { display: flex; }
+.bs-sheet {
+  background: var(--artifact-background, #fff);
+  border-radius: 18px 18px 0 0;
+  padding: 0 0 env(safe-area-inset-bottom,12px);
+  width: 100%; max-width: 480px;
+  box-shadow: 0 -4px 32px rgba(0,0,0,.2);
+  animation: bsSlideUp .22s cubic-bezier(.4,0,.2,1);
+}
+@keyframes bsSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.bs-handle {
+  width: 40px; height: 4px; background: var(--artifact-border-light);
+  border-radius: 2px; margin: 12px auto 6px;
+}
+.bs-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 20px 10px;
+  border-bottom: 1px solid var(--artifact-border-light);
+}
+.bs-title { font-size: 15px; font-weight: 700; color: var(--artifact-text-primary); }
+.bs-date  { font-size: 12px; color: var(--artifact-text-secondary); }
+.bs-body  { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.bs-member-info { display: flex; align-items: center; gap: 12px; }
+.bs-avatar {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--artifact-background-light);
+  border: 2px solid var(--artifact-border-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0; overflow: hidden; position: relative;
+}
+.bs-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.bs-member-name { font-size: 16px; font-weight: 700; color: var(--artifact-text-primary); }
+.bs-member-sub  { font-size: 12px; color: var(--artifact-text-secondary); margin-top: 2px; }
+.bs-km-row { display: flex; align-items: center; gap: 12px; }
+.bs-km-label { font-size: 13px; font-weight: 600; color: var(--artifact-text-primary); flex-shrink: 0; }
+.bs-km-input {
+  flex: 1; padding: 10px 14px; border: 2px solid var(--artifact-border-light);
+  border-radius: 10px; font-size: 22px; font-weight: 700; text-align: center;
+  background: var(--artifact-background); color: var(--artifact-text-primary);
+  transition: border-color .15s;
+}
+.bs-km-input:focus { outline: none; border-color: var(--artifact-primary-brand, #3559e6); }
+.bs-km-stepper { display: flex; flex-direction: column; gap: 4px; }
+.bs-km-stepper button {
+  width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--artifact-border-light);
+  background: var(--artifact-background-light); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center; color: var(--artifact-text-primary);
+}
+.bs-km-stepper button:active { background: var(--artifact-primary-brand, #3559e6); color: #fff; }
+.bs-btns { display: flex; gap: 10px; }
+.bs-btns button {
+  flex: 1; padding: 13px 8px; border-radius: 12px; border: none;
+  cursor: pointer; font-size: 14px; font-weight: 700;
+  transition: opacity .15s, transform .1s;
+}
+.bs-btns button:active { transform: scale(.97); opacity: .85; }
+.bs-btn-present { background: #3559e6; color: #fff; }
+.bs-btn-absent  { background: #fee2e2; color: #dc2626; }
+.bs-btn-clear   { background: var(--artifact-background-light); color: var(--artifact-text-secondary);
+  border: 1px solid var(--artifact-border-light); flex: 0.5; }
+/* ── MEMBER SUMMARY TABLE (bottom) ── */
+.sum-table-wrap   { overflow-x: auto; border-top: 1px solid var(--artifact-border-light); }
+.sum-table        { width: 100%; border-collapse: collapse; font-size: 12px; }
+.sum-table th     { padding: 8px 10px; text-align: center; font-size: 10px; font-weight: 700;
+                    text-transform: uppercase; color: var(--artifact-text-secondary);
+                    background: var(--artifact-background-subtle);
+                    border-bottom: 1px solid var(--artifact-border-light); white-space: nowrap; }
+.sum-table th.left { text-align: left; min-width: 140px; }
+.sum-table td      { padding: 7px 10px; text-align: center; border-bottom: 1px solid var(--artifact-border-light); vertical-align: middle; }
+.sum-table td.name-cell { text-align: left; font-weight: 600; font-size: 11px; white-space: nowrap; }
+.total-cell        { font-weight: 800; color: var(--artifact-primary-brand); }
+.km-total          { font-size: 11px; color: var(--artifact-pos); font-weight: 700; }
+.prog-bar-wrap     { background: var(--artifact-border-light); border-radius: 4px; height: 6px; min-width: 60px; overflow: hidden; margin: 2px auto 0; }
+.prog-bar-fill     { height: 100%; border-radius: 4px; background: var(--artifact-primary-brand); transition: width .5s; }
+/* day detail modal */
+.day-modal-header  { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+.day-member-row    { display: flex; align-items: center; gap: 10px; padding: 8px 0;
+                     border-bottom: 1px solid var(--artifact-border-light); }
+.day-member-row:last-child { border-bottom: none; }
+.day-member-name   { flex: 1; font-size: 13px; font-weight: 600; }
+.day-status-btn    { font-size: 18px; cursor: pointer; border: 2px solid transparent;
+                     border-radius: 6px; padding: 2px 6px; transition: .12s; background: none; }
+.day-status-btn:hover { border-color: var(--artifact-primary-brand); background: var(--artifact-background-subtle); }
+.day-status-btn.active { border-color: var(--artifact-primary-brand); background: #dce7ff; }
+html[data-theme=dark] .day-status-btn.active { background: #1a2a4a; }
+.day-km-input  { width: 60px; padding: 4px 6px; border: 1px solid var(--artifact-border-light);
+                 border-radius: 5px; font-size: 13px; text-align: center;
+                 background: var(--artifact-background); color: var(--artifact-text-primary); }
+.day-km-label  { font-size: 11px; color: var(--artifact-text-secondary); }
+@media(max-width:640px){
+  .m-member-cell, .m-member-hdr { min-width: 90px; font-size: 10px; padding: 4px 5px !important; }
+  .m-day-hdr { min-width: 28px; width: 28px; }
+  .m-cell { min-width: 28px; }
+  .m-cell-icon { font-size: 11px; }
+}
 
 /* KM MODAL */
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
@@ -331,13 +441,13 @@ td.name-cell   { text-align: left; font-weight: 600; font-size: 11px; white-spac
 .count-val { font-size: 18px; font-weight: 800; min-width: 22px; text-align: center;
              color: var(--artifact-primary-brand); }
 .member-col-hdr {
-  display: grid; grid-template-columns: 24px 1fr 78px 106px;
+  display: grid; grid-template-columns: 52px 1fr 78px 106px;
   gap: 6px; padding: 0 4px 6px;
   font-size: 10px; font-weight: 700; text-transform: uppercase;
   color: var(--artifact-text-secondary); letter-spacing: .04em;
 }
 .member-edit-row {
-  display: grid; grid-template-columns: 24px 1fr 78px 106px;
+  display: grid; grid-template-columns: 52px 1fr 78px 106px;
   gap: 6px; align-items: center; padding: 4px;
   border-radius: 6px; transition: background .15s;
 }
@@ -632,13 +742,19 @@ td.name-cell   { text-align: left; font-weight: 600; font-size: 11px; white-spac
 
   <!-- ATTENDANCE TAB -->
   <div id="tab-attendance" style="display:none" data-glean-id="attendance-section">
-    <div class="table-section">
-      <div class="table-header">
-        <div class="table-title">📋 Attendance &amp; KM Log</div>
-        <div style="font-size:11px;color:var(--artifact-text-secondary)">Click a cell to mark ✅ Present / ❌ Absent</div>
+    <div class="cal-section">
+      <div class="cal-header">
+        <div class="cal-title">🗓️ August 2026 — Attendance Calendar</div>
+        <div class="cal-legend">
+          <span><span class="leg-dot" style="background:#3b82f6"></span>Mon</span>
+          <span><span class="leg-dot" style="background:#16a34a"></span>Wed</span>
+          <span><span class="leg-dot" style="background:#f97316"></span>Fri</span>
+          <span style="font-size:10px">· Click a run day to log attendance</span>
+        </div>
       </div>
-      <div class="table-wrap">
-        <table id="attTable"></table>
+      <div class="matrix-scroll" id="matrixWrap"></div>
+      <div class="sum-table-wrap">
+        <table class="sum-table" id="sumTable"></table>
       </div>
     </div>
   </div>
@@ -689,84 +805,123 @@ let RUNS = [...SCHEDULE];
 // ── QUOTE ENGINE ──────────────────────────────────────────
 const QUOTES = {
   sleeping: [
-    "Zzz... did someone say run? 💤",
-    "My shoes are still in the box 📦",
-    "Running... in my dreams 🌙",
-    "Error 404: Motivation not found 😴",
-    "Loading... please wait... 🔄",
-    "I'll start Monday. Again. 📅",
-    "GPS needs a nap too 🛌",
+    "Zzz... someone say RUN? Nah. 💤",
+    "My shoes are collecting dust. AND WEB. 🕸️",
+    "Running? I thought you said RESTING 😴",
+    "Error 404: Motivation not found 🚫",
+    "I'm saving energy. Since last week. ⚡",
+    "Started from the couch. Still on the couch. 🛋️",
+    "My running schedule says: tomorrow. Always tomorrow. 📅",
+    "Technically still warming up... for 3 weeks 🔥",
+    "GPS can't track what doesn't move 📍",
+    "My spirit runs. My body disagrees. 👻",
+    "Coach said rest day. I said rest month. 💅",
+    "Zero km. Maximum excuses. World record. 🏆",
   ],
   done: [
-    "36km done. Carry me home 🏆",
-    "I'm basically a car now 🏎️",
-    "Call an ambulance. NOT FOR ME 💪",
-    "Target reached. Trophies welcome 🥇",
-    "BEAST MODE: activated ✅",
-    "Too easy. Doing it again. 😤",
+    "36km. I am the road now. 🛣️",
+    "Call an ambulance. NOT FOR ME. 💪",
+    "My legs resigned. I ignored them. 🦵",
+    "Target reached. Retirement incoming. 🎉",
+    "Ran 36km. Still not thin. This is a scam. 😤",
+    "I peaked. Literally and figuratively. ⛰️",
+    "Done. Where's my trophy and my food? 🥇🍜",
+    "36km and I still look this good. Science. 😎",
+    "Finished. Please send stretcher. 🚑",
+    "BEAST MODE: ON. Also: LEGS DEAD. 💀",
   ],
   leader: [
-    "Footsteps? Just my echo 👑",
+    "Footsteps? Just my echo. 👑",
     "Gap is growing & so is my ego 😈",
-    "Fear me, mortals! 🔥",
-    "Sponsored by 'No Days Off' ⚡",
-    "Lapped them. Twice. Oops. 🚀",
-    "This road belongs to me 🛣️",
+    "Fear me, mortals 🔥",
+    "I don't sweat — I sparkle ✨",
+    "Lapped them twice. Starting to feel bad. Nah. 🚀",
+    "This road paid rent to ME 🏠",
+    "The others are running. I'm just commuting. 🚌",
+    "Distance: MAX. Humility: MIN. 📊",
+    "Not showing off. Just jogging. At Mach 2. ✈️",
+    "They call it unfair. I call it training. 😇",
+    "First place is lonely. But roomy. 🛋️",
   ],
   close: [
     "Almost there... or am I? 🤔",
-    "Pain is temporary, glory lasts 💪",
-    "36km = 36×1km. Easy math! 📐",
-    "I can smell the finish line 👃",
-    "Final boss approaching 😤",
+    "Pain is temporary. This leaderboard is forever. 📸",
+    "36km = 36 x 1km. Easy math, hard legs. 📐",
+    "I can smell the finish line. Or is that me? 👃",
+    "Final boss incoming. The boss is also me. 😤",
+    "So close I can taste the victory pho 🍜",
+    "Body: STOP. Brain: NO. We keep going. 🧠",
+    "98% done. 2% pure suffering. Let's go. 💪",
+    "Home stretch. Ignore the crying. That's motivation. 😭",
   ],
   mid: [
-    "Pacing myself. Very slowly. 😅",
-    "Saving energy for the sprint 🧠",
-    "Rome wasn't built in a day 🏛️",
+    "Pacing myself. Very. Very. Slowly. 😅",
+    "Saving energy for when I actually need it... still waiting 🧠",
+    "Rome wasn't built in a day. Neither is my fitness. 🏛️",
     "Slow and steady... ish 🐢",
-    "My legs filed a complaint 📝",
+    "My legs filed a formal HR complaint 📝",
+    "Half the month gone. Half my will too. 🌗",
+    "Running is 90% mental. The other 10% is also suffering. 🧠",
+    "Average pace, exceptional excuses 📋",
+    "I run because punching people is illegal 🥊",
+    "Training for the 50km. Currently at 18km. Roughly on track. Maybe. 🗺️",
   ],
   behind: [
     "The road misses me. Probably. 🛣️",
     "Running mentally. Does that count? 🧠",
     "Great personality though 😅",
-    "In a very long warm-up phase 🤷",
+    "In a VERY long warm-up phase 🤷",
     "Starting soon™ ⏳",
+    "My Strava is embarrassingly empty 📭",
+    "I have a running outfit. That's step one. 👟",
+    "Technically I ran... to the fridge 🧊",
+    "Motivation level: requires reboot 🔄",
+    "The group needs a mascot. I volunteer. 🐨",
+    "I signed up for the vibes, not the km 🎵",
+    "Plot twist: I was the group chat, not the runner 💬",
+    "My shoes went for a run without me. Impressive. 👟",
   ],
   lt_urgent: [
-    "LT deadline coming! No more excuses! 🎯",
-    "PANIC RUN ACTIVATED! 😱",
-    "Clock is ticking! GO GO GO! 🕐",
+    "LT DEADLINE IN < 30 DAYS. PANIC ACTIVATED 😱",
+    "The calendar is not your friend right now 📅",
+    "At this pace you'll finish... never. RUN. 🏃",
+    "Your long-term goal called. It's concerned. 📞",
+    "Time flies. You do not. Fix that. ✈️",
+    "Fun fact: deadlines don't negotiate 🕐",
   ],
   lt_on_track: [
     "Long game winner right here 📈",
-    "On track for the big goal! 🎯",
+    "Quietly crushing the big goal 💪",
+    "Slow burn. Results incoming. 🔥",
+    "Your future self will thank you. Probably. 🙏",
+    "The tortoise wins again 🐢",
   ],
 };
 
+// Rotate quotes based on day-of-month so they change daily
 function getQuote(s, rank, ltTotalKm) {
   const lt = ltTargets[s.mi];
   const monthPct   = TARGET_KM > 0 ? s.km / TARGET_KM : 0;
   const isDone     = s.km >= TARGET_KM;
   const isSleeping = s.km === 0;
   const isLeader   = rank === 0 && s.km > 0;
+  const dayRotate  = new Date().getDate() + s.mi; // changes daily per member
+  const pick = (arr) => arr[dayRotate % arr.length];
   // LT urgency
   if (lt && lt.date && lt.km > 0) {
     const daysLeft = Math.ceil((new Date(lt.date) - new Date()) / 86400000);
     const ltPct    = ltTotalKm / lt.km;
-    if (daysLeft <= 30 && ltPct < 0.8)
-      return QUOTES.lt_urgent[s.mi % QUOTES.lt_urgent.length];
-    if (ltPct >= 0.9 && !isDone)
-      return QUOTES.lt_on_track[s.mi % QUOTES.lt_on_track.length];
+    if (daysLeft <= 30 && ltPct < 0.8) return pick(QUOTES.lt_urgent);
+    if (ltPct >= 0.9 && !isDone)       return pick(QUOTES.lt_on_track);
   }
-  if (isSleeping) return QUOTES.sleeping[s.mi % QUOTES.sleeping.length];
-  if (isDone)     return QUOTES.done[s.mi % QUOTES.done.length];
-  if (isLeader)   return QUOTES.leader[s.mi % QUOTES.leader.length];
-  if (monthPct > 0.75) return QUOTES.close[s.mi % QUOTES.close.length];
-  if (monthPct > 0.25) return QUOTES.mid[s.mi % QUOTES.mid.length];
-  return QUOTES.behind[s.mi % QUOTES.behind.length];
+  if (isSleeping)       return pick(QUOTES.sleeping);
+  if (isDone)           return pick(QUOTES.done);
+  if (isLeader)         return pick(QUOTES.leader);
+  if (monthPct > 0.75)  return pick(QUOTES.close);
+  if (monthPct > 0.25)  return pick(QUOTES.mid);
+  return pick(QUOTES.behind);
 }
+
 
 // ── RUN GENERATION ────────────────────────────────────────
 function genRuns(y, m) {
@@ -813,6 +968,7 @@ async function initFirebase() {
       if (v.ltTargets)   ltTargets   = {...v.ltTargets};
       if (v.activeCount) activeCount = v.activeCount;
       if (Array.isArray(v.animals) && v.animals.length) ANIMALS = [...v.animals];
+      if (v.customIcons && typeof v.customIcons === 'object') customIcons = {...v.customIcons};
       if (v.photos) {
         Object.entries(v.photos).forEach(([k, url]) => {
           localStorage.setItem('trek_photo_' + k, url);
@@ -877,17 +1033,9 @@ function loadLocal() {
 function getPhoto(mi) { return localStorage.getItem(`trek_photo_${mi}`) || null; }
 function savePhoto(mi, url) { localStorage.setItem(`trek_photo_${mi}`, url); }
 window.handleAvatarClick = function(e, mi) {
-  // Top half of avatar = change face photo; bottom half = change animal
-  const rect = e.currentTarget.getBoundingClientRect();
-  const relY = e.clientY - rect.top;
-  if (relY < rect.height * 0.55) {
-    window.uploadPhoto(mi);
-  } else {
-    // Open animal picker for this member
-    openMemberEditor();
-    // Slight delay to ensure modal is open before scrolling to member
-    setTimeout(() => window.openAnimalPicker(mi), 120);
-  }
+  // Clicking avatar always opens photo upload
+  // Animal icon is changed in 👥 Members settings
+  window.uploadPhoto(mi);
 };
 window.uploadPhoto = function(mi) {
   const input = document.createElement('input');
@@ -967,7 +1115,7 @@ function renderRace(stats) {
   sorted.forEach((s, rank) => {
     const pct        = Math.min(s.km / TARGET_KM * 100, 100);
     const photo      = getPhoto(s.mi);
-    const animal     = ANIMALS[s.mi % ANIMALS.length];
+    const animal     = getIcon(s.mi);
     const color      = LANE_CLR[s.mi % LANE_CLR.length];
     const isLeader   = rank === 0 && s.km > 0;
     const isDone     = s.km >= TARGET_KM;
@@ -1004,7 +1152,7 @@ function renderRace(stats) {
     row.innerHTML = `
       <div class="racer-rank">${rankIcon}</div>
       <div class="racer-info">
-        <div class="avatar-wrap" title="Click face area to change photo · Click body to change animal" onclick="handleAvatarClick(event,${s.mi})">
+        <div class="avatar-wrap" title="Click to upload your face photo 📸" onclick="handleAvatarClick(event,${s.mi})">
           <div class="avatar" style="border-color:${color}">${avatarInner}</div>
         </div>
         <div style="min-width:0;flex:1">
@@ -1039,54 +1187,227 @@ function renderRace(stats) {
   });
 }
 
-// ── RENDER TABLE ─────────────────────────────────────────
-function renderTable() {
-  const tbl = document.getElementById('attTable');
-  const ac  = Math.min(activeCount, MEMBERS.length);
-  let html = `<thead><tr><th class="member-col">Member</th>`;
-  RUNS.forEach(r => {
-    html += `<th><span class="run-hdate day-${r.day}">${r.day} ${r.date.slice(8)}</span></th>`;
-  });
-  html += `<th>Runs</th><th>Total KM</th></tr></thead><tbody>`;
-  MEMBERS.slice(0, ac).forEach((name, mi) => {
-    const animal = ANIMALS[mi % ANIMALS.length];
+// ── MATRIX CALENDAR RENDER ─────────────────────────────────
+function renderCalendar() { renderMatrix(); }
+function renderMatrix() {
+  const wrap = document.getElementById('matrixWrap');
+  const ac   = Math.min(activeCount, MEMBERS.length);
+  if (!wrap) return;
+  const year = curYear, month = curMonth;
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const todayStr = new Date().toISOString().slice(0,10);
+  const mm = String(month+1).padStart(2,'0');
+  const DOW_S = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const runMap = {};
+  RUNS.forEach(r => { runMap[r.date] = r; });
+
+  // ── header row
+  let h = '<table class="matrix-table"><thead><tr>';
+  h += '<th class="m-member-hdr">Member</th>';
+  for (let d=1; d<=daysInMonth; d++) {
+    const dd = String(d).padStart(2,'0');
+    const dateStr = `${year}-${mm}-${dd}`;
+    const run = runMap[dateStr];
+    const dow = new Date(year, month, d).getDay();
+    const isToday = dateStr === todayStr;
+    const isWknd  = dow===0||dow===6;
+    let cls = 'm-day-hdr';
+    if (run) cls += run.day==='Mon'?' hdr-mon':run.day==='Wed'?' hdr-wed':' hdr-fri';
+    if (isToday) cls += ' hdr-today';
+    if (isWknd && !run) cls += ' hdr-weekend';
+    const runBadgeCls = run ? (run.day==='Mon'?' m-run-r':run.day==='Wed'?' m-run-g':' m-run-o') : '';
+    h += `<th class="${cls}">
+      <div class="dh-dow">${DOW_S[dow]}</div>
+      <div class="dh-num">${isToday?'📍':''} ${d}</div>
+      ${run ? `<div class="dh-run${runBadgeCls}">R${run.num}</div>` : ''}
+    </th>`;
+  }
+  h += '</tr></thead><tbody>';
+
+  // ── member rows
+  for (let mi=0; mi<ac; mi++) {
+    const animal = getIcon(mi);
     const photo  = getPhoto(mi);
-    const avatarHtml = `<span style="font-size:16px;position:relative;display:inline-block;width:22px;height:22px;vertical-align:middle">
-      <span style="position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);font-size:18px">${animal}</span>
-      ${photo?`<img style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:13px;height:13px;border-radius:50%;object-fit:cover;border:1.5px solid var(--artifact-background-light);z-index:2" src="${photo}" alt=""/>`:''}
-    </span>`;
-    html += `<tr><td class="name-cell">${avatarHtml} ${name}</td>`;
-    let runs = 0, km = 0;
-    RUNS.forEach(r => {
-      const k = `${r.id}_${mi}`;
-      const s  = att[k] || 0;
-      const kv = kmData[k] ?? DEFAULT_KM;
-      if (s === 1) { runs++; km += kv; }
-      const icon   = s===1?'✅':s===2?'❌':'⬜';
-      const kmShow = s===1 ? `<div class="km-val">${kv}km</div>` : '';
-      html += `<td class="run-cell" onclick="openKm('${r.id}',${mi})" data-glean-id="cell-${r.id}-${mi}">
-                 <span class="status-icon">${icon}</span>${kmShow}</td>`;
-    });
-    html += `<td class="total-cell">${runs}</td><td class="km-total">${Math.round(km*10)/10} km</td></tr>`;
-  });
-  html += '</tbody>';
-  tbl.innerHTML = html;
+    const av = photo
+      ? `<img src="${photo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">`
+      : `<span style="font-size:15px;vertical-align:middle;margin-right:3px">${animal}</span>`;
+    h += `<tr><td class="m-member-cell">${av}${MEMBERS[mi]}</td>`;
+    for (let d=1; d<=daysInMonth; d++) {
+      const dd = String(d).padStart(2,'0');
+      const dateStr = `${year}-${mm}-${dd}`;
+      const run = runMap[dateStr];
+      const cellKey = run ? `${run.id}_${mi}` : `free_${dateStr}_${mi}`;
+      const s  = att[cellKey]  || 0;
+      const kv = kmData[cellKey] ?? DEFAULT_KM;
+      const icon = s===1?'✅':s===2?'❌':'⬜';
+      const dow  = new Date(year, month, d).getDay();
+      const isToday   = dateStr===todayStr;
+      const isWknd    = dow===0||dow===6;
+      let cls = 'm-cell';
+      if (run) cls += run.day==='Mon'?' cell-run-mon':run.day==='Wed'?' cell-run-wed':' cell-run-fri';
+      if (isToday) cls += ' cell-today';
+      if (isWknd && !run) cls += ' cell-weekend';
+      h += `<td class="${cls}"
+        onclick="matrixClick(event,'${cellKey}',${mi})"
+        title="${MEMBERS[mi]} · ${dateStr}${s===1?' · '+kv+'km':''}"
+      ><span class="m-cell-icon">${icon}</span>${s===1?`<span class="m-cell-km">${kv}km</span>`:''}</td>`;
+    }
+    h += '</tr>';
+  }
+  h += '</tbody></table>';
+  wrap.innerHTML = h;
+  renderSummary(ac);
+  const MNAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const calTitle = document.querySelector('.cal-title');
+  if (calTitle) calTitle.textContent = `🗓️ ${MNAMES[month]} ${year} — Attendance`;
 }
+
+function renderSummary(ac) {
+  const tbl=document.getElementById('sumTable'); if(!tbl) return;
+  let h=`<thead><tr><th class="left">Member</th><th>Runs</th><th>Total KM</th><th>Progress</th><th>Avg KM/Run</th></tr></thead><tbody>`;
+  for(let mi=0;mi<ac;mi++){
+    const animal=getIcon(mi), photo=getPhoto(mi);
+    const av=`<span style="font-size:15px;position:relative;display:inline-block;width:20px;height:20px;vertical-align:middle"><span style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);font-size:16px">${animal}</span>${photo?`<img style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;object-fit:cover;border:1px solid var(--artifact-background-light);z-index:2" src="${photo}" alt=""/>`:''}</span>`;
+    let runs=0,km=0;
+    RUNS.forEach(r=>{const k=`${r.id}_${mi}`,s=att[k]||0,kv=kmData[k]??DEFAULT_KM;if(s===1){runs++;km+=kv;}});
+    const pct=Math.min(100,Math.round(km/TARGET_KM*100));
+    const avg=runs>0?Math.round(km/runs*10)/10:0;
+    const bc=pct>=100?'#22c55e':pct>=66?'#3b82f6':pct>=33?'#f97316':'#ef4444';
+    h+=`<tr><td class="name-cell">${av} ${MEMBERS[mi]}</td><td class="total-cell">${runs}/${RUNS.length}</td><td class="km-total">${Math.round(km*10)/10} km</td><td><div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%;background:${bc}"></div></div><div style="font-size:9px;color:var(--artifact-text-secondary);margin-top:2px">${pct}% of ${TARGET_KM}km</div></td><td style="font-size:11px">${avg>0?avg+'km':'—'}</td></tr>`;
+  }
+  tbl.innerHTML=h+'</tbody>';
+}
+
+// ── MATRIX CELL CLICK + BOTTOM SHEET ─────────────────────────────────────
+let _bsKey = null, _bsMi = null;
+
+window.matrixClick = function(evt, cellKey, mi) {
+  evt.stopPropagation();
+  openBs(cellKey, mi);
+};
+
+function openBs(cellKey, mi) {
+  _bsKey = cellKey; _bsMi = mi;
+  const animal  = getIcon(mi);
+  const name    = MEMBERS[mi];
+  const curKm   = kmData[cellKey] ?? DEFAULT_KM;
+  const curStat = att[cellKey] || 0;
+  const ltKm    = ltTargets[mi]?.km   || '—';
+  const ltDate  = ltTargets[mi]?.date || '';
+  const photo   = getPhoto(mi);
+
+  // Parse date from cellKey (format: r{N}_{mi} or free_{YYYY-MM-DD}_{mi})
+  let dateStr = '';
+  if (cellKey.startsWith('free_')) {
+    const parts = cellKey.split('_');
+    dateStr = parts[1] || '';
+  } else {
+    // find run date from schedule
+    const runIdx = parseInt(cellKey.split('_')[0].replace('r','')) - 1;
+    const run = SCHEDULE[runIdx];
+    if (run) dateStr = run.date;
+  }
+  const dateLabel = dateStr
+    ? new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'})
+    : '';
+
+  // Status label
+  const statusLabel = curStat === 1 ? '✅ Currently: Present' : curStat === 2 ? '❌ Currently: Absent' : '⬜ Not logged yet';
+
+  // Populate sheet
+  document.getElementById('bsTitle').textContent = animal + ' ' + name;
+  document.getElementById('bsDate').textContent  = dateLabel;
+  document.getElementById('bsMemberName').textContent = name;
+  document.getElementById('bsMemberSub').textContent  = statusLabel;
+
+  // Avatar
+  const avatarEl = document.getElementById('bsAvatar');
+  if (photo) {
+    avatarEl.innerHTML = `<img src="${photo}" alt="${name}"><span style="position:absolute;bottom:0;right:0;font-size:16px">${animal}</span>`;
+  } else {
+    avatarEl.textContent = animal;
+  }
+
+  // KM input
+  const inp = document.getElementById('bsKmInput');
+  inp.value = curKm;
+
+  // Open overlay
+  const ov = document.getElementById('bsOverlay');
+  ov.classList.add('open');
+  setTimeout(() => { inp.focus(); inp.select(); }, 200);
+}
+
+window.bsOverlayClick = function(e) {
+  if (e.target === document.getElementById('bsOverlay')) closeBs();
+};
+
+window.closeBs = function() {
+  const ov = document.getElementById('bsOverlay');
+  if (!ov) return;
+  ov.classList.remove('open');
+  _bsKey = null; _bsMi = null;
+};
+
+window.bsKmStep = function(delta) {
+  const inp = document.getElementById('bsKmInput');
+  const val = parseFloat(inp.value) || DEFAULT_KM;
+  inp.value = Math.max(0, Math.round((val + delta) * 10) / 10);
+};
+
+window.bsConfirm = function(state) {
+  if (!_bsKey) return;
+  const km = parseFloat(document.getElementById('bsKmInput')?.value) || DEFAULT_KM;
+  writeMatrixCell(_bsKey, state, state === 0 ? DEFAULT_KM : km);
+  // Update sub-label immediately
+  const statusLabel = state === 1 ? '✅ Currently: Present' : state === 2 ? '❌ Currently: Absent' : '⬜ Not logged yet';
+  document.getElementById('bsMemberSub').textContent = statusLabel;
+  closeBs();
+};
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('bsOverlay')?.classList.contains('open')) return;
+  if (e.key === 'Enter')  { e.preventDefault(); bsConfirm(1); }
+  if (e.key === 'Escape') { e.preventDefault(); closeBs(); }
+});
+
+async function writeMatrixCell(cellKey, state, km) {
+  att[cellKey]    = state;
+  kmData[cellKey] = km;
+  localStorage.setItem('trek_att', JSON.stringify(att));
+  localStorage.setItem('trek_km',  JSON.stringify(kmData));
+  renderMatrix();
+  renderKPIs(getMemberStats());
+  renderRace(getMemberStats());
+  if (db) {
+    try {
+      window._fbSet(window._fbRef(db, `trek_dlut_50km/att/${cellKey}`), state);
+      window._fbSet(window._fbRef(db, `trek_dlut_50km/km/${cellKey}`),  km);
+    } catch(e) { console.warn('Firebase write failed', e); }
+  }
+}
+
+function renderTable() { renderMatrix(); }
 
 function renderAll() {
   const stats = getMemberStats();
   renderKPIs(stats);
   renderRace(stats);
-  renderTable();
+  renderMatrix();
   const MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   document.getElementById('monthLabel').textContent = `${MNAMES[curMonth]} ${curYear}`;
-}
+
+  refreshMemberBtns();}
 
 // ── KM MODAL ─────────────────────────────────────────────
 let kmModal_run = null, kmModal_mi = null;
 window.openKm = function(runId, mi) {
   kmModal_run = runId; kmModal_mi = mi;
-  document.getElementById('kmAnimal').textContent = ANIMALS[mi % ANIMALS.length];
+  const _kmIcon = getIcon(mi);
+  const _kmAnimalEl = document.getElementById('kmAnimal');
+  if (_kmIcon.startsWith('data:')) {
+    _kmAnimalEl.innerHTML = '<img src="' + _kmIcon + '" style="width:40px;height:40px;object-fit:cover;border-radius:8px">';
+  } else { _kmAnimalEl.textContent = _kmIcon; }
   document.getElementById('kmName').textContent   = MEMBERS[mi];
   const k = `${runId}_${mi}`;
   document.getElementById('kmInput').value = kmData[k] ?? DEFAULT_KM;
@@ -1117,7 +1438,9 @@ window.openMemberEditor = function() {
     const lt = ltTargets[i] || {};
     const inactive = i >= activeCount;
     return `<div class="member-edit-row ${inactive?'inactive':''}" id="mer_${i}">
-      <button type="button" class="animal-pick-btn" id="apb_${i}" onclick="openAnimalPicker(${i})" title="🐾 Click to change animal" style="cursor:pointer;font-size:22px;background:var(--artifact-background);border:2px solid var(--artifact-border-light);border-radius:8px;padding:4px 8px;transition:all .15s" onmouseover="this.style.borderColor='var(--artifact-primary-brand)';this.style.transform='scale(1.15)'" onmouseout="this.style.borderColor='var(--artifact-border-light)';this.style.transform='scale(1)'">${ANIMALS[i]}</button>
+      <button type="button" id="apb_${i}" data-apidx="${i}" class="ap-open-btn" title="🐾 Click to change animal / icon"
+        style="font-size:22px;background:var(--artifact-background);border:2px solid var(--artifact-border-light);border-radius:8px;padding:3px 5px;cursor:pointer;width:48px;height:48px;display:flex;align-items:center;justify-content:center;transition:border-color .15s,transform .15s;line-height:1"
+      >${customIcons[i] ? '<img src="'+customIcons[i]+'" style="width:32px;height:32px;object-fit:cover;border-radius:6px" alt="icon">' : ANIMALS[i]}</button>
       <input id="mi_${i}" value="${m}" placeholder="Member ${i+1}" type="text"/>
       <input type="number" id="lt_km_${i}" value="${lt.km||''}" placeholder="e.g. 50" min="0" step="1"/>
       <input type="date"   id="lt_dt_${i}" value="${lt.date||''}"/>
@@ -1179,18 +1502,177 @@ window.changeMonth = function(dir) {
 
 // ── MISC ─────────────────────────────────────────────────
 window.resetData = function() {
-  if (!confirm('Reset ALL attendance data? This cannot be undone.')) return;
+  const code = prompt('🔒 Enter passcode to reset all data:');
+  if (code === null) return; // cancelled
+  if (code !== '1233') {
+    alert('❌ Wrong passcode. Reset cancelled.');
+    return;
+  }
+  if (!confirm('⚠️ Are you sure? This will delete ALL attendance & KM data for everyone. This cannot be undone.')) return;
   att = {}; kmData = {};
   if (db) {
     window._fbSet(window._fbRef(db, 'trek_dlut_50km/att'), {});
     window._fbSet(window._fbRef(db, 'trek_dlut_50km/km'),  {});
   } else { saveLocal(); }
   renderAll();
+  alert('✅ All data has been reset.');
 };
 window.toggleDark = function() {
   const h = document.documentElement;
   h.dataset.theme = h.dataset.theme === 'dark' ? '' : 'dark';
   localStorage.setItem('trek_theme', h.dataset.theme);
+};
+
+
+// ── EXPOSE MODULE VARS TO NON-MODULE SCRIPTS ─────────────────────────────
+
+// ── ANIMAL PICKER (fully inside module — no bridge needed) ───────────────────
+const ALL_ANIMALS = [
+  '🐯','🦊','🐸','🐼','🐱','🐻','🦁','🐨','🐮','🐶',
+  '🐺','🦝','🐭','🐹','🐰','🐇','🦄','🐧','🦅','🦆',
+  '🐬','🦈','🐊','🦖','🐉','🦕','🐔','🦜','🦓','🦒',
+  '🐘','🦏','🦛','🐃','🦬','🐗','🦌','🐿️','🦔','🦦',
+  '🦥','🦘','🦙','🐪','🐫','🐓','🦃','🕊️','🦢','🦩',
+  '🦚','🐢','🦎','🐍','🦋','🐝','🐛','🐞','🦗','🦂',
+  '🏃','🚴','🧗','🏊','🤸','🚵','⚡','🔥','💪','🥷',
+];
+// Custom uploaded icons per member (base64 / data URL)
+let customIcons = (() => {
+  try { const s = localStorage.getItem('trek_custom_icons'); return s ? JSON.parse(s) : {}; } catch(e) { return {}; }
+})();
+
+function getIcon(mi) {
+  return customIcons[mi] || ANIMALS[mi % ANIMALS.length];
+}
+function isCustomIcon(mi) { return !!customIcons[mi]; }
+
+let apTargetIdx = -1;
+
+function openApModal(idx) {
+  apTargetIdx = idx;
+  const name = MEMBERS[idx] || ('Member ' + (idx+1));
+  document.getElementById('apTitle').textContent = '🐾 Change icon for ' + name;
+  const current = getIcon(idx);
+  const grid = document.getElementById('apGrid');
+  grid.innerHTML = ALL_ANIMALS.map(e => {
+    const isCur = !isCustomIcon(idx) && e === current;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = e;
+    btn.dataset.emoji = e;
+    btn.style.cssText = [
+      'font-size:20px',
+      'background:' + (isCur ? '#dce7ff' : 'none'),
+      'border:2px solid ' + (isCur ? '#3559e6' : 'transparent'),
+      'border-radius:8px',
+      'padding:3px',
+      'cursor:pointer',
+      'width:36px',
+      'height:36px',
+      'display:inline-flex',
+      'align-items:center',
+      'justify-content:center',
+      'transition:all .1s',
+    ].join(';');
+    btn.addEventListener('mouseenter', () => { btn.style.background='#f0f4ff'; btn.style.borderColor='#3559e6'; btn.style.transform='scale(1.15)'; });
+    btn.addEventListener('mouseleave', () => { btn.style.background=isCur?'#dce7ff':'none'; btn.style.borderColor=isCur?'#3559e6':'transparent'; btn.style.transform='scale(1)'; });
+    btn.addEventListener('click', () => apSelectEmoji(e));
+    return btn.outerHTML;
+  }).join('');
+  // re-attach listeners after innerHTML (outerHTML loses them — use event delegation)
+  grid.onclick = (ev) => {
+    const btn = ev.target.closest('button[data-emoji]');
+    if (btn) apSelectEmoji(btn.dataset.emoji);
+  };
+  const ov = document.getElementById('apOverlay');
+  ov.style.display = 'flex';
+  // Apply dark mode to picker box
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('apBox').style.background = dark ? '#1e1e2e' : '#fff';
+  document.getElementById('apBox').style.color = dark ? '#e0e0e0' : '#1b1b1b';
+}
+
+async function apSelectEmoji(emoji) {
+  if (apTargetIdx < 0) return;
+  const idx = apTargetIdx;
+  delete customIcons[idx]; // remove custom image if any
+  ANIMALS[idx] = emoji;
+  localStorage.setItem('trek_animals', JSON.stringify(ANIMALS));
+  localStorage.setItem('trek_custom_icons', JSON.stringify(customIcons));
+  closeApModal();
+  updateMemberBtn(idx);
+  renderAll();
+  if (db) {
+    try { await window._fbSet(window._fbRef(db, 'trek_dlut_50km/animals'), ANIMALS); } catch(e) {}
+  }
+}
+
+async function apSelectCustom(dataUrl) {
+  if (apTargetIdx < 0) return;
+  const idx = apTargetIdx;
+  customIcons[idx] = dataUrl;
+  localStorage.setItem('trek_custom_icons', JSON.stringify(customIcons));
+  closeApModal();
+  updateMemberBtn(idx);
+  renderAll();
+  if (db) {
+    try { await window._fbSet(window._fbRef(db, 'trek_dlut_50km/customIcons'), customIcons); } catch(e) {}
+  }
+}
+
+function updateMemberBtn(idx) {
+  const btn = document.getElementById('apb_' + idx);
+  if (!btn) return;
+  const ci = customIcons[idx];
+  if (ci) {
+    btn.innerHTML = '<img src="' + ci + '" style="width:32px;height:32px;object-fit:cover;border-radius:6px" alt="icon">';
+  } else {
+    btn.textContent = ANIMALS[idx];
+  }
+}
+
+function closeApModal() {
+  document.getElementById('apOverlay').style.display = 'none';
+  apTargetIdx = -1;
+}
+
+// Wire up close button and overlay click
+document.getElementById('apClose').addEventListener('click', closeApModal);
+document.getElementById('apOverlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('apOverlay')) closeApModal();
+});
+
+// Wire up file upload
+document.getElementById('apFileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => { apSelectCustom(ev.target.result); };
+  reader.readAsDataURL(file);
+  e.target.value = ''; // reset so same file can be re-selected
+});
+
+// Wire up all .ap-open-btn buttons via event delegation on document
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.ap-open-btn');
+  if (btn) {
+    const idx = parseInt(btn.dataset.apidx, 10);
+    if (!isNaN(idx)) openApModal(idx);
+  }
+});
+
+// Update member buttons to show custom icons after load
+function refreshMemberBtns() {
+  MEMBERS.forEach((_, i) => updateMemberBtn(i));
+}
+
+
+window._APP = {
+  getAnimals:  () => ANIMALS,
+  setAnimal:   (i, e) => { ANIMALS[i] = e; },
+  getMembers:  () => MEMBERS,
+  renderAll:   () => renderAll(),
+  getDb:       () => db,
 };
 
 // ── BOOT ─────────────────────────────────────────────────
@@ -1250,77 +1732,71 @@ document.getElementById('memberOverlay').addEventListener('click', function(e) {
   });
 </script>
 
-<!-- ANIMAL PICKER OVERLAY -->
-<div class="animal-picker-overlay hidden" id="animalPickerOverlay">
-  <div class="animal-picker-box">
-    <div class="ap-title">🐾 Pick an animal for <span id="apMemberName">Member</span></div>
-    <div class="ap-grid" id="apGrid"></div>
-    <div class="ap-close" onclick="closeAnimalPicker()">✕ Cancel</div>
+<script>
+</script>
+
+
+<!-- ── BOTTOM SHEET ── -->
+<div class="bs-overlay" id="bsOverlay" onclick="bsOverlayClick(event)">
+  <div class="bs-sheet" id="bsSheet">
+    <div class="bs-handle"></div>
+    <div class="bs-header">
+      <div>
+        <div class="bs-title" id="bsTitle">Member Name</div>
+        <div class="bs-date"  id="bsDate">Date</div>
+      </div>
+      <button onclick="closeBs()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--artifact-text-secondary)">✕</button>
+    </div>
+    <div class="bs-body">
+      <div class="bs-member-info">
+        <div class="bs-avatar" id="bsAvatar"></div>
+        <div>
+          <div class="bs-member-name" id="bsMemberName"></div>
+          <div class="bs-member-sub"  id="bsMemberSub"></div>
+        </div>
+      </div>
+      <div class="bs-km-row">
+        <span class="bs-km-label">🏃 Distance (km)</span>
+        <input type="number" class="bs-km-input" id="bsKmInput"
+          min="0" max="99" step="0.5" value="3"
+          inputmode="decimal" pattern="[0-9]*">
+        <div class="bs-km-stepper">
+          <button onclick="bsKmStep(0.5)">＋</button>
+          <button onclick="bsKmStep(-0.5)">－</button>
+        </div>
+      </div>
+      <div class="bs-btns">
+        <button class="bs-btn-present" onclick="bsConfirm(1)">✅ Present</button>
+        <button class="bs-btn-absent"  onclick="bsConfirm(2)">❌ Absent</button>
+        <button class="bs-btn-clear"   onclick="bsConfirm(0)">⬜ Clear</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<script>
-// ── ANIMAL PICKER ──────────────────────────────────────────
-const ALL_ANIMALS = [
-  '🐯','🦊','🐸','🐼','🐱','🐻','🦁','🐨','🐮','🐶',
-  '🐺','🦝','🐭','🐹','🐰','🦋','🐯','🦄','🐧','🦅',
-  '🐬','🦈','🐊','🦖','🐉','🦊','🐔','🦜','🦓','🦒',
-  '🐘','🦏','🦛','🐃','🦬','🐗','🦌','🐿️','🦔','🦦',
-  '🦥','🦘','🦙','🐪','🐫','🦙','🐓','🦃','🕊️','🦢',
-  '🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🦕','🦖',
-  '🏃','🚴','🧗','🏊','🤸','🚵','⚡','🔥','💪','🥷'
-];
-let apTargetIndex = -1;
 
-window.openAnimalPicker = function(idx) {
-  apTargetIndex = idx;
-  // Ensure overlay is in body (re-append to guarantee it's on top)
-  const ov = document.getElementById('animalPickerOverlay');
-  if (ov) document.body.appendChild(ov); // move to end of body → always topmost
-  document.getElementById('apMemberName').textContent = MEMBERS[idx] || `Member ${idx+1}`;
-  const grid = document.getElementById('apGrid');
-  const current = ANIMALS[idx] || '';
-  grid.innerHTML = ALL_ANIMALS.map(e =>
-    `<div class="ap-cell ${e===current?'chosen':''}" onclick="selectAnimal('${e}')" title="${e}">${e}</div>`
-  ).join('');
-  document.getElementById('animalPickerOverlay').classList.remove('hidden');
-  document.getElementById('animalPickerOverlay').style.zIndex = '99999';
-};
-
-window.selectAnimal = async function(emoji) {
-  if (apTargetIndex < 0) return;
-  const idx = apTargetIndex;
-  // Update ANIMALS array immediately (source of truth)
-  ANIMALS[idx] = emoji;
-  localStorage.setItem('trek_animals', JSON.stringify(ANIMALS));
-  // Highlight chosen cell in picker
-  document.querySelectorAll('.ap-cell').forEach(c => {
-    c.classList.toggle('chosen', c.textContent.trim() === emoji);
-  });
-  // Close picker first so renderAll can update member editor button
-  closeAnimalPicker();
-  // Re-render everything: race track + left column + member editor
-  renderAll();
-  // Refresh the member editor button immediately (in case modal still open)
-  const btn = document.getElementById(`apb_${idx}`);
-  if (btn) btn.textContent = emoji;
-  // Save to Firebase so all users see the change
-  if (db) {
-    try { await window._fbSet(window._fbRef(db, 'trek_dlut_50km/animals'), ANIMALS); }
-    catch(e) { console.warn('Firebase animal save failed', e); }
-  }
-};
-
-window.closeAnimalPicker = function() {
-  document.getElementById('animalPickerOverlay').classList.add('hidden');
-  apTargetIndex = -1;
-};
-
-// Close on backdrop click
-document.getElementById('animalPickerOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closeAnimalPicker();
-});
-</script>
+<!-- ── ANIMAL PICKER MODAL ── -->
+<div id="apOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;align-items:center;justify-content:center;padding:16px">
+  <div id="apBox" style="background:#fff;border-radius:14px;padding:16px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.3)">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span id="apTitle" style="font-weight:700;font-size:14px;color:#1b1b1b">🐾 Change Icon</span>
+      <button id="apClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <!-- Upload custom image/GIF -->
+    <div style="display:flex;gap:8px;align-items:center;padding:8px;background:#f6f8ff;border-radius:8px;border:1.5px dashed #3559e6">
+      <span style="font-size:20px">📁</span>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600;color:#3559e6">Upload custom icon (image / GIF)</div>
+        <div style="font-size:11px;color:#888">JPG, PNG, GIF, WEBP supported</div>
+      </div>
+      <label for="apFileInput" style="background:#3559e6;color:#fff;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Browse 📂</label>
+      <input type="file" id="apFileInput" accept="image/*,.gif" style="display:none">
+    </div>
+    <!-- Emoji grid -->
+    <div style="font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em">— or pick an emoji —</div>
+    <div id="apGrid" style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
 
 </body>
 </html>
