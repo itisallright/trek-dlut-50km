@@ -1399,7 +1399,7 @@ function renderKPIs(stats) {
   const onTrack   = stats.filter(s => s.km >= TARGET_KM).length;
   document.getElementById('kpiRuns').textContent   = totalRuns;
   document.getElementById('kpiKm').textContent     = Math.round(clubKm*10)/10 + ' km';
-  const avgKmPerMember = ac > 0 ? Math.round(clubKm / ac * 10) / 10 : 0;
+  const avgKmPerMember = stats.length > 0 ? Math.round(clubKm / stats.length * 10) / 10 : 0;
   document.getElementById('kpiAvg').textContent    = avgKmPerMember + ' km';
   document.getElementById('kpiTop').textContent    = top.name?.split(' ')[0] || '–';
   document.getElementById('kpiTarget').textContent = `${onTrack}/${stats.length}`;
@@ -1639,15 +1639,15 @@ function openBs(cellKey, mi) {
   const ltDate  = ltTargets[mi]?.date || '';
   const photo   = getPhoto(mi);
 
-  // Parse date from cellKey (format: r{N}_{mi} or free_{YYYY-MM-DD}_{mi})
+  // Parse date from cellKey (format: r2026-08-03_0 or free_YYYY-MM-DD_mi)
   let dateStr = '';
   if (cellKey.startsWith('free_')) {
     const parts = cellKey.split('_');
     dateStr = parts[1] || '';
   } else {
-    // find run date from schedule
-    const runIdx = parseInt(cellKey.split('_')[0].replace('r','')) - 1;
-    const run = SCHEDULE[runIdx];
+    // runId = everything before last _
+    const runId = cellKey.substring(0, cellKey.lastIndexOf('_'));
+    const run = RUNS.find(r => r.id === runId);
     if (run) dateStr = run.date;
   }
   const dateLabel = dateStr
@@ -2163,6 +2163,19 @@ function openApModal(idx) {
     const btn = ev.target.closest('button[data-emoji]');
     if (btn) apSelectEmoji(btn.dataset.emoji);
   };
+  // Show/hide current icon preview
+  const apCurrentRow = document.getElementById('apCurrentRow');
+  const apCurrentPreview = document.getElementById('apCurrentPreview');
+  const apCurrentLabel = document.getElementById('apCurrentLabel');
+  if (isCustomIcon(idx)) {
+    apCurrentRow.style.display = 'flex';
+    const ci = customIcons[idx];
+    apCurrentPreview.innerHTML = `<img src="${ci}" style="width:100%;height:100%;object-fit:cover;border-radius:6px">`;
+    apCurrentLabel.textContent = 'Custom image/GIF';
+    document.getElementById('apClearIconBtn').onclick = () => { clearCustomIcon(idx); closeApModal(); };
+  } else {
+    apCurrentRow.style.display = 'none';
+  }
   const ov = document.getElementById('apOverlay');
   ov.style.display = 'flex';
   // Apply dark mode to picker box
