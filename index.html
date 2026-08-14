@@ -321,7 +321,7 @@ html[data-theme=dark] .m-run-o { background: #431407; color: #fdba74; }
   background: var(--artifact-background-light);
   border: 1px solid var(--artifact-border-light);
   padding: 5px 8px; white-space: nowrap; font-weight: 600; font-size: 11px; min-width: 130px; }
-.m-cell { border: 1px solid var(--artifact-border-light); text-align: center;
+.m-cell { position: relative; border: 1px solid var(--artifact-border-light); text-align: center;
   padding: 2px 1px; cursor: pointer; transition: background .1s; vertical-align: middle;
   min-width: 36px; user-select: none; }
 .m-cell:hover { filter: brightness(.92); }
@@ -652,7 +652,159 @@ html[data-theme=dark] .day-status-btn.active { background: #1a2a4a; }
   .kpi, .race-section, .table-section { box-shadow: none !important; border: 1px solid rgba(0,0,0,.08); }
   button { display: none !important; }
 }
+
+/* ══════════════════════════════════════════
+   RUN TO EARN  –  DLUT Token System
+   ══════════════════════════════════════════ */
+.earn-section { background: var(--artifact-background-light);
+  border: 1px solid var(--artifact-border-light);
+  border-radius: var(--r); overflow: hidden; margin-bottom: 20px; }
+.earn-header { padding: 16px 20px; border-bottom: 1px solid var(--artifact-border-light);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.earn-title  { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.earn-body   { padding: 20px; }
+
+/* Wallet card */
+.wallet-card { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-radius: 12px; padding: 20px 24px; color: #fff; margin-bottom: 20px;
+  position: relative; overflow: hidden; }
+.wallet-card::before { content: ''; position: absolute; top: -40px; right: -40px;
+  width: 140px; height: 140px; border-radius: 50%;
+  background: rgba(255,215,0,.07); pointer-events: none; }
+.wallet-card::after { content: ''; position: absolute; bottom: -30px; left: -30px;
+  width: 100px; height: 100px; border-radius: 50%;
+  background: rgba(255,255,255,.04); pointer-events: none; }
+.wc-top    { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.wc-brand  { font-size: 13px; font-weight: 700; color: #ffd700; letter-spacing: .08em; text-transform: uppercase; }
+.wc-chain  { font-size: 11px; color: rgba(255,255,255,.5); background: rgba(255,255,255,.1);
+  padding: 3px 10px; border-radius: 20px; }
+.wc-balance { margin-bottom: 8px; }
+.wc-bal-label { font-size: 11px; color: rgba(255,255,255,.5); letter-spacing: .06em; text-transform: uppercase; }
+.wc-bal-val   { font-size: 36px; font-weight: 900; color: #ffd700; letter-spacing: -1px; line-height: 1.1; }
+.wc-bal-sym   { font-size: 16px; font-weight: 700; color: rgba(255,215,0,.7); margin-left: 4px; }
+.wc-addr   { font-size: 11px; color: rgba(255,255,255,.5); font-family: monospace; margin-bottom: 14px; }
+.wc-btns   { display: flex; gap: 8px; flex-wrap: wrap; }
+.wc-btn    { padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 700;
+  border: none; cursor: pointer; transition: opacity .15s; }
+.wc-btn:active { opacity: .7; }
+.wc-btn-connect { background: #ffd700; color: #1a1a2e; }
+.wc-btn-claim   { background: rgba(255,255,255,.12); color: #fff;
+  border: 1px solid rgba(255,255,255,.2); }
+.wc-btn-claim:disabled { opacity: .4; cursor: not-allowed; }
+.wc-not-connected { text-align: center; padding: 8px 0 4px; }
+.wc-not-connected p { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 8px; }
+
+/* Token summary grid */
+.token-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px; margin-bottom: 20px; }
+.token-kpi  { background: var(--artifact-background-subtle); border: 1px solid var(--artifact-border-light);
+  border-radius: 10px; padding: 14px 16px; }
+.token-kpi-icon  { font-size: 20px; margin-bottom: 4px; }
+.token-kpi-val   { font-size: 22px; font-weight: 800; color: var(--artifact-primary-brand); letter-spacing: -.5px; }
+.token-kpi-label { font-size: 10px; color: var(--artifact-text-secondary); text-transform: uppercase;
+  letter-spacing: .05em; margin-top: 2px; }
+
+/* Earn rate card */
+.rate-card { background: var(--artifact-background-subtle); border: 1px solid var(--artifact-border-light);
+  border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; }
+.rate-title { font-size: 12px; font-weight: 700; color: var(--artifact-text-secondary);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+.rate-rows  { display: flex; flex-direction: column; gap: 6px; }
+.rate-row   { display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; color: var(--artifact-text-primary); }
+.rate-desc  { display: flex; align-items: center; gap: 7px; }
+.rate-badge { padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 800;
+  background: #fef3c7; color: #d97706; white-space: nowrap; }
+.rate-badge.gold  { background: #fef9c3; color: #ca8a04; }
+.rate-badge.green { background: var(--artifact-posbg); color: var(--artifact-pos); }
+.rate-badge.blue   { background: #dbeafe; color: #1d4ed8; }
+.rate-badge.purple { background: #f3e8ff; color: #7e22ce; font-size: 11px; font-weight: 800; }
+html[data-theme=dark] .rate-badge.purple { background: #3b0764; color: #d8b4fe; }
+.rate-badge.orange { background: #fff7ed; color: #c2410c; font-size: 11px; font-weight: 800; }
+html[data-theme=dark] .rate-badge.orange { background: #431407; color: #fdba74; }
+html[data-theme=dark] .rate-badge.blue  { background: #1e3a5f; color: #93c5fd; }
+html[data-theme=dark] .rate-badge.green { background: #052e16; color: #4ade80; }
+
+/* Leaderboard */
+.earn-leaderboard { overflow-x: auto; }
+.earn-lb-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.earn-lb-table th { padding: 8px 12px; text-align: left; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; color: var(--artifact-text-secondary);
+  background: var(--artifact-background-subtle);
+  border-bottom: 1px solid var(--artifact-border-light); white-space: nowrap; }
+.earn-lb-table th.right { text-align: right; }
+.earn-lb-table td { padding: 10px 12px; border-bottom: 1px solid var(--artifact-border-light);
+  vertical-align: middle; }
+.earn-lb-table tr:last-child td { border-bottom: none; }
+.earn-lb-table tr:hover td { background: var(--artifact-background-subtle); }
+.lb-rank  { font-size: 16px; width: 30px; }
+.lb-name  { font-weight: 600; font-size: 12px; }
+.lb-km    { color: var(--artifact-text-secondary); font-size: 11px; }
+.lb-token { font-size: 15px; font-weight: 800; color: #d97706; text-align: right; }
+.lb-token .sym { font-size: 10px; font-weight: 600; color: var(--artifact-text-secondary); margin-left: 3px; }
+.lb-bar-wrap { width: 80px; background: var(--artifact-border-light); border-radius: 4px; height: 5px;
+  display: inline-block; overflow: hidden; vertical-align: middle; margin-left: 8px; }
+.lb-bar-fill { height: 100%; background: linear-gradient(to right, #f59e0b, #ffd700);
+  border-radius: 4px; transition: width .6s; }
+.lb-breakdown { display: flex; gap: 4px; flex-wrap: wrap; }
+.lb-chip  { font-size: 9px; padding: 1px 6px; border-radius: 10px;
+  background: var(--artifact-background-subtle); color: var(--artifact-text-secondary);
+  border: 1px solid var(--artifact-border-light); white-space: nowrap; }
+.lb-chip.hi { background: #fef3c7; color: #d97706; border-color: #fde68a; }
+html[data-theme=dark] .lb-chip.hi { background: #451a03; color: #fbbf24; border-color: #92400e; }
+
+/* Wallet NOT connected state */
+.wallet-disconnected { display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 16px 0 4px; }
+.wallet-disconnected p { font-size: 12px; color: rgba(255,255,255,.5); text-align: center; }
+
+/* Claim modal */
+.claim-modal { max-width: 360px; }
+.claim-success { text-align: center; }
+.claim-success .big { font-size: 48px; margin-bottom: 8px; }
+.claim-success .title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+.claim-success .sub { font-size: 12px; color: var(--artifact-text-secondary); line-height: 1.6; }
+
+@media (max-width: 640px) {
+  .wallet-card { padding: 16px; }
+  .wc-bal-val  { font-size: 28px; }
+  .token-grid  { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .earn-lb-table .lb-bar-wrap { display: none; }
+}
+
+/* ── Race Charts ──────────────────────────────────────────── */
+.race-charts-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 14px 16px 16px;
+}
+@media (max-width: 640px) {
+  .race-charts-wrap { grid-template-columns: 1fr; }
+}
+.rc-card {
+  background: var(--artifact-background);
+  border: 1px solid var(--artifact-border-light);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.rc-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--artifact-text-primary);
+  margin-bottom: 2px;
+}
+.rc-subtitle {
+  font-size: 11px;
+  color: var(--artifact-text-secondary);
+  margin-bottom: 12px;
+}
+.rc-canvas-wrap {
+  position: relative;
+  height: 200px;
+}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -747,6 +899,7 @@ html[data-theme=dark] .day-status-btn.active { background: #1a2a4a; }
 <div class="tabs">
   <button class="tab active" type="button" onclick="switchTab('race',this)">🏁 Race</button>
   <button class="tab"        type="button" onclick="switchTab('attendance',this)">📋 Attendance</button>
+  <button class="tab"        type="button" onclick="switchTab('earn',this)">💰 Earn</button>
 </div>
 
 <!-- MAIN -->
@@ -754,7 +907,7 @@ html[data-theme=dark] .day-status-btn.active { background: #1a2a4a; }
   <div class="kpi-row" data-glean-id="kpi-row">
     <div class="kpi" data-glean-id="kpi-sessions"><div class="kpi-icon">🏃</div><div class="kpi-val" id="kpiRuns">0</div><div class="kpi-label">Sessions Logged</div></div>
     <div class="kpi" data-glean-id="kpi-km"><div class="kpi-icon">📏</div><div class="kpi-val" id="kpiKm">0 km</div><div class="kpi-label">Club Total KM</div></div>
-    <div class="kpi" data-glean-id="kpi-avg"><div class="kpi-icon">📊</div><div class="kpi-val" id="kpiAvg">0%</div><div class="kpi-label">Avg Attendance</div></div>
+    <div class="kpi" data-glean-id="kpi-avg"><div class="kpi-icon">📏</div><div class="kpi-val" id="kpiAvg">0 km</div><div class="kpi-label">Avg KM / Member</div></div>
     <div class="kpi" data-glean-id="kpi-top"><div class="kpi-icon">🏆</div><div class="kpi-val" id="kpiTop">–</div><div class="kpi-label">Top Runner</div></div>
     <div class="kpi" data-glean-id="kpi-target"><div class="kpi-icon">🎯</div><div class="kpi-val" id="kpiTarget">0/10</div><div class="kpi-label">On Track (36 km)</div></div>
   </div>
@@ -775,6 +928,101 @@ html[data-theme=dark] .day-status-btn.active { background: #1a2a4a; }
         <div id="raceRows"></div>
       </div>
     </div>
+
+    <!-- ── RACE CHARTS ───────────────────────────────────────── -->
+    <div class="race-charts-wrap" id="raceChartsWrap">
+      <div class="rc-card">
+        <div class="rc-title">🥇 Milestone Winners</div>
+        <div class="rc-subtitle">First member to reach each weekly target</div>
+        <div class="rc-canvas-wrap"><canvas id="chartMilestone"></canvas></div>
+      </div>
+      <div class="rc-card">
+        <div class="rc-title">💎 DLUT Token Balance</div>
+        <div class="rc-subtitle">Tokens earned by each member this month</div>
+        <div class="rc-canvas-wrap"><canvas id="chartDlut"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- EARN TAB -->
+  <div id="tab-earn" style="display:none" data-glean-id="earn-section">
+
+    <!-- Wallet Card -->
+    <div class="earn-section">
+      <div class="earn-header">
+        <div class="earn-title">🏦 Your DLUT Wallet</div>
+        <div style="font-size:11px;color:var(--artifact-text-secondary)">Connect MetaMask to claim tokens on-chain</div>
+      </div>
+      <div class="earn-body">
+        <div class="wallet-card">
+          <div class="wc-top">
+            <div class="wc-brand">💎 DLUT Token</div>
+            <div class="wc-chain" id="wcChain">Polygon Amoy Testnet</div>
+          </div>
+          <div id="wcConnected" style="display:none">
+            <div class="wc-balance">
+              <div class="wc-bal-label">Your DLUT Points</div>
+              <div><span class="wc-bal-val" id="wcBalance">0</span><span class="wc-bal-sym">DLUT</span></div>
+            </div>
+            <div class="wc-addr" id="wcAddr">0x...</div>
+            <div class="wc-btns">
+              <button class="wc-btn wc-btn-claim" id="wcClaimBtn" onclick="claimTokens()" disabled>
+                ⛓️ Claim On-Chain (coming soon)
+              </button>
+              <button class="wc-btn" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);font-size:11px;font-weight:600" onclick="disconnectWallet()">Disconnect</button>
+            </div>
+          </div>
+          <div id="wcDisconnected">
+            <div class="wallet-disconnected">
+              <div style="font-size:32px">🦊</div>
+              <p>Connect MetaMask to link your wallet.<br>Your DLUT points are tracked off-chain and claimable when the smart contract is deployed.</p>
+              <button class="wc-btn wc-btn-connect" onclick="connectWallet()">🦊 Connect MetaMask</button>
+              <p style="font-size:10px;margin-top:4px;opacity:.6">No MetaMask? Install from metamask.io · Or just earn points below — wallet is optional!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Token KPIs -->
+        <div class="token-grid" id="earnKpis"></div>
+
+        <!-- Earn Rates -->
+        <div class="rate-card">
+          <div class="rate-title">💰 How to Earn DLUT Tokens</div>
+          <div class="rate-rows">
+            <div style="font-size:10px;font-weight:700;color:var(--artifact-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">🏃 Distance</div>
+            <div class="rate-row"><div class="rate-desc">🏃 Every km run</div><span class="rate-badge">10 DLUT / km</span></div>
+            <div class="rate-row"><div class="rate-desc">🎉 First run of month</div><span class="rate-badge blue">+20 DLUT</span></div>
+            <div style="height:6px"></div>
+            <div style="font-size:10px;font-weight:700;color:var(--artifact-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">🏆 Milestone Bonuses</div>
+            <div class="rate-row"><div class="rate-desc">🏆 Reach W1 — 9 km</div><span class="rate-badge gold">+100 DLUT</span></div>
+            <div class="rate-row"><div class="rate-desc">🏆 Reach W2 — 18 km</div><span class="rate-badge gold">+200 DLUT</span></div>
+            <div class="rate-row"><div class="rate-desc">🏆 Reach W3 — 27 km</div><span class="rate-badge gold">+300 DLUT</span></div>
+            <div class="rate-row"><div class="rate-desc">👸 Monthly goal — 36 km</div><span class="rate-badge gold">+500 DLUT</span></div>
+            <div style="height:6px"></div>
+            <div style="font-size:10px;font-weight:700;color:var(--artifact-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">🥇 First-to-Reach Bonus <span style="color:#7e22ce">(1 winner per milestone)</span></div>
+            <div class="rate-row"><div class="rate-desc">🥇 1st member to reach W1</div><span class="rate-badge purple">+150 DLUT</span></div>
+            <div class="rate-row"><div class="rate-desc">🥇 1st member to reach W2</div><span class="rate-badge purple">+250 DLUT</span></div>
+            <div class="rate-row"><div class="rate-desc">🥇 1st member to reach W3</div><span class="rate-badge purple">+350 DLUT</span></div>
+            <div class="rate-row"><div class="rate-desc">👑 1st to monthly goal</div><span class="rate-badge orange">+500 DLUT</span></div>
+            <div style="height:6px"></div>
+            <div style="font-size:10px;font-weight:700;color:var(--artifact-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">🔥 Consistency</div>
+            <div class="rate-row"><div class="rate-desc">🔥 Perfect week (all sessions)</div><span class="rate-badge green">+50 DLUT / week</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="earn-section">
+      <div class="earn-header">
+        <div class="earn-title">🏆 Token Leaderboard</div>
+        <div style="font-size:11px;color:var(--artifact-text-secondary)">Updated in real-time · 1 DLUT ≈ your pride 🏅</div>
+      </div>
+      <div id="firstMilestoneWinners" style="padding:0 20px 12px"></div>
+      <div class="earn-leaderboard" id="earnLeaderboard"></div>
+    </div>
+
   </div>
 
   <!-- ATTENDANCE TAB -->
@@ -1001,6 +1249,7 @@ async function initFirebase() {
       const v = snap.val() || {};
       att     = v.att        || {};
       kmData  = v.km         || {};
+      firstMilestonesCache = v.first_milestones || {};
       if (v.members)     MEMBERS     = [...v.members];
       if (v.ltTargets)   ltTargets   = {...v.ltTargets};
       if (v.activeCount) activeCount = v.activeCount;
@@ -1150,7 +1399,8 @@ function renderKPIs(stats) {
   const onTrack   = stats.filter(s => s.km >= TARGET_KM).length;
   document.getElementById('kpiRuns').textContent   = totalRuns;
   document.getElementById('kpiKm').textContent     = Math.round(clubKm*10)/10 + ' km';
-  document.getElementById('kpiAvg').textContent    = avgPct + '%';
+  const avgKmPerMember = ac > 0 ? Math.round(clubKm / ac * 10) / 10 : 0;
+  document.getElementById('kpiAvg').textContent    = avgKmPerMember + ' km';
   document.getElementById('kpiTop').textContent    = top.name?.split(' ')[0] || '–';
   document.getElementById('kpiTarget').textContent = `${onTrack}/${stats.length}`;
   document.getElementById('membersBtn').textContent = `👥 ${stats.length} Members`;
@@ -1542,11 +1792,179 @@ async function writeMatrixCell(cellKey, state, km) {
 
 function renderTable() { renderMatrix(); }
 
+
+// ── RACE CHARTS ────────────────────────────────────────────────────────────
+let _chartMilestone = null;
+let _chartDlut      = null;
+
+function renderRaceCharts() {
+  if (typeof Chart === 'undefined') return; // Chart.js not yet loaded
+  const ac = Math.min(activeCount, MEMBERS.length);
+
+  // ── Chart 1: Milestone winners ─────────────────────────────────────────
+  const ym      = `${curYear}_${curMonth + 1}`;
+  const fm      = firstMilestonesCache[ym] || {};
+  const mLabels = ['🏆 W1
+9 km', '🏆 W2
+18 km', '🏆 W3
+27 km', '👸 Monthly
+36 km'];
+  const mKeys   = ['W1', 'W2', 'W3', 'M36'];
+  const mColors = ['#f59e0b', '#d97706', '#b45309', '#7e22ce'];
+
+  // Build stacked bars: 1 bar per milestone, value = 1 if won by a member
+  const mDatasets = [];
+  const memberColors = [
+    '#3b82f6','#22c55e','#f97316','#ec4899',
+    '#8b5cf6','#14b8a6','#ef4444','#84cc16','#06b6d4','#f59e0b'
+  ];
+  for (let mi = 0; mi < ac; mi++) {
+    const data = mKeys.map(k => (fm[k]?.mi === mi ? 1 : 0));
+    const hasBadge = data.some(v => v > 0);
+    if (!hasBadge) continue;
+    mDatasets.push({
+      label: MEMBERS[mi].split(' ')[0],
+      data,
+      backgroundColor: memberColors[mi % memberColors.length],
+      borderRadius: 6,
+      borderSkipped: false,
+    });
+  }
+  // If nobody won anything yet, show empty
+  if (mDatasets.length === 0) {
+    mDatasets.push({
+      label: 'Not yet claimed',
+      data: [0, 0, 0, 0],
+      backgroundColor: '#e5e7eb',
+      borderRadius: 6,
+    });
+  }
+
+  const ctxM = document.getElementById('chartMilestone');
+  if (ctxM) {
+    if (_chartMilestone) _chartMilestone.destroy();
+    _chartMilestone = new Chart(ctxM, {
+      type: 'bar',
+      data: { labels: mLabels, datasets: mDatasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 10,
+              font: { size: 11 },
+              color: getComputedStyle(document.documentElement).getPropertyValue('--artifact-text-primary').trim() || '#1b1b1b',
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: ${ctx.raw === 1 ? '🥇 Winner!' : 'Not won'}`,
+            }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            grid: { display: false },
+            ticks: {
+              font: { size: 11 },
+              color: getComputedStyle(document.documentElement).getPropertyValue('--artifact-text-secondary').trim() || '#727272',
+            }
+          },
+          y: {
+            stacked: true,
+            display: false,
+            max: 1.5,
+          }
+        }
+      }
+    });
+  }
+
+  // ── Chart 2: DLUT token balances ───────────────────────────────────────
+  const dlutData = [];
+  const dlutLabels = [];
+  const dlutBgs = [];
+  const dlutBorders = [];
+
+  for (let mi = 0; mi < ac; mi++) {
+    const t = calcTokens(mi);
+    dlutLabels.push(MEMBERS[mi].split(' ')[0]);
+    dlutData.push(t.total);
+    dlutBgs.push(memberColors[mi % memberColors.length] + 'cc');
+    dlutBorders.push(memberColors[mi % memberColors.length]);
+  }
+
+  // Sort by tokens descending
+  const order = dlutData.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
+  const sortedLabels  = order.map(o => dlutLabels[o.i]);
+  const sortedData    = order.map(o => dlutData[o.i]);
+  const sortedBgs     = order.map(o => dlutBgs[o.i]);
+  const sortedBorders = order.map(o => dlutBorders[o.i]);
+
+  const ctxD = document.getElementById('chartDlut');
+  if (ctxD) {
+    if (_chartDlut) _chartDlut.destroy();
+    _chartDlut = new Chart(ctxD, {
+      type: 'bar',
+      data: {
+        labels: sortedLabels,
+        datasets: [{
+          label: 'DLUT Tokens',
+          data: sortedData,
+          backgroundColor: sortedBgs,
+          borderColor: sortedBorders,
+          borderWidth: 1.5,
+          borderRadius: 8,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.raw} DLUT 💎`,
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: {
+              font: { size: 11 },
+              color: getComputedStyle(document.documentElement).getPropertyValue('--artifact-text-secondary').trim() || '#727272',
+            }
+          },
+          y: {
+            grid: {
+              color: getComputedStyle(document.documentElement).getPropertyValue('--artifact-border-light').trim() || '#e5e5e5',
+            },
+            ticks: {
+              font: { size: 10 },
+              color: getComputedStyle(document.documentElement).getPropertyValue('--artifact-text-secondary').trim() || '#727272',
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
 function renderAll() {
   const stats = getMemberStats();
   renderKPIs(stats);
   renderRace(stats);
   renderMatrix();
+  try { renderRaceCharts(); } catch(e) {}
+  try { if(document.getElementById('tab-earn')?.style.display!=='none') renderEarn(); } catch(e){}
+  // Check if this member just crossed a first-milestone
+  const _mi = parseInt(cellKey.split('_mi')[1] ?? cellKey.match(/(\d+)$/)?.[1] ?? -1);
+  if (_mi >= 0 && state === 1) { checkAndClaimFirstMilestone(_mi).catch(()=>{}); }
   const MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   document.getElementById('monthLabel').textContent = `${MNAMES[curMonth]} ${curYear}`;
 
@@ -1642,10 +2060,13 @@ window.saveMembers = async function() {
 
 // ── TABS ──────────────────────────────────────────────────
 window.switchTab = function(t, btn) {
+  if (t === 'earn') { setTimeout(renderEarn, 0); }
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-race').style.display       = t === 'race'       ? '' : 'none';
+  if (t === 'race') { setTimeout(() => { try { renderRaceCharts(); } catch(e){} }, 50); }
   document.getElementById('tab-attendance').style.display = t === 'attendance' ? '' : 'none';
+  document.getElementById('tab-earn').style.display       = t === 'earn'       ? '' : 'none';
 };
 
 // ── MONTH NAV ─────────────────────────────────────────────
@@ -1695,7 +2116,8 @@ const ALL_ANIMALS = [
 ];
 // Custom uploaded icons per member (base64 / data URL)
 // photos & customIcons use Firebase as single source of truth (no localStorage)
-let photosCache = {};   // updated ONLY by Firebase onValue
+let photosCache = {};        // updated ONLY by Firebase onValue
+let firstMilestonesCache = {};  // { "2026_8": { W1:{mi,name,date}, W2:…, W3:…, M36:… } }
 let customIcons = {};   // updated ONLY by Firebase onValue
 
 function getIcon(mi) {
@@ -1909,6 +2331,389 @@ document.getElementById('memberOverlay').addEventListener('click', function(e) {
 </script>
 
 <script>
+
+
+// ════════════════════════════════════════════════
+// RUN TO EARN — DLUT Token System
+// ════════════════════════════════════════════════
+
+// ── TOKEN RATES ──────────────────────────────
+// ── Balanced token economy ─────────────────────────────────────────────
+// Base: 10 DLUT/km  → full 36km = 360 DLUT (steady effort rewarded)
+// Milestones: cumulative 1100 DLUT (keep going rewarded)
+// First-reach: 1250 DLUT max (racing spirit rewarded)
+// Perfect week: 200 DLUT max (consistency rewarded)
+// Balanced: a distance king (36km, no firsts) earns ~1660 DLUT
+//           a speed king (all firsts, 9km only) earns ~620 DLUT
+//           → distance still wins, but firsts give exciting chases!
+const TOKEN_RATES = {
+  perKm:         10,
+  milestone9:   100,   // reach 9km
+  milestone18:  200,   // reach 18km
+  milestone27:  300,   // reach 27km
+  milestone36:  500,   // reach 36km (monthly goal)
+  perfectWeek:   50,   // all sessions in a week
+  firstRun:      20,   // first run of month
+  // 🥇 First-to-reach bonuses (one winner per milestone per month)
+  first9:       150,   // 🥇 1st to W1 → +150 (1.5× milestone)
+  first18:      250,   // 🥇 1st to W2 → +250 (1.25× milestone)
+  first27:      350,   // 🥇 1st to W3 → +350 (1.16× milestone)
+  first36:      500,   // 🥇 1st to Monthly → +500 (double the glory!)
+};
+
+// ── CALC TOKENS FOR ONE MEMBER ───────────────
+function calcTokens(mi) {
+  const todayStr = new Date().toISOString().slice(0,10);
+  let runs = 0, km = 0;
+
+  // Collect all attendance up to today
+  Object.keys(att).forEach(key => {
+    if (!key.endsWith('_' + mi)) return;
+    let dateStr = '';
+    if (key.startsWith('free_')) { dateStr = key.split('_')[1] || ''; }
+    else { dateStr = key.replace(/^r/, '').split('_')[0]; }
+    if (!dateStr || dateStr > todayStr) return;
+    if (att[key] === 1) { runs++; km += (kmData[key] ?? DEFAULT_KM); }
+  });
+  km = Math.round(km * 10) / 10;
+
+  const history = [];
+
+  // Base: km × 10
+  const base = Math.floor(km * TOKEN_RATES.perKm);
+  if (base > 0) history.push({ emoji: '🏃', desc: `${km} km × ${TOKEN_RATES.perKm}`, amount: base, type: 'base' });
+
+  // Milestones (one-time per month)
+  let milestone = 0;
+  const mStones = [
+    { km: 9,  bonus: TOKEN_RATES.milestone9,  label: 'W1 trophy 🏆' },
+    { km: 18, bonus: TOKEN_RATES.milestone18, label: 'W2 trophy 🏆' },
+    { km: 27, bonus: TOKEN_RATES.milestone27, label: 'W3 trophy 🏆' },
+    { km: 36, bonus: TOKEN_RATES.milestone36, label: 'Monthly goal 👸' },
+  ];
+  mStones.forEach(m => {
+    if (km >= m.km) {
+      milestone += m.bonus;
+      history.push({ emoji: '🏆', desc: m.label, amount: m.bonus, type: 'milestone' });
+    }
+  });
+
+  // Perfect week (all scheduled runs in a week attended)
+  let streak = 0;
+  const weekMap = {};
+  RUNS.forEach(r => {
+    if (r.date > todayStr) return;
+    const d    = new Date(r.date);
+    const wKey = `${d.getFullYear()}-W${String(Math.ceil(d.getDate() / 7)).padStart(2,'0')}`;
+    if (!weekMap[wKey]) weekMap[wKey] = { total: 0, present: 0, label: wKey };
+    weekMap[wKey].total++;
+    if (att[`${r.id}_${mi}`] === 1) weekMap[wKey].present++;
+  });
+  Object.values(weekMap).forEach(w => {
+    if (w.total >= 2 && w.present === w.total) {
+      streak += TOKEN_RATES.perfectWeek;
+      history.push({ emoji: '🔥', desc: `Perfect week ${w.label}`, amount: TOKEN_RATES.perfectWeek, type: 'streak' });
+    }
+  });
+
+  // First run of the month bonus
+  const hasRun = runs > 0;
+  const firstRun = hasRun ? TOKEN_RATES.firstRun : 0;
+  if (firstRun > 0) history.push({ emoji: '🎉', desc: 'First run of month', amount: firstRun, type: 'first' });
+
+  // ── First-to-reach bonuses ─────────────────────────────────────────
+  const ym = `${new Date().getFullYear()}_${new Date().getMonth()+1}`;
+  const fm = firstMilestonesCache[ym] || {};
+  let firstReach = 0;
+  const firstMap = [
+    { key: 'W1',  threshold: 9,  rate: TOKEN_RATES.first9,  label: '🥇 1st to W1 (9km)',     emoji: '🥇' },
+    { key: 'W2',  threshold: 18, rate: TOKEN_RATES.first18, label: '🥇 1st to W2 (18km)',    emoji: '🥇' },
+    { key: 'W3',  threshold: 27, rate: TOKEN_RATES.first27, label: '🥇 1st to W3 (27km)',    emoji: '🥇' },
+    { key: 'M36', threshold: 36, rate: TOKEN_RATES.first36, label: '🥇 1st to Monthly Goal', emoji: '👑' },
+  ];
+  firstMap.forEach(f => {
+    if (km >= f.threshold && fm[f.key] && fm[f.key].mi === mi) {
+      firstReach += f.rate;
+      history.push({ emoji: f.emoji, desc: f.label, amount: f.rate, type: 'first_reach' });
+    }
+  });
+
+  const total = base + milestone + streak + firstRun + firstReach;
+  return { base, milestone, streak, firstRun, firstReach, total, km, runs, history };
+}
+
+// ── Check and claim first-milestone on each KM write ────────────────────
+async function checkAndClaimFirstMilestone(mi) {
+  if (!_db) return;
+  const ym = `${new Date().getFullYear()}_${new Date().getMonth()+1}`;
+  const { getDatabase, ref, set, get } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
+  const milestones = [
+    { key: 'W1',  threshold: 9  },
+    { key: 'W2',  threshold: 18 },
+    { key: 'W3',  threshold: 27 },
+    { key: 'M36', threshold: 36 },
+  ];
+  const { km } = calcTokens(mi);
+  for (const m of milestones) {
+    const existing = firstMilestonesCache[ym]?.[m.key];
+    if (km >= m.threshold && !existing) {
+      // This member just crossed the threshold FIRST
+      const rec = { mi, name: MEMBERS[mi], date: new Date().toISOString().slice(0,10) };
+      firstMilestonesCache[ym] = firstMilestonesCache[ym] || {};
+      firstMilestonesCache[ym][m.key] = rec;
+      try {
+        const r = ref(_db, `trek_dlut_50km/first_milestones/${ym}/${m.key}`);
+        await set(r, rec);
+        // Show toast
+        showFirstMilestoneToast(MEMBERS[mi], m.key, mi);
+      } catch(e) { console.warn('first milestone write failed', e); }
+    }
+  }
+}
+
+function showFirstMilestoneToast(name, key, mi) {
+  const labels = { W1: 'Week 1 (9km) 🏆', W2: 'Week 2 (18km) 🏆', W3: 'Week 3 (27km) 🏆', M36: 'Monthly Goal 👸' };
+  const bonuses = { W1: TOKEN_RATES.first9, W2: TOKEN_RATES.first18, W3: TOKEN_RATES.first27, M36: TOKEN_RATES.first36 };
+  const div = document.createElement('div');
+  div.style.cssText = `position:fixed;top:70px;left:50%;transform:translateX(-50%);
+    background:linear-gradient(135deg,#7e22ce,#d97706);color:#fff;
+    padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;
+    z-index:999999;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.3);
+    animation:slideDown .3s ease;pointer-events:none;`;
+  div.innerHTML = `🥇 ${name} is FIRST to reach ${labels[key]}!<br>
+    <span style="font-size:11px;opacity:.9">+${bonuses[key]} DLUT bonus awarded! 🎉</span>`;
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 4000);
+}
+
+// ── RENDER EARN TAB ──────────────────────────
+function renderEarn() {
+  const ac = Math.min(activeCount, MEMBERS.length);
+  const stats = [];
+  for (let mi = 0; mi < ac; mi++) {
+    const tokenData = calcTokens(mi);
+    // Count first-reach badges
+    const ym2 = `${new Date().getFullYear()}_${new Date().getMonth()+1}`;
+    const fm2 = firstMilestonesCache[ym2] || {};
+    const firstBadges = ['W1','W2','W3','M36'].filter(k => fm2[k]?.mi === mi).length;
+    stats.push({ mi, name: MEMBERS[mi], firstBadges, ...tokenData });
+  }
+  stats.sort((a, b) => b.total - a.total);
+
+  const maxTok = stats[0]?.total || 1;
+  const clubTotal = stats.reduce((s, m) => s + m.total, 0);
+  const clubKm    = stats.reduce((s, m) => s + m.km, 0);
+  const myTokens  = walletMemberIdx >= 0 ? (stats.find(s => s.mi === walletMemberIdx)?.total || 0) : 0;
+
+  // ── KPIs ──
+  const kpiBox = document.getElementById('earnKpis');
+  if (kpiBox) {
+    kpiBox.innerHTML = `
+      <div class="token-kpi"><div class="token-kpi-icon">💎</div>
+        <div class="token-kpi-val">${myTokens > 0 ? myTokens : clubTotal}</div>
+        <div class="token-kpi-label">${myTokens > 0 ? 'Your DLUT' : 'Club Total DLUT'}</div></div>
+      <div class="token-kpi"><div class="token-kpi-icon">🏆</div>
+        <div class="token-kpi-val">${stats[0]?.name?.split(' ')[0] || '—'}</div>
+        <div class="token-kpi-label">Token Leader</div></div>
+      <div class="token-kpi"><div class="token-kpi-icon">📏</div>
+        <div class="token-kpi-val">${Math.round(clubKm * 10) / 10} km</div>
+        <div class="token-kpi-label">Club Distance</div></div>
+      <div class="token-kpi"><div class="token-kpi-icon">🔥</div>
+        <div class="token-kpi-val">${stats.filter(s => s.streak > 0).length}</div>
+        <div class="token-kpi-label">Perfect Weeks</div></div>
+    `;
+  }
+
+  // Update wallet balance display
+  const wcBal = document.getElementById('wcBalance');
+  if (wcBal && walletMemberIdx >= 0) wcBal.textContent = myTokens;
+
+  // ── Leaderboard ──
+  // ── Render first-milestone winners ─────────────────────────────────
+  const ym3 = `${new Date().getFullYear()}_${new Date().getMonth()+1}`;
+  const fm3 = firstMilestonesCache[ym3] || {};
+  const wmDiv = document.getElementById('firstMilestoneWinners');
+  if (wmDiv) {
+    const milestoneList = [
+      { key:'W1',  label:'W1 — 9km',  emoji:'🏆', color:'#d97706', bonus: TOKEN_RATES.first9  },
+      { key:'W2',  label:'W2 — 18km', emoji:'🏆', color:'#ca8a04', bonus: TOKEN_RATES.first18 },
+      { key:'W3',  label:'W3 — 27km', emoji:'🏆', color:'#b45309', bonus: TOKEN_RATES.first27 },
+      { key:'M36', label:'Monthly Goal', emoji:'👑', color:'#7e22ce', bonus: TOKEN_RATES.first36 },
+    ];
+    const rows = milestoneList.map(m => {
+      const w = fm3[m.key];
+      const icon = w ? (getPhoto(w.mi) ? `<img src="${getPhoto(w.mi)}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">` : `<span style="font-size:16px">${getIcon(w.mi)}</span>`) : '';
+      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--artifact-border-light)">
+        <span style="font-size:18px">${m.emoji}</span>
+        <div style="flex:1">
+          <span style="font-size:11px;font-weight:700;color:${m.color}">${m.label}</span>
+          <div style="font-size:12px;margin-top:1px">
+            ${w ? `${icon}<span style="font-weight:600">${w.name}</span> <span style="color:var(--artifact-text-secondary);font-size:11px">on ${w.date}</span>` : '<span style="color:var(--artifact-text-secondary);font-style:italic">Not yet claimed — be first! 🏃</span>'}
+          </div>
+        </div>
+        <span style="font-size:11px;font-weight:800;color:${w ? '#7e22ce' : 'var(--artifact-text-secondary)'}">
+          ${w ? `+${m.bonus} DLUT 🥇` : `+${m.bonus} DLUT`}
+        </span>
+      </div>`;
+    }).join('');
+    wmDiv.innerHTML = `
+      <div style="font-size:12px;font-weight:700;color:var(--artifact-text-primary);margin-bottom:4px;padding-top:4px">
+        🥇 First-to-Reach Hall of Fame
+        <span style="font-size:10px;font-weight:400;color:var(--artifact-text-secondary);margin-left:6px">One winner per milestone · resets monthly</span>
+      </div>
+      ${rows}`;
+  }
+
+  const lb = document.getElementById('earnLeaderboard');
+  if (!lb) return;
+  const rankIcons = ['🥇','🥈','🥉'];
+  let rows = '';
+  stats.forEach((s, i) => {
+    const photo  = getPhoto(s.mi);
+    const animal = getIcon(s.mi);
+    const pct    = maxTok > 0 ? Math.round(s.total / maxTok * 100) : 0;
+    const rankIco = rankIcons[i] || (i + 1);
+    const chips = s.history.map(h =>
+      `<span class="lb-chip ${h.type==='base'?'':'hi'}">${h.emoji} ${h.desc}: +${h.amount}</span>`
+    ).join('');
+    const avHtml = photo
+      ? `<img src="${photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px">`
+      : isCustomIcon(s.mi)
+        ? `<img src="${animal}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px">`
+        : `<span style="font-size:20px;vertical-align:middle;margin-right:5px">${animal}</span>`;
+    rows += `<tr>
+      <td class="lb-rank">${rankIco}</td>
+      <td>
+        <div style="display:flex;align-items:center;margin-bottom:4px">${avHtml}
+          <div><div class="lb-name">${s.name}</div>
+          <div class="lb-km">${s.km} km · ${s.runs} runs</div></div>
+        </div>
+        <div class="lb-breakdown">${chips || '<span class="lb-chip">No runs yet 💤</span>'}</div>
+      </td>
+      <td style="text-align:right;vertical-align:top">
+        <div class="lb-token">
+          ${s.firstBadges > 0 ? `<span style="font-size:11px;color:#7e22ce;margin-right:4px">${'🥇'.repeat(s.firstBadges)}</span>` : ''}
+          ${s.total}<span class="sym">DLUT</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:4px">
+          <span style="font-size:9px;color:var(--artifact-text-secondary)">${pct}%</span>
+          <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${pct}%"></div></div>
+        </div>
+      </td>
+    </tr>`;
+  });
+  lb.innerHTML = `<table class="earn-lb-table">
+    <thead><tr>
+      <th style="width:30px">#</th>
+      <th>Member & Earnings</th>
+      <th class="right">DLUT Tokens</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// ── WEB3 / METAMASK ───────────────────────────
+let walletAddress    = null;
+let walletMemberIdx  = -1;  // which member index this wallet is associated with
+let ethersLib        = null;
+
+async function loadEthers() {
+  if (ethersLib) return ethersLib;
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js';
+    s.onload  = () => { ethersLib = window.ethers; resolve(ethersLib); };
+    s.onerror = () => reject(new Error('ethers.js failed to load'));
+    document.head.appendChild(s);
+  });
+}
+
+window.connectWallet = async function() {
+  if (typeof window.ethereum === 'undefined') {
+    alert('MetaMask not found!\n\nPlease install MetaMask from metamask.io and refresh the page.\n\nYour DLUT points are still tracked — wallet is optional!');
+    return;
+  }
+  try {
+    await loadEthers();
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.send('eth_requestAccounts', []);
+    walletAddress  = accounts[0];
+    // Try to match wallet to a member via Firebase wallets node
+    const short = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
+    document.getElementById('wcAddr').textContent  = short;
+    document.getElementById('wcConnected').style.display    = '';
+    document.getElementById('wcDisconnected').style.display = 'none';
+    // Save wallet → Firebase
+    if (db) window._fbSet(window._fbRef(db, 'trek_dlut_50km/wallets/' + walletAddress.toLowerCase()), { address: walletAddress, connectedAt: Date.now() });
+    // Ask which member
+    const ac = Math.min(activeCount, MEMBERS.length);
+    const name = prompt(`Which member are you?\n\n${MEMBERS.slice(0,ac).map((n,i)=>(i+1)+'. '+n).join('\n')}\n\nEnter your number (1-${ac}):`);
+    const idx  = parseInt(name) - 1;
+    if (!isNaN(idx) && idx >= 0 && idx < ac) {
+      walletMemberIdx = idx;
+      localStorage.setItem('trek_wallet_mi', String(idx));
+      localStorage.setItem('trek_wallet_addr', walletAddress);
+    }
+    renderEarn();
+  } catch(e) { console.warn('Wallet connect error', e); }
+};
+
+window.disconnectWallet = function() {
+  walletAddress = null; walletMemberIdx = -1;
+  localStorage.removeItem('trek_wallet_mi');
+  localStorage.removeItem('trek_wallet_addr');
+  document.getElementById('wcConnected').style.display    = 'none';
+  document.getElementById('wcDisconnected').style.display = '';
+  renderEarn();
+};
+
+window.claimTokens = function() {
+  // Placeholder — shows contract deployment instructions
+  const mi  = walletMemberIdx >= 0 ? walletMemberIdx : 0;
+  const tok = calcTokens(mi).total;
+  // Open the claim info modal
+  document.getElementById('kmOverlay').classList.add('open');
+  document.getElementById('kmAnimal').innerHTML = '💎';
+  document.getElementById('kmName').textContent  = '';
+  document.querySelector('#kmOverlay .modal h3').textContent = '⛓️ Claim DLUT On-Chain';
+  document.querySelector('#kmOverlay .modal').innerHTML = `
+    <div class="claim-success">
+      <div class="big">💎</div>
+      <div class="title">${tok} DLUT ready to claim!</div>
+      <div class="sub">
+        The DLUT smart contract is not yet deployed.<br><br>
+        To deploy it on Polygon (free gas):<br>
+        1. Go to <strong>remix.ethereum.org</strong><br>
+        2. Paste the ERC-20 contract template<br>
+        3. Deploy on Polygon Amoy Testnet<br>
+        4. Share contract address with the club<br><br>
+        Your ${tok} DLUT points will be airdropped to:<br>
+        <code style="font-size:10px;word-break:break-all">${walletAddress || '(connect wallet first)'}</code>
+      </div>
+      <button class="btn btn-accent" style="margin-top:16px;width:100%" onclick="document.getElementById('kmOverlay').classList.remove('open')">Got it 👍</button>
+    </div>
+  `;
+};
+
+// Restore wallet from localStorage on load
+(function restoreWallet() {
+  const savedMi   = localStorage.getItem('trek_wallet_mi');
+  const savedAddr = localStorage.getItem('trek_wallet_addr');
+  if (savedMi !== null && savedAddr) {
+    walletMemberIdx = parseInt(savedMi);
+    walletAddress   = savedAddr;
+    const short = savedAddr.slice(0,6) + '...' + savedAddr.slice(-4);
+    const wcConn = document.getElementById('wcConnected');
+    const wcDisc = document.getElementById('wcDisconnected');
+    const wcAddr = document.getElementById('wcAddr');
+    if (wcConn && wcDisc && wcAddr) {
+      wcConn.style.display = '';
+      wcDisc.style.display = 'none';
+      wcAddr.textContent   = short;
+    }
+  }
+})();
+
 </script>
 
 
