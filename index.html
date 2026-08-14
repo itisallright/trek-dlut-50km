@@ -2102,10 +2102,11 @@ window.toggleDark = function() {
 };
 
 
-// ── EXPOSE MODULE VARS TO NON-MODULE SCRIPTS ─────────────────────────────
 
-// ── ANIMAL PICKER (fully inside module — no bridge needed) ───────────────────
-const ALL_ANIMALS = [
+// ════════════════════════════════════════════════
+// ANIMAL PICKER — fully dynamic, appended to body
+// ════════════════════════════════════════════════
+const ALL_ANIMALS_LIST = [
   '🐯','🦊','🐸','🐼','🐱','🐻','🦁','🐨','🐮','🐶',
   '🐺','🦝','🐭','🐹','🐰','🐇','🦄','🐧','🦅','🦆',
   '🐬','🦈','🐊','🦖','🐉','🦕','🐔','🦜','🦓','🦒',
@@ -2114,177 +2115,391 @@ const ALL_ANIMALS = [
   '🦚','🐢','🦎','🐍','🦋','🐝','🐛','🐞','🦗','🦂',
   '🏃','🚴','🧗','🏊','🤸','🚵','⚡','🔥','💪','🥷',
 ];
-// Custom uploaded icons per member (base64 / data URL)
-// photos & customIcons use Firebase as single source of truth (no localStorage)
-let photosCache = {};        // updated ONLY by Firebase onValue
-let firstMilestonesCache = {};  // { "2026_8": { W1:{mi,name,date}, W2:…, W3:…, M36:… } }
-let customIcons = {};   // updated ONLY by Firebase onValue
 
-function getIcon(mi) {
-  return customIcons[mi] || ANIMALS[mi % ANIMALS.length];
+let _apIdx = -1;
+let _apOverlay = null;
+
+function _buildApOverlay() {
+  const ov = document.createElement('div');
+  ov.id = 'apOverlayDyn';
+  ov.style.cssText = [
+    'display:none',
+    'position:fixed',
+    'inset:0',
+    'background:rgba(0,0,0,.6)',
+    'z-index:2147483647',
+    'align-items:center',
+    'justify-content:center',
+    'padding:16px',
+  ].join(';');
+  document.body.appendChild(ov);
+
+  ov.addEventListener('click', e => {
+    if (e.target === ov) _closeAp();
+  });
+  return ov;
 }
-function isCustomIcon(mi) { return !!customIcons[mi]; }
 
-let apTargetIdx = -1;
+function _getApOverlay() {
+  if (!_apOverlay || !document.body.contains(_apOverlay)) {
+    _apOverlay = _buildApOverlay();
+  }
+  return _apOverlay;
+}
 
 function openApModal(idx) {
-  apTargetIdx = idx;
-  const name = MEMBERS[idx] || ('Member ' + (idx+1));
-  document.getElementById('apTitle').textContent = '🐾 Change icon for ' + name;
-  const current = getIcon(idx);
-  const grid = document.getElementById('apGrid');
-  grid.innerHTML = ALL_ANIMALS.map(e => {
-    const isCur = !isCustomIcon(idx) && e === current;
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = e;
-    btn.dataset.emoji = e;
-    btn.style.cssText = [
-      'font-size:20px',
-      'background:' + (isCur ? '#dce7ff' : 'none'),
-      'border:2px solid ' + (isCur ? '#3559e6' : 'transparent'),
-      'border-radius:8px',
-      'padding:3px',
-      'cursor:pointer',
-      'width:36px',
-      'height:36px',
-      'display:inline-flex',
-      'align-items:center',
-      'justify-content:center',
-      'transition:all .1s',
-    ].join(';');
-    btn.addEventListener('mouseenter', () => { btn.style.background='#f0f4ff'; btn.style.borderColor='#3559e6'; btn.style.transform='scale(1.15)'; });
-    btn.addEventListener('mouseleave', () => { btn.style.background=isCur?'#dce7ff':'none'; btn.style.borderColor=isCur?'#3559e6':'transparent'; btn.style.transform='scale(1)'; });
-    btn.addEventListener('click', () => apSelectEmoji(e));
-    return btn.outerHTML;
+  _apIdx = idx;
+  const name = MEMBERS[idx] || ('Member ' + (idx + 1));
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const bg   = isDark ? '#1e1e2e' : '#ffffff';
+  const text = isDark ? '#e0e0e0' : '#1b1b1b';
+  const brd  = isDark ? '#374151' : '#e4e4e7';
+
+  // Build box HTML
+  const currentIcon = getIcon(idx);
+  const isCustom    = isCustomIcon(idx);
+  const curRowHtml  = isCustom
+    ? `<div id="_apCurRow" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff8e1;border:1.5px solid #f59e0b;border-radius:8px;margin-bottom:6px">
+         <img src="${currentIcon}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;flex-shrink:0">
+         <div style="flex:1;font-size:12px;font-weight:600;color:#92400e">Current: custom image/GIF</div>
+         <button id="_apClearBtn" style="background:#dc2626;color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer">🗑 Clear</button>
+       </div>`
+    : '';
+
+  const gridBtns = ALL_ANIMALS_LIST.map(e => {
+    const isCur = !isCustom && e === ANIMALS[idx];
+    return `<button data-emoji="${e}" style="font-size:20px;background:${isCur ? '#dce7ff' : 'transparent'};border:2px solid ${isCur ? '#3559e6' : 'transparent'};border-radius:8px;padding:3px;cursor:pointer;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;line-height:1">${e}</button>`;
   }).join('');
-  // re-attach listeners after innerHTML (outerHTML loses them — use event delegation)
-  grid.onclick = (ev) => {
-    const btn = ev.target.closest('button[data-emoji]');
-    if (btn) apSelectEmoji(btn.dataset.emoji);
-  };
-  // Show/hide current icon preview
-  const apCurrentRow = document.getElementById('apCurrentRow');
-  const apCurrentPreview = document.getElementById('apCurrentPreview');
-  const apCurrentLabel = document.getElementById('apCurrentLabel');
-  if (isCustomIcon(idx)) {
-    apCurrentRow.style.display = 'flex';
-    const ci = customIcons[idx];
-    apCurrentPreview.innerHTML = `<img src="${ci}" style="width:100%;height:100%;object-fit:cover;border-radius:6px">`;
-    apCurrentLabel.textContent = 'Custom image/GIF';
-    document.getElementById('apClearIconBtn').onclick = () => { clearCustomIcon(idx); closeApModal(); };
-  } else {
-    apCurrentRow.style.display = 'none';
-  }
-  const ov = document.getElementById('apOverlay');
+
+  const boxHtml = `
+    <div id="_apBox" style="background:${bg};color:${text};border-radius:14px;padding:16px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+        <span style="font-weight:700;font-size:14px">🐾 Change icon for ${name}</span>
+        <button id="_apClose" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+      </div>
+      ${curRowHtml}
+      <div style="display:flex;gap:8px;align-items:center;padding:8px;background:${isDark ? '#1a2a3a' : '#f6f8ff'};border-radius:8px;border:1.5px dashed #3559e6;flex-shrink:0">
+        <span style="font-size:20px">📁</span>
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:600;color:#3559e6">Upload image / GIF</div>
+          <div style="font-size:11px;color:#888">JPG PNG GIF WEBP supported</div>
+        </div>
+        <label for="_apFile" style="background:#3559e6;color:#fff;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Browse 📂</label>
+        <input type="file" id="_apFile" accept="image/*,.gif" style="display:none">
+      </div>
+      <div style="font-size:10px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em;flex-shrink:0">— or pick an emoji —</div>
+      <div id="_apGrid" style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px;overflow-y:auto;flex:1">${gridBtns}</div>
+    </div>`;
+
+  const ov = _getApOverlay();
+  ov.innerHTML = boxHtml;
   ov.style.display = 'flex';
-  // Apply dark mode to picker box
-  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.getElementById('apBox').style.background = dark ? '#1e1e2e' : '#fff';
-  document.getElementById('apBox').style.color = dark ? '#e0e0e0' : '#1b1b1b';
-}
+  // Move to very end of body to guarantee top z-index
+  document.body.removeChild(ov);
+  document.body.appendChild(ov);
 
-async function apSelectEmoji(emoji) {
-  if (apTargetIdx < 0) return;
-  const idx = apTargetIdx;
-  delete customIcons[idx]; // remove custom image if any
-  ANIMALS[idx] = emoji;
-  // localStorage NOT used for animals/icons — Firebase is source of truth
-  closeApModal();
-  updateMemberBtn(idx);
-  renderAll();
-  if (db) {
-    try { await window._fbSet(window._fbRef(db, 'trek_dlut_50km/animals'), ANIMALS); } catch(e) {}
+  // Wire close button
+  document.getElementById('_apClose').addEventListener('click', _closeAp);
+
+  // Wire clear button if custom icon
+  const clearBtn = document.getElementById('_apClearBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      clearCustomIcon(idx);
+      _closeAp();
+    });
   }
-}
 
-async function apSelectCustom(dataUrl) {
-  if (apTargetIdx < 0) return;
-  const idx = apTargetIdx;
-  customIcons[idx] = dataUrl;
-  // Firebase is the only source of truth — no localStorage for icons
-  if (db) {
-    try { await window._fbSet(window._fbRef(db, 'trek_dlut_50km/customIcons'), customIcons); } catch(e) {}
-  }
-  closeApModal();
-  updateMemberBtn(idx);
-  renderAll();
-}
-
-function updateMemberBtn(idx) {
-  const btn = document.getElementById('apb_' + idx);
-  if (!btn) return;
-  const ci = customIcons[idx];
-  if (ci) {
-    btn.innerHTML = '<img src="' + ci + '" style="width:32px;height:32px;object-fit:cover;border-radius:6px" alt="icon">';
-  } else {
-    btn.textContent = ANIMALS[idx];
-  }
-}
-
-function closeApModal() {
-  document.getElementById('apOverlay').style.display = 'none';
-  apTargetIdx = -1;
-}
-
-// Wire up close button and overlay click
-document.getElementById('apClose').addEventListener('click', closeApModal);
-document.getElementById('apOverlay').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('apOverlay')) closeApModal();
-});
-
-// Wire up file upload
-document.getElementById('apFileInput').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const isGif = file.type === 'image/gif';
-  if (isGif && file.size > 400*1024) {
-    alert('⚠️ GIF is ' + (file.size/1024).toFixed(0) + 'KB — max 400KB recommended for Firebase sync. Please use a smaller GIF.');
-    e.target.value = ''; return;
-  }
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    if (isGif) {
-      apSelectCustom(ev.target.result); // keep animated GIF as-is
-    } else {
-      // Compress to 120×120 PNG — keeps Firebase fast
-      const img = new Image();
-      img.onload = () => {
-        const cv = document.createElement('canvas'); cv.width = cv.height = 120;
-        const ct = cv.getContext('2d');
-        const s = Math.min(img.width, img.height);
-        ct.drawImage(img, (img.width-s)/2, (img.height-s)/2, s, s, 0, 0, 120, 120);
-        apSelectCustom(cv.toDataURL('image/png'));
-      };
-      img.src = ev.target.result;
+  // Wire file upload
+  document.getElementById('_apFile').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const isGif = file.type === 'image/gif';
+    if (isGif && file.size > 500 * 1024) {
+      alert('⚠️ GIF is ' + (file.size/1024).toFixed(0) + 'KB — max 500KB recommended. Use a smaller GIF.');
+      e.target.value = '';
+      return;
     }
-  };
-  reader.readAsDataURL(file);
-  e.target.value = '';
-});
+    const reader = new FileReader();
+    reader.onload = async ev => {
+      if (isGif) {
+        await _apSaveCustom(idx, ev.target.result);
+      } else {
+        const img = new Image();
+        img.onload = async () => {
+          const cv = document.createElement('canvas');
+          cv.width = cv.height = 120;
+          const ct = cv.getContext('2d');
+          const s = Math.min(img.width, img.height);
+          ct.drawImage(img, (img.width-s)/2, (img.height-s)/2, s, s, 0, 0, 120, 120);
+          await _apSaveCustom(idx, cv.toDataURL('image/png'));
+        };
+        img.src = ev.target.result;
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  });
 
-// Wire up all .ap-open-btn buttons via event delegation on document
-document.addEventListener('click', (e) => {
+  // Wire emoji grid clicks — direct addEventListener on each button
+  const grid = document.getElementById('_apGrid');
+  grid.querySelectorAll('button[data-emoji]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _apSelectEmoji(idx, btn.dataset.emoji);
+    });
+    btn.addEventListener('mouseenter', () => {
+      btn.style.background = '#f0f4ff';
+      btn.style.borderColor = '#3559e6';
+      btn.style.transform = 'scale(1.15)';
+    });
+    btn.addEventListener('mouseleave', () => {
+      const isCur = !isCustom && btn.dataset.emoji === ANIMALS[idx];
+      btn.style.background = isCur ? '#dce7ff' : 'transparent';
+      btn.style.borderColor = isCur ? '#3559e6' : 'transparent';
+      btn.style.transform = 'scale(1)';
+    });
+  });
+}
+
+function _closeAp() {
+  const ov = document.getElementById('apOverlayDyn');
+  if (ov) ov.style.display = 'none';
+  _apIdx = -1;
+}
+
+async function _apSelectEmoji(idx, emoji) {
+  delete customIcons[idx];
+  ANIMALS[idx] = emoji;
+  _closeAp();
+  renderAll();
+  if (db) {
+    try {
+      await window._fbSet(window._fbRef(db, 'trek_dlut_50km/animals'), ANIMALS);
+      await window._fbSet(window._fbRef(db, 'trek_dlut_50km/customIcons'), customIcons);
+    } catch(e) {}
+  }
+}
+
+async function _apSaveCustom(idx, dataUrl) {
+  customIcons[idx] = dataUrl;
+  delete ANIMALS[idx]; // will fall back to MBRS default
+  _closeAp();
+  renderAll();
+  if (db) {
+    try {
+      await window._fbSet(window._fbRef(db, 'trek_dlut_50km/customIcons'), customIcons);
+    } catch(e) {}
+  }
+}
+
+// Wire up .ap-open-btn via event delegation on document
+document.addEventListener('click', e => {
   const btn = e.target.closest('.ap-open-btn');
-  if (btn) {
-    const idx = parseInt(btn.dataset.apidx, 10);
-    if (!isNaN(idx)) openApModal(idx);
+  if (!btn) return;
+  const idx = parseInt(btn.getAttribute('data-apidx'), 10);
+  if (!isNaN(idx)) {
+    // Close member modal first to avoid any stacking context conflict
+    document.getElementById('memberOverlay').classList.remove('open');
+    setTimeout(() => openApModal(idx), 50);
   }
 });
 
-// Update member buttons to show custom icons after load
 function refreshMemberBtns() {
-  MEMBERS.forEach((_, i) => updateMemberBtn(i));
+  MEMBERS.forEach((_, i) => {
+    const btn = document.getElementById('apb_' + i);
+    if (!btn) return;
+    const ci = customIcons[i];
+    if (ci) {
+      btn.innerHTML = '<img src="' + ci + '" style="width:32px;height:32px;object-fit:cover;border-radius:6px" alt="icon">';
+    } else {
+      btn.textContent = ANIMALS[i] || MBRS[i].animal;
+    }
+  });
 }
 
-
-window._APP = {
-  getAnimals:  () => ANIMALS,
-  setAnimal:   (i, e) => { ANIMALS[i] = e; },
-  getMembers:  () => MEMBERS,
-  renderAll:   () => renderAll(),
-  getDb:       () => db,
+// ════════════════════════════════════════════════
+// RUN TO EARN — DLUT Token System (inside module)
+// ════════════════════════════════════════════════
+const TOKEN_RATES = {
+  perKm:10, milestone9:100, milestone18:200, milestone27:300, milestone36:500,
+  perfectWeek:50, firstRun:20,
+  first9:150, first18:250, first27:350, first36:500,
 };
+
+function calcTokens(mi) {
+  const todayStr = new Date().toISOString().slice(0,10);
+  let runs=0, km=0;
+  Object.keys(att).forEach(key => {
+    if (!key.endsWith('_'+mi)) return;
+    let dateStr='';
+    if (key.startsWith('free_')) { dateStr=key.split('_')[1]||''; }
+    else { dateStr=key.replace(/^r/,'').split('_')[0]; }
+    if (!dateStr||dateStr>todayStr) return;
+    if (att[key]===1) { runs++; km+=(kmData[key]??DEFAULT_KM); }
+  });
+  km=Math.round(km*10)/10;
+  const history=[];
+  const base=Math.floor(km*TOKEN_RATES.perKm);
+  if (base>0) history.push({emoji:'🏃',desc:`${km} km × ${TOKEN_RATES.perKm}`,amount:base,type:'base'});
+  let milestone=0;
+  [{km:9,bonus:TOKEN_RATES.milestone9,label:'W1 trophy 🏆'},
+   {km:18,bonus:TOKEN_RATES.milestone18,label:'W2 trophy 🏆'},
+   {km:27,bonus:TOKEN_RATES.milestone27,label:'W3 trophy 🏆'},
+   {km:36,bonus:TOKEN_RATES.milestone36,label:'Monthly goal 👸'}
+  ].forEach(m=>{ if(km>=m.km){milestone+=m.bonus;history.push({emoji:'🏆',desc:m.label,amount:m.bonus,type:'milestone'});} });
+  let streak=0;
+  const weekMap={};
+  RUNS.forEach(r=>{
+    if(r.date>todayStr) return;
+    const d=new Date(r.date);
+    const wKey=`${d.getFullYear()}-W${String(Math.ceil(d.getDate()/7)).padStart(2,'0')}`;
+    if(!weekMap[wKey]) weekMap[wKey]={total:0,present:0,label:wKey};
+    weekMap[wKey].total++;
+    if(att[`${r.id}_${mi}`]===1) weekMap[wKey].present++;
+  });
+  Object.values(weekMap).forEach(w=>{
+    if(w.total>=2&&w.present===w.total){streak+=TOKEN_RATES.perfectWeek;history.push({emoji:'🔥',desc:`Perfect week ${w.label}`,amount:TOKEN_RATES.perfectWeek,type:'streak'});}
+  });
+  const firstRun=runs>0?TOKEN_RATES.firstRun:0;
+  if(firstRun>0) history.push({emoji:'🎉',desc:'First run of month',amount:firstRun,type:'first'});
+  const ym=`${new Date().getFullYear()}_${new Date().getMonth()+1}`;
+  const fm=firstMilestonesCache[ym]||{};
+  let firstReach=0;
+  [{key:'W1',threshold:9,rate:TOKEN_RATES.first9,label:'🥇 1st to W1 (9km)',emoji:'🥇'},
+   {key:'W2',threshold:18,rate:TOKEN_RATES.first18,label:'🥇 1st to W2 (18km)',emoji:'🥇'},
+   {key:'W3',threshold:27,rate:TOKEN_RATES.first27,label:'🥇 1st to W3 (27km)',emoji:'🥇'},
+   {key:'M36',threshold:36,rate:TOKEN_RATES.first36,label:'🥇 1st to Monthly Goal',emoji:'👑'}
+  ].forEach(f=>{
+    if(km>=f.threshold&&fm[f.key]&&fm[f.key].mi===mi){firstReach+=f.rate;history.push({emoji:f.emoji,desc:f.label,amount:f.rate,type:'first_reach'});}
+  });
+  const total=base+milestone+streak+firstRun+firstReach;
+  return {base,milestone,streak,firstRun,firstReach,total,km,runs,history};
+}
+
+async function checkAndClaimFirstMilestone(mi) {
+  if (!db) return;
+  const ym=`${new Date().getFullYear()}_${new Date().getMonth()+1}`;
+  const {set,ref:rr}=await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
+  const milestones=[{key:'W1',threshold:9},{key:'W2',threshold:18},{key:'W3',threshold:27},{key:'M36',threshold:36}];
+  const {km}=calcTokens(mi);
+  for (const m of milestones) {
+    const existing=firstMilestonesCache[ym]?.[m.key];
+    if(km>=m.threshold&&!existing){
+      const rec={mi,name:MEMBERS[mi],date:new Date().toISOString().slice(0,10)};
+      if(!firstMilestonesCache[ym]) firstMilestonesCache[ym]={};
+      firstMilestonesCache[ym][m.key]=rec;
+      try { await set(rr(db,`trek_dlut_50km/first_milestones/${ym}/${m.key}`),rec); showFirstMilestoneToast(MEMBERS[mi],m.key,mi); } catch(e){}
+    }
+  }
+}
+
+function showFirstMilestoneToast(name,key,mi){
+  const labels={W1:'Week 1 (9km) 🏆',W2:'Week 2 (18km) 🏆',W3:'Week 3 (27km) 🏆',M36:'Monthly Goal 👸'};
+  const bonuses={W1:TOKEN_RATES.first9,W2:TOKEN_RATES.first18,W3:TOKEN_RATES.first27,M36:TOKEN_RATES.first36};
+  const div=document.createElement('div');
+  div.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7e22ce,#d97706);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:999999;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.3);pointer-events:none;';
+  div.innerHTML=`🥇 ${name} is FIRST to reach ${labels[key]}!<br><span style="font-size:11px;opacity:.9">+${bonuses[key]} DLUT bonus awarded! 🎉</span>`;
+  document.body.appendChild(div);
+  setTimeout(()=>div.remove(),4000);
+}
+
+function renderEarn(){
+  const ac=Math.min(activeCount,MEMBERS.length);
+  const stats=[];
+  for(let mi=0;mi<ac;mi++){
+    const tokenData=calcTokens(mi);
+    const ym2=`${new Date().getFullYear()}_${new Date().getMonth()+1}`;
+    const fm2=firstMilestonesCache[ym2]||{};
+    const firstBadges=['W1','W2','W3','M36'].filter(k=>fm2[k]?.mi===mi).length;
+    stats.push({mi,name:MEMBERS[mi],firstBadges,...tokenData});
+  }
+  stats.sort((a,b)=>b.total-a.total);
+  const maxTok=stats[0]?.total||1;
+  const clubKm=stats.reduce((s,m)=>s+m.km,0);
+  const myTokens=walletMemberIdx>=0?(stats.find(s=>s.mi===walletMemberIdx)?.total||0):0;
+  const kpiBox=document.getElementById('earnKpis');
+  if(kpiBox){
+    kpiBox.innerHTML=`
+      <div class="token-kpi"><div class="token-kpi-icon">💎</div><div class="token-kpi-val">${myTokens>0?myTokens:stats.reduce((a,s)=>a+s.total,0)}</div><div class="token-kpi-label">${myTokens>0?'Your DLUT':'Club Total DLUT'}</div></div>
+      <div class="token-kpi"><div class="token-kpi-icon">🏆</div><div class="token-kpi-val">${stats[0]?.name?.split(' ')[0]||'—'}</div><div class="token-kpi-label">Token Leader</div></div>
+      <div class="token-kpi"><div class="token-kpi-icon">📏</div><div class="token-kpi-val">${Math.round(clubKm*10)/10} km</div><div class="token-kpi-label">Club Distance</div></div>
+      <div class="token-kpi"><div class="token-kpi-icon">🔥</div><div class="token-kpi-val">${stats.filter(s=>s.streak>0).length}</div><div class="token-kpi-label">Perfect Weeks</div></div>`;
+  }
+  const wcBal=document.getElementById('wcBalance');
+  if(wcBal&&walletMemberIdx>=0) wcBal.textContent=myTokens;
+  const ym3=`${new Date().getFullYear()}_${new Date().getMonth()+1}`;
+  const fm3=firstMilestonesCache[ym3]||{};
+  const wmDiv=document.getElementById('firstMilestoneWinners');
+  if(wmDiv){
+    const mList=[{key:'W1',label:'W1 — 9km',emoji:'🏆',color:'#d97706',bonus:TOKEN_RATES.first9},{key:'W2',label:'W2 — 18km',emoji:'🏆',color:'#ca8a04',bonus:TOKEN_RATES.first18},{key:'W3',label:'W3 — 27km',emoji:'🏆',color:'#b45309',bonus:TOKEN_RATES.first27},{key:'M36',label:'Monthly Goal',emoji:'👑',color:'#7e22ce',bonus:TOKEN_RATES.first36}];
+    const rows=mList.map(m=>{
+      const w=fm3[m.key];
+      const ico=w?(getPhoto(w.mi)?`<img src="${getPhoto(w.mi)}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">`:`<span style="font-size:16px">${getIcon(w.mi)}</span>`):'';
+      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--artifact-border-light)">
+        <span style="font-size:18px">${m.emoji}</span>
+        <div style="flex:1"><span style="font-size:11px;font-weight:700;color:${m.color}">${m.label}</span>
+        <div style="font-size:12px;margin-top:1px">${w?`${ico}<span style="font-weight:600">${w.name}</span> <span style="color:var(--artifact-text-secondary);font-size:11px">on ${w.date}</span>`:'<span style="color:var(--artifact-text-secondary);font-style:italic">Not yet claimed — be first! 🏃</span>'}</div></div>
+        <span style="font-size:11px;font-weight:800;color:${w?'#7e22ce':'var(--artifact-text-secondary)'}">${w?`+${m.bonus} DLUT 🥇`:`+${m.bonus} DLUT`}</span></div>`;
+    }).join('');
+    wmDiv.innerHTML=`<div style="font-size:12px;font-weight:700;color:var(--artifact-text-primary);margin-bottom:4px;padding-top:4px">🥇 First-to-Reach Hall of Fame <span style="font-size:10px;font-weight:400;color:var(--artifact-text-secondary);margin-left:6px">One winner per milestone · resets monthly</span></div>${rows}`;
+  }
+  const lb=document.getElementById('earnLeaderboard');
+  if(!lb) return;
+  const rankIcons=['🥇','🥈','🥉'];
+  let lbRows='';
+  stats.forEach((s,i)=>{
+    const photo=getPhoto(s.mi),animal=getIcon(s.mi);
+    const pct=maxTok>0?Math.round(s.total/maxTok*100):0;
+    const rankIco=rankIcons[i]||(i+1);
+    const chips=s.history.map(h=>`<span class="lb-chip ${h.type==='base'?'':'hi'}">${h.emoji} ${h.desc}: +${h.amount}</span>`).join('');
+    const avHtml=photo?`<img src="${photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px">`:isCustomIcon(s.mi)?`<img src="${animal}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px">`:`<span style="font-size:20px;vertical-align:middle;margin-right:5px">${animal}</span>`;
+    lbRows+=`<tr><td class="lb-rank">${rankIco}</td><td><div style="display:flex;align-items:center;margin-bottom:4px">${avHtml}<div><div class="lb-name">${s.name}</div><div class="lb-km">${s.km} km · ${s.runs} runs</div></div></div><div class="lb-breakdown">${chips||'<span class="lb-chip">No runs yet 💤</span>'}</div></td><td style="text-align:right;vertical-align:top"><div class="lb-token">${s.firstBadges>0?`<span style="font-size:11px;color:#7e22ce;margin-right:4px">${'🥇'.repeat(s.firstBadges)}</span>`:''} ${s.total}<span class="sym">DLUT</span></div><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:4px"><span style="font-size:9px;color:var(--artifact-text-secondary)">${pct}%</span><div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${pct}%"></div></div></div></td></tr>`;
+  });
+  lb.innerHTML=`<table class="earn-lb-table"><thead><tr><th style="width:30px">#</th><th>Member & Earnings</th><th class="right">DLUT Tokens</th></tr></thead><tbody>${lbRows}</tbody></table>`;
+}
+
+// Web3 / MetaMask
+let walletAddress=null, walletMemberIdx=-1, ethersLib=null;
+async function _loadEthers(){
+  if(ethersLib) return ethersLib;
+  return new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js';s.onload=()=>{ethersLib=window.ethers;res(ethersLib);};s.onerror=()=>rej(new Error('ethers.js failed'));document.head.appendChild(s);});
+}
+window.connectWallet=async function(){
+  if(typeof window.ethereum==='undefined'){alert('MetaMask not found!\n\nInstall from metamask.io and refresh.\n\nYour DLUT points are tracked — wallet is optional!');return;}
+  try{
+    await _loadEthers();
+    const provider=new ethers.providers.Web3Provider(window.ethereum);
+    const accounts=await provider.send('eth_requestAccounts',[]);
+    walletAddress=accounts[0];
+    const short=walletAddress.slice(0,6)+'...'+walletAddress.slice(-4);
+    document.getElementById('wcAddr').textContent=short;
+    document.getElementById('wcConnected').style.display='';
+    document.getElementById('wcDisconnected').style.display='none';
+    if(db) window._fbSet(window._fbRef(db,'trek_dlut_50km/wallets/'+walletAddress.toLowerCase()),{address:walletAddress,connectedAt:Date.now()});
+    const ac=Math.min(activeCount,MEMBERS.length);
+    const name=prompt(`Which member are you?\n\n${MEMBERS.slice(0,ac).map((n,i)=>(i+1)+'. '+n).join('\n')}\n\nEnter your number (1-${ac}):`);
+    const idx=parseInt(name)-1;
+    if(!isNaN(idx)&&idx>=0&&idx<ac){walletMemberIdx=idx;localStorage.setItem('trek_wallet_mi',String(idx));localStorage.setItem('trek_wallet_addr',walletAddress);}
+    renderEarn();
+  }catch(e){console.warn('Wallet connect error',e);}
+};
+window.disconnectWallet=function(){
+  walletAddress=null;walletMemberIdx=-1;
+  localStorage.removeItem('trek_wallet_mi');localStorage.removeItem('trek_wallet_addr');
+  document.getElementById('wcConnected').style.display='none';
+  document.getElementById('wcDisconnected').style.display='';
+  renderEarn();
+};
+window.claimTokens=function(){
+  const mi=walletMemberIdx>=0?walletMemberIdx:0;
+  const tok=calcTokens(mi).total;
+  const m=document.querySelector('#kmOverlay .modal');
+  if(m){document.getElementById('kmOverlay').classList.add('open');m.innerHTML=`<div style="text-align:center"><div style="font-size:48px;margin-bottom:8px">💎</div><div style="font-size:18px;font-weight:800;margin-bottom:6px">${tok} DLUT ready!</div><div style="font-size:12px;color:var(--artifact-text-secondary);line-height:1.6">Smart contract not yet deployed.<br>Deploy on Polygon → airdrop to:<br><code style="font-size:10px;word-break:break-all">${walletAddress||'(connect wallet first)'}</code></div><button class="btn btn-accent" style="margin-top:16px;width:100%" onclick="document.getElementById('kmOverlay').classList.remove('open')">Got it 👍</button></div>`;}
+};
+// Restore wallet on load
+(()=>{const m=localStorage.getItem('trek_wallet_mi'),a=localStorage.getItem('trek_wallet_addr');if(m&&a){walletMemberIdx=parseInt(m);walletAddress=a;const short=a.slice(0,6)+'...'+a.slice(-4);const wc=document.getElementById('wcConnected'),wd=document.getElementById('wcDisconnected'),wa=document.getElementById('wcAddr');if(wc&&wd&&wa){wc.style.display='';wd.style.display='none';wa.textContent=short;}}})();
+
+
 
 // ── BOOT ─────────────────────────────────────────────────
 (async () => {
@@ -2343,392 +2558,6 @@ document.getElementById('memberOverlay').addEventListener('click', function(e) {
   });
 </script>
 
-<script>
-
-
-// ════════════════════════════════════════════════
-// RUN TO EARN — DLUT Token System
-// ════════════════════════════════════════════════
-
-// ── TOKEN RATES ──────────────────────────────
-// ── Balanced token economy ─────────────────────────────────────────────
-// Base: 10 DLUT/km  → full 36km = 360 DLUT (steady effort rewarded)
-// Milestones: cumulative 1100 DLUT (keep going rewarded)
-// First-reach: 1250 DLUT max (racing spirit rewarded)
-// Perfect week: 200 DLUT max (consistency rewarded)
-// Balanced: a distance king (36km, no firsts) earns ~1660 DLUT
-//           a speed king (all firsts, 9km only) earns ~620 DLUT
-//           → distance still wins, but firsts give exciting chases!
-const TOKEN_RATES = {
-  perKm:         10,
-  milestone9:   100,   // reach 9km
-  milestone18:  200,   // reach 18km
-  milestone27:  300,   // reach 27km
-  milestone36:  500,   // reach 36km (monthly goal)
-  perfectWeek:   50,   // all sessions in a week
-  firstRun:      20,   // first run of month
-  // 🥇 First-to-reach bonuses (one winner per milestone per month)
-  first9:       150,   // 🥇 1st to W1 → +150 (1.5× milestone)
-  first18:      250,   // 🥇 1st to W2 → +250 (1.25× milestone)
-  first27:      350,   // 🥇 1st to W3 → +350 (1.16× milestone)
-  first36:      500,   // 🥇 1st to Monthly → +500 (double the glory!)
-};
-
-// ── CALC TOKENS FOR ONE MEMBER ───────────────
-function calcTokens(mi) {
-  const todayStr = new Date().toISOString().slice(0,10);
-  let runs = 0, km = 0;
-
-  // Collect all attendance up to today
-  Object.keys(att).forEach(key => {
-    if (!key.endsWith('_' + mi)) return;
-    let dateStr = '';
-    if (key.startsWith('free_')) { dateStr = key.split('_')[1] || ''; }
-    else { dateStr = key.replace(/^r/, '').split('_')[0]; }
-    if (!dateStr || dateStr > todayStr) return;
-    if (att[key] === 1) { runs++; km += (kmData[key] ?? DEFAULT_KM); }
-  });
-  km = Math.round(km * 10) / 10;
-
-  const history = [];
-
-  // Base: km × 10
-  const base = Math.floor(km * TOKEN_RATES.perKm);
-  if (base > 0) history.push({ emoji: '🏃', desc: `${km} km × ${TOKEN_RATES.perKm}`, amount: base, type: 'base' });
-
-  // Milestones (one-time per month)
-  let milestone = 0;
-  const mStones = [
-    { km: 9,  bonus: TOKEN_RATES.milestone9,  label: 'W1 trophy 🏆' },
-    { km: 18, bonus: TOKEN_RATES.milestone18, label: 'W2 trophy 🏆' },
-    { km: 27, bonus: TOKEN_RATES.milestone27, label: 'W3 trophy 🏆' },
-    { km: 36, bonus: TOKEN_RATES.milestone36, label: 'Monthly goal 👸' },
-  ];
-  mStones.forEach(m => {
-    if (km >= m.km) {
-      milestone += m.bonus;
-      history.push({ emoji: '🏆', desc: m.label, amount: m.bonus, type: 'milestone' });
-    }
-  });
-
-  // Perfect week (all scheduled runs in a week attended)
-  let streak = 0;
-  const weekMap = {};
-  RUNS.forEach(r => {
-    if (r.date > todayStr) return;
-    const d    = new Date(r.date);
-    const wKey = `${d.getFullYear()}-W${String(Math.ceil(d.getDate() / 7)).padStart(2,'0')}`;
-    if (!weekMap[wKey]) weekMap[wKey] = { total: 0, present: 0, label: wKey };
-    weekMap[wKey].total++;
-    if (att[`${r.id}_${mi}`] === 1) weekMap[wKey].present++;
-  });
-  Object.values(weekMap).forEach(w => {
-    if (w.total >= 2 && w.present === w.total) {
-      streak += TOKEN_RATES.perfectWeek;
-      history.push({ emoji: '🔥', desc: `Perfect week ${w.label}`, amount: TOKEN_RATES.perfectWeek, type: 'streak' });
-    }
-  });
-
-  // First run of the month bonus
-  const hasRun = runs > 0;
-  const firstRun = hasRun ? TOKEN_RATES.firstRun : 0;
-  if (firstRun > 0) history.push({ emoji: '🎉', desc: 'First run of month', amount: firstRun, type: 'first' });
-
-  // ── First-to-reach bonuses ─────────────────────────────────────────
-  const ym = `${new Date().getFullYear()}_${new Date().getMonth()+1}`;
-  const fm = firstMilestonesCache[ym] || {};
-  let firstReach = 0;
-  const firstMap = [
-    { key: 'W1',  threshold: 9,  rate: TOKEN_RATES.first9,  label: '🥇 1st to W1 (9km)',     emoji: '🥇' },
-    { key: 'W2',  threshold: 18, rate: TOKEN_RATES.first18, label: '🥇 1st to W2 (18km)',    emoji: '🥇' },
-    { key: 'W3',  threshold: 27, rate: TOKEN_RATES.first27, label: '🥇 1st to W3 (27km)',    emoji: '🥇' },
-    { key: 'M36', threshold: 36, rate: TOKEN_RATES.first36, label: '🥇 1st to Monthly Goal', emoji: '👑' },
-  ];
-  firstMap.forEach(f => {
-    if (km >= f.threshold && fm[f.key] && fm[f.key].mi === mi) {
-      firstReach += f.rate;
-      history.push({ emoji: f.emoji, desc: f.label, amount: f.rate, type: 'first_reach' });
-    }
-  });
-
-  const total = base + milestone + streak + firstRun + firstReach;
-  return { base, milestone, streak, firstRun, firstReach, total, km, runs, history };
-}
-
-// ── Check and claim first-milestone on each KM write ────────────────────
-async function checkAndClaimFirstMilestone(mi) {
-  if (!db) return;
-  const ym = `${new Date().getFullYear()}_${new Date().getMonth()+1}`;
-  const { getDatabase, ref, set, get } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
-  const milestones = [
-    { key: 'W1',  threshold: 9  },
-    { key: 'W2',  threshold: 18 },
-    { key: 'W3',  threshold: 27 },
-    { key: 'M36', threshold: 36 },
-  ];
-  const { km } = calcTokens(mi);
-  for (const m of milestones) {
-    const existing = firstMilestonesCache[ym]?.[m.key];
-    if (km >= m.threshold && !existing) {
-      // This member just crossed the threshold FIRST
-      const rec = { mi, name: MEMBERS[mi], date: new Date().toISOString().slice(0,10) };
-      firstMilestonesCache[ym] = firstMilestonesCache[ym] || {};
-      firstMilestonesCache[ym][m.key] = rec;
-      try {
-        const r = ref(db,  `trek_dlut_50km/first_milestones/${ym}/${m.key}`);
-        await set(r, rec);
-        // Show toast
-        showFirstMilestoneToast(MEMBERS[mi], m.key, mi);
-      } catch(e) { console.warn('first milestone write failed', e); }
-    }
-  }
-}
-
-function showFirstMilestoneToast(name, key, mi) {
-  const labels = { W1: 'Week 1 (9km) 🏆', W2: 'Week 2 (18km) 🏆', W3: 'Week 3 (27km) 🏆', M36: 'Monthly Goal 👸' };
-  const bonuses = { W1: TOKEN_RATES.first9, W2: TOKEN_RATES.first18, W3: TOKEN_RATES.first27, M36: TOKEN_RATES.first36 };
-  const div = document.createElement('div');
-  div.style.cssText = `position:fixed;top:70px;left:50%;transform:translateX(-50%);
-    background:linear-gradient(135deg,#7e22ce,#d97706);color:#fff;
-    padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;
-    z-index:999999;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.3);
-    animation:slideDown .3s ease;pointer-events:none;`;
-  div.innerHTML = `🥇 ${name} is FIRST to reach ${labels[key]}!<br>
-    <span style="font-size:11px;opacity:.9">+${bonuses[key]} DLUT bonus awarded! 🎉</span>`;
-  document.body.appendChild(div);
-  setTimeout(() => div.remove(), 4000);
-}
-
-// ── RENDER EARN TAB ──────────────────────────
-function renderEarn() {
-  const ac = Math.min(activeCount, MEMBERS.length);
-  const stats = [];
-  for (let mi = 0; mi < ac; mi++) {
-    const tokenData = calcTokens(mi);
-    // Count first-reach badges
-    const ym2 = `${new Date().getFullYear()}_${new Date().getMonth()+1}`;
-    const fm2 = firstMilestonesCache[ym2] || {};
-    const firstBadges = ['W1','W2','W3','M36'].filter(k => fm2[k]?.mi === mi).length;
-    stats.push({ mi, name: MEMBERS[mi], firstBadges, ...tokenData });
-  }
-  stats.sort((a, b) => b.total - a.total);
-
-  const maxTok = stats[0]?.total || 1;
-  const clubTotal = stats.reduce((s, m) => s + m.total, 0);
-  const clubKm    = stats.reduce((s, m) => s + m.km, 0);
-  const myTokens  = walletMemberIdx >= 0 ? (stats.find(s => s.mi === walletMemberIdx)?.total || 0) : 0;
-
-  // ── KPIs ──
-  const kpiBox = document.getElementById('earnKpis');
-  if (kpiBox) {
-    kpiBox.innerHTML = `
-      <div class="token-kpi"><div class="token-kpi-icon">💎</div>
-        <div class="token-kpi-val">${myTokens > 0 ? myTokens : clubTotal}</div>
-        <div class="token-kpi-label">${myTokens > 0 ? 'Your DLUT' : 'Club Total DLUT'}</div></div>
-      <div class="token-kpi"><div class="token-kpi-icon">🏆</div>
-        <div class="token-kpi-val">${stats[0]?.name?.split(' ')[0] || '—'}</div>
-        <div class="token-kpi-label">Token Leader</div></div>
-      <div class="token-kpi"><div class="token-kpi-icon">📏</div>
-        <div class="token-kpi-val">${Math.round(clubKm * 10) / 10} km</div>
-        <div class="token-kpi-label">Club Distance</div></div>
-      <div class="token-kpi"><div class="token-kpi-icon">🔥</div>
-        <div class="token-kpi-val">${stats.filter(s => s.streak > 0).length}</div>
-        <div class="token-kpi-label">Perfect Weeks</div></div>
-    `;
-  }
-
-  // Update wallet balance display
-  const wcBal = document.getElementById('wcBalance');
-  if (wcBal && walletMemberIdx >= 0) wcBal.textContent = myTokens;
-
-  // ── Leaderboard ──
-  // ── Render first-milestone winners ─────────────────────────────────
-  const ym3 = `${new Date().getFullYear()}_${new Date().getMonth()+1}`;
-  const fm3 = firstMilestonesCache[ym3] || {};
-  const wmDiv = document.getElementById('firstMilestoneWinners');
-  if (wmDiv) {
-    const milestoneList = [
-      { key:'W1',  label:'W1 — 9km',  emoji:'🏆', color:'#d97706', bonus: TOKEN_RATES.first9  },
-      { key:'W2',  label:'W2 — 18km', emoji:'🏆', color:'#ca8a04', bonus: TOKEN_RATES.first18 },
-      { key:'W3',  label:'W3 — 27km', emoji:'🏆', color:'#b45309', bonus: TOKEN_RATES.first27 },
-      { key:'M36', label:'Monthly Goal', emoji:'👑', color:'#7e22ce', bonus: TOKEN_RATES.first36 },
-    ];
-    const rows = milestoneList.map(m => {
-      const w = fm3[m.key];
-      const icon = w ? (getPhoto(w.mi) ? `<img src="${getPhoto(w.mi)}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">` : `<span style="font-size:16px">${getIcon(w.mi)}</span>`) : '';
-      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--artifact-border-light)">
-        <span style="font-size:18px">${m.emoji}</span>
-        <div style="flex:1">
-          <span style="font-size:11px;font-weight:700;color:${m.color}">${m.label}</span>
-          <div style="font-size:12px;margin-top:1px">
-            ${w ? `${icon}<span style="font-weight:600">${w.name}</span> <span style="color:var(--artifact-text-secondary);font-size:11px">on ${w.date}</span>` : '<span style="color:var(--artifact-text-secondary);font-style:italic">Not yet claimed — be first! 🏃</span>'}
-          </div>
-        </div>
-        <span style="font-size:11px;font-weight:800;color:${w ? '#7e22ce' : 'var(--artifact-text-secondary)'}">
-          ${w ? `+${m.bonus} DLUT 🥇` : `+${m.bonus} DLUT`}
-        </span>
-      </div>`;
-    }).join('');
-    wmDiv.innerHTML = `
-      <div style="font-size:12px;font-weight:700;color:var(--artifact-text-primary);margin-bottom:4px;padding-top:4px">
-        🥇 First-to-Reach Hall of Fame
-        <span style="font-size:10px;font-weight:400;color:var(--artifact-text-secondary);margin-left:6px">One winner per milestone · resets monthly</span>
-      </div>
-      ${rows}`;
-  }
-
-  const lb = document.getElementById('earnLeaderboard');
-  if (!lb) return;
-  const rankIcons = ['🥇','🥈','🥉'];
-  let rows = '';
-  stats.forEach((s, i) => {
-    const photo  = getPhoto(s.mi);
-    const animal = getIcon(s.mi);
-    const pct    = maxTok > 0 ? Math.round(s.total / maxTok * 100) : 0;
-    const rankIco = rankIcons[i] || (i + 1);
-    const chips = s.history.map(h =>
-      `<span class="lb-chip ${h.type==='base'?'':'hi'}">${h.emoji} ${h.desc}: +${h.amount}</span>`
-    ).join('');
-    const avHtml = photo
-      ? `<img src="${photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px">`
-      : isCustomIcon(s.mi)
-        ? `<img src="${animal}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px">`
-        : `<span style="font-size:20px;vertical-align:middle;margin-right:5px">${animal}</span>`;
-    rows += `<tr>
-      <td class="lb-rank">${rankIco}</td>
-      <td>
-        <div style="display:flex;align-items:center;margin-bottom:4px">${avHtml}
-          <div><div class="lb-name">${s.name}</div>
-          <div class="lb-km">${s.km} km · ${s.runs} runs</div></div>
-        </div>
-        <div class="lb-breakdown">${chips || '<span class="lb-chip">No runs yet 💤</span>'}</div>
-      </td>
-      <td style="text-align:right;vertical-align:top">
-        <div class="lb-token">
-          ${s.firstBadges > 0 ? `<span style="font-size:11px;color:#7e22ce;margin-right:4px">${'🥇'.repeat(s.firstBadges)}</span>` : ''}
-          ${s.total}<span class="sym">DLUT</span>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:4px">
-          <span style="font-size:9px;color:var(--artifact-text-secondary)">${pct}%</span>
-          <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${pct}%"></div></div>
-        </div>
-      </td>
-    </tr>`;
-  });
-  lb.innerHTML = `<table class="earn-lb-table">
-    <thead><tr>
-      <th style="width:30px">#</th>
-      <th>Member & Earnings</th>
-      <th class="right">DLUT Tokens</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
-}
-
-// ── WEB3 / METAMASK ───────────────────────────
-let walletAddress    = null;
-let walletMemberIdx  = -1;  // which member index this wallet is associated with
-let ethersLib        = null;
-
-async function loadEthers() {
-  if (ethersLib) return ethersLib;
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js';
-    s.onload  = () => { ethersLib = window.ethers; resolve(ethersLib); };
-    s.onerror = () => reject(new Error('ethers.js failed to load'));
-    document.head.appendChild(s);
-  });
-}
-
-window.connectWallet = async function() {
-  if (typeof window.ethereum === 'undefined') {
-    alert('MetaMask not found!\n\nPlease install MetaMask from metamask.io and refresh the page.\n\nYour DLUT points are still tracked — wallet is optional!');
-    return;
-  }
-  try {
-    await loadEthers();
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const accounts = await provider.send('eth_requestAccounts', []);
-    walletAddress  = accounts[0];
-    // Try to match wallet to a member via Firebase wallets node
-    const short = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
-    document.getElementById('wcAddr').textContent  = short;
-    document.getElementById('wcConnected').style.display    = '';
-    document.getElementById('wcDisconnected').style.display = 'none';
-    // Save wallet → Firebase
-    if (db) window._fbSet(window._fbRef(db, 'trek_dlut_50km/wallets/' + walletAddress.toLowerCase()), { address: walletAddress, connectedAt: Date.now() });
-    // Ask which member
-    const ac = Math.min(activeCount, MEMBERS.length);
-    const name = prompt(`Which member are you?\n\n${MEMBERS.slice(0,ac).map((n,i)=>(i+1)+'. '+n).join('\n')}\n\nEnter your number (1-${ac}):`);
-    const idx  = parseInt(name) - 1;
-    if (!isNaN(idx) && idx >= 0 && idx < ac) {
-      walletMemberIdx = idx;
-      localStorage.setItem('trek_wallet_mi', String(idx));
-      localStorage.setItem('trek_wallet_addr', walletAddress);
-    }
-    renderEarn();
-  } catch(e) { console.warn('Wallet connect error', e); }
-};
-
-window.disconnectWallet = function() {
-  walletAddress = null; walletMemberIdx = -1;
-  localStorage.removeItem('trek_wallet_mi');
-  localStorage.removeItem('trek_wallet_addr');
-  document.getElementById('wcConnected').style.display    = 'none';
-  document.getElementById('wcDisconnected').style.display = '';
-  renderEarn();
-};
-
-window.claimTokens = function() {
-  // Placeholder — shows contract deployment instructions
-  const mi  = walletMemberIdx >= 0 ? walletMemberIdx : 0;
-  const tok = calcTokens(mi).total;
-  // Open the claim info modal
-  document.getElementById('kmOverlay').classList.add('open');
-  document.getElementById('kmAnimal').innerHTML = '💎';
-  document.getElementById('kmName').textContent  = '';
-  document.querySelector('#kmOverlay .modal h3').textContent = '⛓️ Claim DLUT On-Chain';
-  document.querySelector('#kmOverlay .modal').innerHTML = `
-    <div class="claim-success">
-      <div class="big">💎</div>
-      <div class="title">${tok} DLUT ready to claim!</div>
-      <div class="sub">
-        The DLUT smart contract is not yet deployed.<br><br>
-        To deploy it on Polygon (free gas):<br>
-        1. Go to <strong>remix.ethereum.org</strong><br>
-        2. Paste the ERC-20 contract template<br>
-        3. Deploy on Polygon Amoy Testnet<br>
-        4. Share contract address with the club<br><br>
-        Your ${tok} DLUT points will be airdropped to:<br>
-        <code style="font-size:10px;word-break:break-all">${walletAddress || '(connect wallet first)'}</code>
-      </div>
-      <button class="btn btn-accent" style="margin-top:16px;width:100%" onclick="document.getElementById('kmOverlay').classList.remove('open')">Got it 👍</button>
-    </div>
-  `;
-};
-
-// Restore wallet from localStorage on load
-(function restoreWallet() {
-  const savedMi   = localStorage.getItem('trek_wallet_mi');
-  const savedAddr = localStorage.getItem('trek_wallet_addr');
-  if (savedMi !== null && savedAddr) {
-    walletMemberIdx = parseInt(savedMi);
-    walletAddress   = savedAddr;
-    const short = savedAddr.slice(0,6) + '...' + savedAddr.slice(-4);
-    const wcConn = document.getElementById('wcConnected');
-    const wcDisc = document.getElementById('wcDisconnected');
-    const wcAddr = document.getElementById('wcAddr');
-    if (wcConn && wcDisc && wcAddr) {
-      wcConn.style.display = '';
-      wcDisc.style.display = 'none';
-      wcAddr.textContent   = short;
-    }
-  }
-})();
-
-</script>
-
 
 <!-- ── BOTTOM SHEET ── -->
 <div class="bs-overlay" id="bsOverlay" onclick="bsOverlayClick(event)">
@@ -2775,38 +2604,6 @@ window.claimTokens = function() {
   </div>
 </div>
 
-
-<!-- ── ANIMAL PICKER MODAL ── -->
-<div id="apOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;align-items:center;justify-content:center;padding:16px">
-  <div id="apBox" style="background:#fff;border-radius:14px;padding:16px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.3)">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <span id="apTitle" style="font-weight:700;font-size:14px;color:#1b1b1b">🐾 Change Icon</span>
-      <button id="apClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center">✕</button>
-    </div>
-    <!-- Current icon preview + clear -->
-    <div id="apCurrentRow" style="display:none;align-items:center;gap:10px;padding:8px 10px;background:#fff8e1;border:1.5px solid #f59e0b;border-radius:8px">
-      <div id="apCurrentPreview" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:28px;border-radius:8px;overflow:hidden;background:#f6f6f6;flex-shrink:0"></div>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:600;color:#92400e">Current icon</div>
-        <div style="font-size:11px;color:#b45309" id="apCurrentLabel">Custom image</div>
-      </div>
-      <button id="apClearIconBtn" style="background:#dc2626;color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">🗑 Clear</button>
-    </div>
-    <!-- Upload custom image/GIF -->
-    <div style="display:flex;gap:8px;align-items:center;padding:8px;background:#f6f8ff;border-radius:8px;border:1.5px dashed #3559e6">
-      <span style="font-size:20px">📁</span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:600;color:#3559e6">Upload custom icon (image / GIF)</div>
-        <div style="font-size:11px;color:#888">JPG, PNG, GIF, WEBP supported</div>
-      </div>
-      <label for="apFileInput" style="background:#3559e6;color:#fff;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Browse 📂</label>
-      <input type="file" id="apFileInput" accept="image/*,.gif" style="display:none">
-    </div>
-    <!-- Emoji grid -->
-    <div style="font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em">— or pick an emoji —</div>
-    <div id="apGrid" style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
 
 </body>
 </html>
