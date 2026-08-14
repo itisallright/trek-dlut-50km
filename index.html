@@ -772,39 +772,41 @@ html[data-theme=dark] .lb-chip.hi { background: #451a03; color: #fbbf24; border-
   .earn-lb-table .lb-bar-wrap { display: none; }
 }
 
-/* ── Race Charts ──────────────────────────────────────────── */
-.race-charts-wrap {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  padding: 14px 16px 16px;
+/* ── Milestone Winners Row ──────────────────────────────────────────── */
+.race-milestone-winners {
+  display: flex; position: relative; margin-bottom: 8px;
+  padding-left: 208px; padding-right: 72px; height: 40px; align-items: center;
 }
-@media (max-width: 640px) {
-  .race-charts-wrap { grid-template-columns: 1fr; }
+.mw-slot {
+  position: absolute; transform: translateX(-50%); text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
 }
-.rc-card {
-  background: var(--artifact-background);
-  border: 1px solid var(--artifact-border-light);
-  border-radius: 12px;
-  padding: 14px 16px;
+.mw-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid #ffd700; background: var(--artifact-background-subtle);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; overflow: hidden; flex-shrink: 0;
 }
-.rc-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--artifact-text-primary);
-  margin-bottom: 2px;
+.mw-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.mw-avatar.unclaimed { border-color: var(--artifact-border-light); opacity: .5; }
+.mw-name { font-size: 7px; font-weight: 700; color: #d97706; white-space: nowrap; max-width: 44px; overflow: hidden; text-overflow: ellipsis; }
+.mw-name.unclaimed { color: var(--artifact-text-secondary); font-weight: 400; font-style: italic; }
+
+/* ── DLUT Token badge on racer ───────────────────────────────────────── */
+.dlut-tag {
+  font-size: 8px; font-weight: 800;
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: #fff; border-radius: 10px;
+  padding: 1px 5px; white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(217,119,6,.4);
+  letter-spacing: .02em;
 }
-.rc-subtitle {
-  font-size: 11px;
-  color: var(--artifact-text-secondary);
-  margin-bottom: 12px;
-}
-.rc-canvas-wrap {
-  position: relative;
-  height: 200px;
+.racer-dlut {
+  font-size: 10px; font-weight: 700; color: #d97706;
+  margin-top: 2px; white-space: nowrap;
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 </head>
 <body>
 
@@ -929,19 +931,7 @@ html[data-theme=dark] .lb-chip.hi { background: #451a03; color: #fbbf24; border-
       </div>
     </div>
 
-    <!-- ── RACE CHARTS ───────────────────────────────────────── -->
-    <div class="race-charts-wrap" id="raceChartsWrap">
-      <div class="rc-card">
-        <div class="rc-title">🥇 Milestone Winners</div>
-        <div class="rc-subtitle">First member to reach each weekly target</div>
-        <div class="rc-canvas-wrap"><canvas id="chartMilestone"></canvas></div>
-      </div>
-      <div class="rc-card">
-        <div class="rc-title">💎 DLUT Token Balance</div>
-        <div class="rc-subtitle">Tokens earned by each member this month</div>
-        <div class="rc-canvas-wrap"><canvas id="chartDlut"></canvas></div>
-      </div>
-    </div>
+    <!-- Milestone winners + DLUT embedded in race track -->
   </div>
 
 
@@ -1439,6 +1429,43 @@ function renderRace(stats) {
     span.textContent = m.km === 0 ? '🚩' : `${m.icon} ${m.label}`;
     milBox.appendChild(span);
   });
+
+  // ── Milestone Winners row ──────────────────────────────────────────────
+  const ym = `${curYear}_${curMonth + 1}`;
+  const fm = firstMilestonesCache[ym] || {};
+  const winnerSlots = [
+    { km: 9,  key: 'W1',  emoji: '🏆' },
+    { km: 18, key: 'W2',  emoji: '🏆' },
+    { km: 27, key: 'W3',  emoji: '🏆' },
+    { km: 36, key: 'M36', emoji: '👸' },
+  ];
+  let winnersRow = document.getElementById('raceMilestoneWinners');
+  if (!winnersRow) {
+    winnersRow = document.createElement('div');
+    winnersRow.id = 'raceMilestoneWinners';
+    winnersRow.className = 'race-milestone-winners';
+    milBox.parentNode.insertBefore(winnersRow, milBox.nextSibling);
+  }
+  winnersRow.innerHTML = winnerSlots.map(slot => {
+    const w = fm[slot.key];
+    let avHtml = '';
+    if (w) {
+      const ph = getPhoto(w.mi);
+      const ic = getIcon(w.mi);
+      avHtml = ph
+        ? `<img src="${ph}" alt="${w.name}">`
+        : isCustomIcon(w.mi)
+          ? `<img src="${ic}" alt="${w.name}">`
+          : `<span>${ic}</span>`;
+    } else {
+      avHtml = `<span style="font-size:11px;color:var(--artifact-text-secondary)">?</span>`;
+    }
+    const pct = slot.km / TARGET_KM * 100;
+    return `<div class="mw-slot" style="left:${pct}%">
+      <div class="mw-avatar${w ? '' : ' unclaimed'}">${avHtml}</div>
+      <div class="mw-name${w ? '' : ' unclaimed'}">${w ? w.name.split(' ')[0] : 'First?'}</div>
+    </div>`;
+  }).join('');
   const sorted = [...stats].sort((a, b) => b.km - a.km);
   sorted.forEach((s, rank) => {
     const pct        = Math.min(s.km / TARGET_KM * 100, 100);
@@ -1450,6 +1477,7 @@ function renderRace(stats) {
     const isSleeping = s.km === 0;
     const ltTotalKm  = getMemberTotalKm(s.mi);
     const quote      = getQuote(s, rank, ltTotalKm);
+    const tokens     = calcTokens(s.mi).total;
     const rankIcon   = rank===0&&s.km>0?'🥇':rank===1&&s.km>0?'🥈':rank===2&&s.km>0?'🥉':rank+1;
     const lt         = ltTargets[s.mi];
 
@@ -1486,6 +1514,7 @@ function renderRace(stats) {
         <div style="min-width:0;flex:1">
           <div class="racer-name">${s.name}</div>
           <div class="racer-km">${s.km}/${TARGET_KM} km this month</div>
+          <div class="racer-dlut">💎 ${tokens} DLUT</div>
           ${ltHtml}
         </div>
       </div>
@@ -1515,6 +1544,7 @@ function renderRace(stats) {
               <div class="speed-line" style="width:8px"></div>
             </div>
             <div class="sprite-body-wrap">${spriteInner}</div>
+            <div class="dlut-tag">💎${tokens}</div>
             <div class="km-tag">${s.km} km</div>
           </div>
           ${isDone?'<div class="status-badge">🎉</div>':isSleeping?'<div class="status-badge">💤</div>':''}
@@ -1811,161 +1841,8 @@ function renderTable() { renderMatrix(); }
 
 
 // ── RACE CHARTS ────────────────────────────────────────────────────────────
-let _chartMilestone = null;
-let _chartDlut      = null;
-
 function renderRaceCharts() {
-  if (typeof Chart === 'undefined') return; // Chart.js not yet loaded
-  const ac = Math.min(activeCount, MEMBERS.length);
-
-  // ── Chart 1: Milestone winners ─────────────────────────────────────────
-  const ym      = `${curYear}_${curMonth + 1}`;
-  const fm      = firstMilestonesCache[ym] || {};
-  const mLabels = ['W1\n9km', 'W2\n18km', 'W3\n27km', 'Monthly\n36km'];
-  const mKeys   = ['W1', 'W2', 'W3', 'M36'];
-  const mColors = ['#f59e0b', '#d97706', '#b45309', '#7e22ce'];
-
-  // Build stacked bars: 1 bar per milestone, value = 1 if won by a member
-  const mDatasets = [];
-  const memberColors = [
-    '#3b82f6','#22c55e','#f97316','#ec4899',
-    '#8b5cf6','#14b8a6','#ef4444','#84cc16','#06b6d4','#f59e0b'
-  ];
-  for (let mi = 0; mi < ac; mi++) {
-    const data = mKeys.map(k => (fm[k]?.mi === mi ? 1 : 0));
-    const hasBadge = data.some(v => v > 0);
-    if (!hasBadge) continue;
-    mDatasets.push({
-      label: MEMBERS[mi].split(' ')[0],
-      data,
-      backgroundColor: memberColors[mi % memberColors.length],
-      borderRadius: 6,
-      borderSkipped: false,
-    });
-  }
-  // If nobody won anything yet, show empty
-  if (mDatasets.length === 0) {
-    mDatasets.push({
-      label: 'Not yet claimed',
-      data: [0, 0, 0, 0],
-      backgroundColor: '#e5e7eb',
-      borderRadius: 6,
-    });
-  }
-
-  const ctxM = document.getElementById('chartMilestone');
-  if (ctxM) {
-    if (_chartMilestone) _chartMilestone.destroy();
-    _chartMilestone = new Chart(ctxM, {
-      type: 'bar',
-      data: { labels: mLabels, datasets: mDatasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              boxWidth: 10,
-              font: { size: 11 },
-              color: getComputedStyle(document.documentElement).getPropertyValue('--artifact-text-primary').trim() || '#1b1b1b',
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: ctx => ` ${ctx.dataset.label}: ${ctx.raw === 1 ? '🥇 Winner!' : 'Not won'}`,
-            }
-          }
-        },
-        scales: {
-          x: {
-            stacked: true,
-            grid: { display: false },
-            ticks: {
-              font: { size: 11 },
-              color: getComputedStyle(document.documentElement).getPropertyValue('--artifact-text-secondary').trim() || '#727272',
-            }
-          },
-          y: {
-            stacked: true,
-            display: false,
-            max: 1.5,
-          }
-        }
-      }
-    });
-  }
-
-  // ── Chart 2: DLUT token balances ───────────────────────────────────────
-  const dlutData = [];
-  const dlutLabels = [];
-  const dlutBgs = [];
-  const dlutBorders = [];
-
-  for (let mi = 0; mi < ac; mi++) {
-    const t = calcTokens(mi);
-    dlutLabels.push(MEMBERS[mi].split(' ')[0]);
-    dlutData.push(t.total);
-    dlutBgs.push(memberColors[mi % memberColors.length] + 'cc');
-    dlutBorders.push(memberColors[mi % memberColors.length]);
-  }
-
-  // Sort by tokens descending
-  const order = dlutData.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
-  const sortedLabels  = order.map(o => dlutLabels[o.i]);
-  const sortedData    = order.map(o => dlutData[o.i]);
-  const sortedBgs     = order.map(o => dlutBgs[o.i]);
-  const sortedBorders = order.map(o => dlutBorders[o.i]);
-
-  const ctxD = document.getElementById('chartDlut');
-  if (ctxD) {
-    if (_chartDlut) _chartDlut.destroy();
-    _chartDlut = new Chart(ctxD, {
-      type: 'bar',
-      data: {
-        labels: sortedLabels,
-        datasets: [{
-          label: 'DLUT Tokens',
-          data: sortedData,
-          backgroundColor: sortedBgs,
-          borderColor: sortedBorders,
-          borderWidth: 1.5,
-          borderRadius: 8,
-          borderSkipped: false,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => ` ${ctx.raw} DLUT 💎`,
-            }
-          }
-        },
-        scales: {
-          x: {
-            grid: { display: false },
-            ticks: {
-              font: { size: 11 },
-              color: getComputedStyle(document.documentElement).getPropertyValue('--artifact-text-secondary').trim() || '#727272',
-            }
-          },
-          y: {
-            grid: {
-              color: getComputedStyle(document.documentElement).getPropertyValue('--artifact-border-light').trim() || '#e5e5e5',
-            },
-            ticks: {
-              font: { size: 10 },
-              color: getComputedStyle(document.documentElement).getPropertyValue('--artifact-text-secondary').trim() || '#727272',
-            }
-          }
-        }
-      }
-    });
-  }
+  // Charts replaced by inline race-road elements
 }
 
 function renderAll() {
@@ -2444,7 +2321,7 @@ function renderEarn(){
     const mList=[{key:'W1',label:'W1 — 9km',emoji:'🏆',color:'#d97706',bonus:TOKEN_RATES.first9},{key:'W2',label:'W2 — 18km',emoji:'🏆',color:'#ca8a04',bonus:TOKEN_RATES.first18},{key:'W3',label:'W3 — 27km',emoji:'🏆',color:'#b45309',bonus:TOKEN_RATES.first27},{key:'M36',label:'Monthly Goal',emoji:'👑',color:'#7e22ce',bonus:TOKEN_RATES.first36}];
     const rows=mList.map(m=>{
       const w=fm3[m.key];
-      const ico=w?(getPhoto(w.mi)?`<img src="${getPhoto(w.mi)}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">`:`<span style="font-size:16px">${getIcon(w.mi)}</span>`):'';
+      const ico=w?(getPhoto(w.mi)?`<img src="${getPhoto(w.mi)}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">`:isCustomIcon(w.mi)?`<img src="${getIcon(w.mi)}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">`:`<span style="font-size:16px">${getIcon(w.mi)}</span>`):'';
       return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--artifact-border-light)">
         <span style="font-size:18px">${m.emoji}</span>
         <div style="flex:1"><span style="font-size:11px;font-weight:700;color:${m.color}">${m.label}</span>
