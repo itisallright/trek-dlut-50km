@@ -1087,6 +1087,20 @@ let curYear  = META.year;
 let curMonth = META.month - 1;
 let RUNS = [...SCHEDULE];
 
+// ── MISSING STATE (were never declared — root cause of all crashes) ──
+let customIcons        = {};   // mi → data URL for custom uploaded image/GIF
+let photosCache        = {};   // mi → face photo data URL (Firebase-only)
+let firstMilestonesCache = {}; // ym → { W1, W2, W3, M36 } first-reach records
+
+// ── HELPER: get display icon for a member ─────────────────────────────
+function isCustomIcon(mi) {
+  return !!(customIcons && customIcons[mi]);
+}
+function getIcon(mi) {
+  if (customIcons && customIcons[mi]) return customIcons[mi];
+  return ANIMALS[mi] || (MBRS[mi] && MBRS[mi].animal) || '🐾';
+}
+
 // ── QUOTE ENGINE ──────────────────────────────────────────
 const QUOTES = {
   sleeping: [
