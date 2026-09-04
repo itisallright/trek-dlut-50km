@@ -352,6 +352,7 @@ select.admin-inp{cursor:pointer}
     <div class="status-pill"><div class="status-dot" id="statusDot"></div><span id="statusLbl">Offline</span></div>
     <button class="icon-btn" onclick="_a.openMembers()" title="Team Settings">👥</button>
     <button class="icon-btn" onclick="_a.download()" title="Download" style="color:var(--green);border-color:var(--green)">⬇️</button>
+    <button class="icon-btn" onclick="showDebug()" title="Debug Firebase" style="color:var(--orange);border-color:var(--orange)">🔍</button>
     <button class="icon-btn" onclick="_a.confirmReset()" title="Reset Data" style="color:var(--red);border-color:var(--red)">🗑</button>
   </div>
 </div>
@@ -908,6 +909,25 @@ window._a={
   unlockAdmin,awardBonus,addPrize,redeem,adjRate,saveRates,resetRates,
   switchTab,prevMonth,nextMonth,setWallet,confirmReset,download
 };
+
+// ─── DEBUG PANEL ───────────────────────────────────────────────────────────
+function showDebug(){
+  const mk=`${Y}-${Mo}`;
+  const attKeys=Object.keys(att).filter(k=>k.includes(`${Y}-${String(Mo+1).padStart(2,'0')}`));
+  const augKeys=Object.keys(att).filter(k=>k.includes('2026-08'));
+  const allKeys=Object.keys(att);
+  const msg=[
+    `📅 Current view: ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Mo]} ${Y}`,
+    `🔥 Firebase: ${db?'Connected ✅':'Not connected ❌'}`,
+    `📊 Total att keys in Firebase: ${allKeys.length}`,
+    `📅 Aug 2026 att keys: ${augKeys.length} → ${augKeys.slice(0,3).join(', ')}${augKeys.length>3?'...':''}`,
+    `📅 Current month att keys: ${attKeys.length}`,
+    `👥 Members loaded: ${M.length} (active: ${AC})`,
+    `📸 Photos: ${Object.keys(photos).length}`,
+    `💎 Rates: perKm=${rates.perKm}`,
+  ].join('\n');
+  alert(msg);
+}
 
 // ─── BOOT ──────────────────────────────────────────────────────────────────
 initFB();
