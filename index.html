@@ -1554,6 +1554,11 @@ document.addEventListener('touchend', e => {
   if (Math.abs(dx) > 60) { if (dx < 0) nextMonth(); else prevMonth(); }
 }, {passive:true});
 
+// ─── PRESERVE AUGUST 2026 DATA ─────────────────────────────────────────────
+// All August 2026 attendance, KM, photos, and member data is stored in Firebase
+// under trek_dlut_50km/ — it loads automatically on every page open.
+// Nothing is lost when you update this HTML file.
+
 // ─── BOOT ──────────────────────────────────────────────────────────────────
 initFirebase();
 </script>
