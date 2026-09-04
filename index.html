@@ -869,27 +869,81 @@ function download(){
 
 // ─── DEBUG ─────────────────────────────────────────────────────────────────
 function debugInfo(){
+  // Show copyable debug panel
+  const existing=document.getElementById('debugPanel');
+  if(existing){existing.remove();return;}
+
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const allKeys=Object.keys(att);
   const augKeys=allKeys.filter(k=>k.includes('2026-08'));
   const curKeys=allKeys.filter(k=>k.includes(`${Y}-${String(Mo+1).padStart(2,'0')}`));
-  const photoCount=Object.keys(photos).length;
-  const iconCount=Object.keys(icons).length;
-  const connected=document.getElementById('statusLbl').textContent;
-  alert(
-    `📅 Current view: ${months[Mo]} ${Y}\n`+
-    `🔥 Firebase: ${connected}\n`+
-    `📊 Total att keys: ${allKeys.length}\n`+
-    `📅 Aug 2026 att keys: ${augKeys.length}\n`+
-    (augKeys.length>0?`   Sample: ${augKeys.slice(0,3).join(', ')}\n`:'')+
-    `📅 Current month att keys: ${curKeys.length}\n`+
-    `👥 Members: ${M.length} (active: ${AC})\n`+
-    `📸 Photos: ${photoCount} | Icons: ${iconCount}\n`+
-    `💎 Rates: perKm=${rates.perKm}\n`+
-    `🔑 FB Path: ${FB_PATH}\n`+
-    `📦 customIcons in FB: ${Object.keys(icons).length}\n`+
-    `🏆 firstMilestones: ${JSON.stringify(fm).substring(0,80)}`
-  );
+
+  // Also probe Firebase raw to find where data actually lives
+  const lines=[
+    `=== TREK DLUT DEBUG ===`,
+    `Time: ${new Date().toISOString()}`,
+    `Current view: ${months[Mo]} ${Y}`,
+    `Firebase status: ${document.getElementById('statusLbl').textContent}`,
+    `FB_PATH used: "${FB_PATH}"`,
+    `--- ATT DATA ---`,
+    `Total att keys in memory: ${allKeys.length}`,
+    `Aug 2026 att keys: ${augKeys.length}`,
+    `Aug sample keys: ${augKeys.slice(0,5).join(' | ')||'none'}`,
+    `Current month keys: ${curKeys.length}`,
+    `--- MEMBERS ---`,
+    `Members loaded: ${M.length} (active: ${AC})`,
+    `Member[0]: ${JSON.stringify(M[0]||{})}`,
+    `--- MEDIA ---`,
+    `Photos: ${Object.keys(photos).length}`,
+    `Icons: ${Object.keys(icons).length}`,
+    `--- RATES ---`,
+    `perKm: ${rates.perKm}`,
+    `--- MILESTONES ---`,
+    `fm keys: ${Object.keys(fm).join(', ')||'none'}`,
+    `fm data: ${JSON.stringify(fm).substring(0,120)}`,
+    `--- RAW FIREBASE PROBE ---`,
+    `(probing now... check below after 2s)`
+  ];
+
+  const panel=document.createElement('div');
+  panel.id='debugPanel';
+  panel.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.92);z-index:9999;padding:14px;overflow-y:auto;font-family:monospace';
+  panel.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="color:#f5c842;font-weight:700;font-size:13px">🔍 Debug Info</span>
+      <button onclick="document.getElementById('debugPanel').remove()" style="background:var(--red);border:none;color:#fff;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px">✕ Close</button>
+    </div>
+    <textarea id="debugText" style="width:100%;height:calc(100vh - 120px);background:#111;color:#0f0;border:1px solid #333;border-radius:6px;padding:10px;font-size:11px;font-family:monospace;resize:none">${lines.join('\n')}</textarea>
+    <button onclick="navigator.clipboard.writeText(document.getElementById('debugText').value).then(()=>alert('Copied!'))" style="margin-top:8px;width:100%;background:var(--accent);border:none;color:#fff;padding:8px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700">📋 Copy All Text</button>
+  `;
+  document.body.appendChild(panel);
+
+  // Probe Firebase at multiple paths to find where data actually is
+  if(db){
+    const probeResults=[];
+    const paths=['trek_dlut_50km','trek_dlut_50km/att','att',''];
+    let done=0;
+    paths.forEach(path=>{
+      const ref=path?db.ref(path):db.ref('/');
+      ref.once('value').then(snap=>{
+        const v=snap.val();
+        const keys=v&&typeof v==='object'?Object.keys(v):[];
+        probeResults.push(`PATH "${path||'/'}" → ${v===null?'NULL':keys.length+' keys: '+keys.slice(0,6).join(', ')}`);
+        done++;
+        if(done===paths.length){
+          const ta=document.getElementById('debugText');
+          if(ta) ta.value=ta.value.replace('(probing now... check below after 2s)',probeResults.join('\n'));
+        }
+      }).catch(e=>{
+        probeResults.push(`PATH "${path||'/'}" → ERROR: ${e.message}`);
+        done++;
+        if(done===paths.length){
+          const ta=document.getElementById('debugText');
+          if(ta) ta.value=ta.value.replace('(probing now... check below after 2s)',probeResults.join('\n'));
+        }
+      });
+    });
+  }
 }
 
 // ─── SWIPE ─────────────────────────────────────────────────────────────────
