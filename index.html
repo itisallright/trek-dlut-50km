@@ -2,2495 +2,1120 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>🏁 TREK DLUT 50KM – Running Tracker</title>
-<script>window.APP_DATA = {"metadata": {"title": "TREK DLUT 50KM \u2013 Running Tracker", "generated_at": "2026-08-06T06:59:03.333259+00:00", "year": 2026, "month": 8, "month_name": "August", "app_dir": "/home/user/output/running_tracker_firebase"}, "config": {"target_km": 36, "default_km": 3, "weekly_min": 9, "session_time": "4:45 PM"}, "members": [{"index": 0, "name": "Hai Bui", "animal": "\ud83d\udc2f", "color": "#3b82f6"}, {"index": 1, "name": "Chinh Ton", "animal": "\ud83e\udd8a", "color": "#ef4444"}, {"index": 2, "name": "Khoa Vo", "animal": "\ud83d\udc38", "color": "#22c55e"}, {"index": 3, "name": "Truong Nguyen", "animal": "\ud83d\udc3c", "color": "#a855f7"}, {"index": 4, "name": "Thien Le", "animal": "\ud83d\udc31", "color": "#eab308"}, {"index": 5, "name": "Hoang Tran", "animal": "\ud83d\udc3b", "color": "#78716c"}, {"index": 6, "name": "Tri Nguyen", "animal": "\ud83e\udd81", "color": "#f97316"}, {"index": 7, "name": "Member 8", "animal": "\ud83d\udc28", "color": "#ec4899"}, {"index": 8, "name": "Member 9", "animal": "\ud83d\udc2e", "color": "#06b6d4"}, {"index": 9, "name": "Member 10", "animal": "\ud83d\udc36", "color": "#8b5cf6"}], "schedule": [{"id": "r2026-08-03", "date": "2026-08-03", "day": "Mon", "label": "Mon 3 Aug", "num": 1}, {"id": "r2026-08-05", "date": "2026-08-05", "day": "Wed", "label": "Wed 5 Aug", "num": 2}, {"id": "r2026-08-07", "date": "2026-08-07", "day": "Fri", "label": "Fri 7 Aug", "num": 3}, {"id": "r2026-08-10", "date": "2026-08-10", "day": "Mon", "label": "Mon 10 Aug", "num": 4}, {"id": "r2026-08-12", "date": "2026-08-12", "day": "Wed", "label": "Wed 12 Aug", "num": 5}, {"id": "r2026-08-14", "date": "2026-08-14", "day": "Fri", "label": "Fri 14 Aug", "num": 6}, {"id": "r2026-08-17", "date": "2026-08-17", "day": "Mon", "label": "Mon 17 Aug", "num": 7}, {"id": "r2026-08-19", "date": "2026-08-19", "day": "Wed", "label": "Wed 19 Aug", "num": 8}, {"id": "r2026-08-21", "date": "2026-08-21", "day": "Fri", "label": "Fri 21 Aug", "num": 9}, {"id": "r2026-08-24", "date": "2026-08-24", "day": "Mon", "label": "Mon 24 Aug", "num": 10}, {"id": "r2026-08-26", "date": "2026-08-26", "day": "Wed", "label": "Wed 26 Aug", "num": 11}, {"id": "r2026-08-28", "date": "2026-08-28", "day": "Fri", "label": "Fri 28 Aug", "num": 12}, {"id": "r2026-08-31", "date": "2026-08-31", "day": "Mon", "label": "Mon 31 Aug", "num": 13}]};</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
-:root {
-  --artifact-background: var(--theme-background, #f4f4f5);
-  --artifact-background-light: var(--theme-background-light, #ffffff);
-  --artifact-background-subtle: var(--theme-background-subtle, #f0f0f2);
-  --artifact-border-light: var(--theme-border-light, #e4e4e7);
-  --artifact-text-primary: var(--theme-text-primary, #18181b);
-  --artifact-text-secondary: var(--theme-text-secondary, #71717a);
-  --artifact-primary-brand: var(--theme-primary-brand, #3559e6);
-  --artifact-pos: #16a34a; --artifact-posbg: #dcfce7;
-  --artifact-neg: #dc2626; --artifact-negbg: #fee2e2;
-  --artifact-warn: #d97706; --artifact-warnbg: #fef3c7;
-  --artifact-road: #4b5563; --artifact-grass: #86efac;
-  --artifact-shadow: 0 2px 12px rgba(0,0,0,.08);
-  --r: 10px;
-  font-size: 14px;
+:root{
+  --bg:#0f0f1a;--bg2:#1a1a2e;--bg3:#16213e;--bg4:#0d1b2a;
+  --accent:#6c63ff;--accent2:#ff6584;--gold:#ffd700;--green:#00e676;
+  --red:#ff4444;--purple:#b44fff;--orange:#ff9800;
+  --text:#e0e0e0;--text2:#a0a0b0;--border:#2a2a4a;
+  --card:#1e1e35;--card2:#252540;
+  --ssj:#ffd700;--ssj3:#b44fff;--god:#ff4500;--ui:#c0c0ff;
 }
-html[data-theme=dark] {
-  --artifact-pos: #4ade80; --artifact-posbg: #052e16;
-  --artifact-neg: #f87171; --artifact-negbg: #450a0a;
-  --artifact-warn: #fbbf24; --artifact-warnbg: #451a03;
-  --artifact-road: #374151; --artifact-grass: #166534;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--artifact-background); color: var(--artifact-text-primary);
-       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
-button { cursor: pointer; font-family: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-input  { font-family: inherit; }
-
-/* TOPBAR */
-.topbar { background: var(--artifact-background-light); border-bottom: 1px solid var(--artifact-border-light);
-          padding: 0 20px; height: 52px; display: flex; align-items: center;
-          justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-.topbar-left { display: flex; align-items: center; gap: 10px; }
-.topbar-logo  { font-size: 20px; }
-.topbar-title { font-weight: 700; font-size: 15px; letter-spacing: -.3px; }
-.topbar-sub   { font-size: 11px; color: var(--artifact-text-secondary); margin-top: 1px; }
-.topbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--artifact-border-light);
-       background: var(--artifact-background-subtle); color: var(--artifact-text-primary);
-       font-size: 12px; font-weight: 600; transition: .15s; }
-.btn:hover { background: var(--artifact-border-light); }
-.btn-accent { background: var(--artifact-primary-brand); color: #fff; border-color: var(--artifact-primary-brand); }
-.btn-accent:hover { opacity: .9; }
-.btn-sm { padding: 4px 10px; font-size: 11px; }
-.btn-danger { background: var(--artifact-negbg); color: var(--artifact-neg); border-color: var(--artifact-neg); }
-
-/* TABS */
-.tabs { display: flex; border-bottom: 1px solid var(--artifact-border-light);
-        background: var(--artifact-background-light); padding: 0 20px; }
-.tab { padding: 10px 18px; font-size: 13px; font-weight: 600; border: none; background: none;
-       color: var(--artifact-text-secondary); cursor: pointer; border-bottom: 2px solid transparent;
-       margin-bottom: -1px; transition: .15s; }
-.tab.active { color: var(--artifact-primary-brand); border-bottom-color: var(--artifact-primary-brand); }
-
-/* MAIN */
-.main { max-width: 1100px; margin: 0 auto; padding: 20px; }
-
-/* KPIS */
-.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-           gap: 10px; margin-bottom: 20px; }
-.kpi { background: var(--artifact-background-light); border: 1px solid var(--artifact-border-light);
-       border-radius: var(--r); padding: 14px 16px; }
-.kpi-val   { font-size: 24px; font-weight: 800; letter-spacing: -1px; }
-.kpi-label { font-size: 11px; color: var(--artifact-text-secondary); margin-top: 2px;
-             text-transform: uppercase; letter-spacing: .05em; }
-.kpi-icon  { font-size: 18px; margin-bottom: 4px; }
-
-/* RACE SECTION */
-.race-section { background: var(--artifact-background-light); border: 1px solid var(--artifact-border-light);
-                border-radius: var(--r); overflow: hidden; margin-bottom: 20px; }
-.race-header  { padding: 16px 20px; border-bottom: 1px solid var(--artifact-border-light);
-                display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-.race-title   { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-.race-meta    { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.race-badge   { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
-                background: var(--artifact-warnbg); color: var(--artifact-warn); }
-.race-badge.green { background: var(--artifact-posbg); color: var(--artifact-pos); }
-.race-track   { padding: 16px 20px; display: flex; flex-direction: column; gap: 0; }
-.race-milestones { display: flex; position: relative; margin-bottom: 6px;
-                   padding-left: 208px; padding-right: 72px; height: 26px; }
-.milestone { position: absolute; transform: translateX(-50%); text-align: center;
-             font-size: 10px; font-weight: 700; color: var(--artifact-text-secondary); }
-.milestone::before { content: ''; position: absolute; top: -4px; left: 50%;
-                     width: 1px; height: 4px; background: var(--artifact-border-light); }
-
-/* RACER ROW */
-.racer-row  { display: flex; align-items: center; gap: 8px; padding-top: 34px; margin-bottom: 2px; }
-.racer-info { width: 172px; flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
-
-
-/* ── ANIMAL PICKER ───────────────────────────── */
-.animal-pick-btn {
-  font-size: 22px; background: none; border: 2px solid transparent;
-  border-radius: 8px; cursor: pointer; padding: 2px 5px; transition: border .15s, transform .15s;
-  line-height: 1;
-}
-.animal-pick-btn:hover { border-color: var(--accent); transform: scale(1.15); }
-
-
-/* AVATAR: body = animal emoji, face = photo overlay */
-.avatar-wrap { position: relative; cursor: pointer; flex-shrink: 0; }
-.avatar {
-  width: 40px; height: 40px; border-radius: 50%;
-  border: 2px solid var(--artifact-border-light);
-  background: var(--artifact-background-subtle);
-  position: relative; overflow: hidden;
-  transition: transform .2s;
-}
-.avatar:hover { transform: scale(1.08); }
-.avatar::after {
-  content: '';
-  position: absolute;
-  top: 50%; left: 0; right: 0;
-  height: 1px;
-  background: rgba(255,255,255,0.25);
-  pointer-events: none;
-}
-.avatar[title]:hover::before {
-  content: attr(data-hint);
-  position: absolute; bottom: -20px; left: 50%;
-  transform: translateX(-50%);
-  font-size: 9px; white-space: nowrap;
-  background: rgba(0,0,0,.7); color: #fff;
-  padding: 2px 5px; border-radius: 4px;
-  pointer-events: none; z-index: 10;
-}
-.av-body {
-  position: absolute;
-  bottom: -3px; left: 50%;
-  transform: translateX(-50%);
-  font-size: 28px; line-height: 1;
-  user-select: none;
-}
-.av-face {
-  position: absolute;
-  top: 2px; left: 50%;
-  transform: translateX(-50%);
-  width: 24px; height: 24px;
-  border-radius: 50%; object-fit: cover;
-  border: 2px solid var(--artifact-background-light);
-  z-index: 2;
-}
-
-.racer-name { font-size: 12px; font-weight: 700; color: var(--artifact-text-primary);
-              white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
-.racer-km   { font-size: 10px; color: var(--artifact-text-secondary); }
-
-/* LONG TERM */
-.lt-info  { font-size: 9px; color: var(--artifact-primary-brand); margin-top: 2px; white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
-.lt-pbar  { height: 3px; background: var(--artifact-border-light); border-radius: 2px; margin-top: 2px;
-            overflow: hidden; max-width: 100px; }
-.lt-pfill { height: 100%; background: var(--artifact-primary-brand); border-radius: 2px; transition: width .6s; }
-
-.road-wrap  { flex: 1; position: relative; padding-right: 72px; }
-.road       { height: 46px; background: var(--artifact-road); border-radius: 6px;
-              position: relative; overflow: visible; }
-.road-line  { position: absolute; top: 50%; left: 0; right: 0;
-              border-top: 2px dashed rgba(255,255,255,.2); pointer-events: none; }
-.road-shoulder { position: absolute; left: 0; right: 0; height: 4px; background: var(--artifact-grass); }
-.road-shoulder.top    { top: -4px; border-radius: 3px 3px 0 0; }
-.road-shoulder.bottom { bottom: -4px; border-radius: 0 0 3px 3px; }
-.road-progress { position: absolute; left: 0; top: 0; height: 100%; border-radius: 6px;
-                 opacity: .25; transition: width 1s ease; }
-.racer-sprite { position: absolute; top: 50%; transform: translate(-50%, -50%);
-                transition: left 1s cubic-bezier(.34,1.56,.64,1);
-                display: flex; flex-direction: column; align-items: center; gap: 1px; z-index: 10; }
-
-/* THOUGHT BUBBLE */
-.thought-bubble {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--artifact-background-light);
-  border: 1.5px solid var(--artifact-border-light);
-  border-radius: 10px;
-  padding: 4px 9px;
-  font-size: 9px;
-  font-weight: 600;
-  white-space: nowrap;
-  color: var(--artifact-text-primary);
-  box-shadow: 0 3px 10px rgba(0,0,0,.1);
-  z-index: 30;
-  pointer-events: none;
-  animation: float-thought 3s ease-in-out infinite;
-}
-.thought-bubble::after {
-  content: '';
-  position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-  width: 0; height: 0;
-  border: 5px solid transparent;
-  border-top-color: var(--artifact-background-light);
-  margin-top: -1px; z-index: 2;
-}
-.thought-bubble::before {
-  content: '';
-  position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-  width: 0; height: 0;
-  border: 6px solid transparent;
-  border-top-color: var(--artifact-border-light);
-  z-index: 1;
-}
-@keyframes float-thought {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50%       { transform: translateX(-50%) translateY(-3px); }
-}
-
-/* SPRITE */
-.sprite-body-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
-.sprite-body-wrap .animal { font-size: 22px; display: block; animation: run-bounce .35s infinite ease-in-out; }
-.sprite-face {
-  position: absolute; top: -3px; left: 50%; transform: translateX(-50%);
-  width: 15px; height: 15px;
-  border-radius: 50%; object-fit: cover;
-  border: 1.5px solid #fff;
-  z-index: 5;
-}
-.racer-sprite .km-tag  { font-size: 9px; font-weight: 800; background: rgba(0,0,0,.75);
-                          color: #fff; border-radius: 10px; padding: 1px 5px; white-space: nowrap; }
-.racer-sprite .speed-lines { position: absolute; right: 22px; top: 50%; transform: translateY(-50%);
-                               display: flex; flex-direction: column; gap: 3px; opacity: 0; transition: .3s; }
-.racer-sprite.leader .speed-lines { opacity: 1; }
-.speed-line   { height: 2px; background: linear-gradient(to right, transparent, rgba(255,215,0,.7)); border-radius: 1px; }
-.finish-flag  { display: none; }
-.finish-label { font-size: 9px; font-weight: 800; color: var(--artifact-text-primary); }
-
-/* WEEKLY TROPHIES */
-.w-trophy { position: absolute; bottom: 3px; transform: translateX(-50%);
-            display: flex; flex-direction: column; align-items: center; gap: 1px;
-            pointer-events: none; z-index: 5; }
-.w-trophy-icon { font-size: 13px; filter: grayscale(1) opacity(.35);
-                 transition: filter .6s, transform .4s; }
-.w-trophy.done .w-trophy-icon { filter: none; animation: trophy-glow .8s ease-out; }
-.w-trophy-label { font-size: 6px; font-weight: 800; color: rgba(255,255,255,.6);
-                  line-height: 1; transition: color .4s; }
-.w-trophy.done .w-trophy-label { color: #ffd700; }
-@keyframes trophy-glow {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.5) rotate(-8deg); }
-  70%  { transform: scale(1.3) rotate(6deg); }
-  100% { transform: scale(1); }
-}
-/* SIX-PACK finish */
-.sixpack-finish { position: absolute; right: -68px; top: 50%; transform: translateY(-50%);
-                  display: flex; flex-direction: column; align-items: center; gap: 1px; }
-.sixpack-icon   { font-size: 28px; filter: grayscale(1) opacity(.35);
-                  display:inline-block; transform: scaleX(1.5) scaleY(1.3);
-                  transition: filter .6s; cursor: default; }
-.sixpack-icon.done { filter: none; animation: sixpack-pop 1.3s ease-out;
-                     transform: scaleX(1.5) scaleY(1.3); }
-.sixpack-label  { font-size: 7.5px; font-weight: 800; color: rgba(255,255,255,.5);
-                  text-align: center; line-height: 1.4; margin-top: 3px; }
-.sixpack-label.done { color: #ffcc00; text-shadow: 0 0 8px #ff6b35; }
-@keyframes sixpack-pop {
-  0%   { transform: scaleX(1.5) scaleY(1.3) rotate(0); }
-  20%  { transform: scaleX(2.0) scaleY(1.7) rotate(-12deg); }
-  40%  { transform: scaleX(1.7) scaleY(1.5) rotate(10deg); }
-  60%  { transform: scaleX(1.8) scaleY(1.6) rotate(-6deg); }
-  80%  { transform: scaleX(1.55) scaleY(1.35) rotate(3deg); }
-  100% { transform: scaleX(1.5) scaleY(1.3) rotate(0); }
-}
-.status-badge { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 14px; }
-.racer-rank   { width: 20px; flex-shrink: 0; font-size: 11px; font-weight: 800;
-                color: var(--artifact-text-secondary); text-align: right; }
-
-/* ANIMATIONS */
-@keyframes run-bounce { 0%,100%{transform:translateY(0) scaleX(1);}50%{transform:translateY(-4px) scaleX(.96);} }
-@keyframes zzz        { 0%,100%{opacity:1;transform:translateY(0) scale(1);}50%{opacity:.5;transform:translateY(-4px) scale(.9);} }
-@keyframes winner-glow{ 0%,100%{filter:drop-shadow(0 0 4px gold);}50%{filter:drop-shadow(0 0 12px gold);} }
-.sleeping .animal { animation: zzz 1.2s infinite !important; }
-.winner .animal   { animation: run-bounce .22s infinite ease-in-out, winner-glow 1s infinite !important; }
-
-/* ATTENDANCE TABLE */
-/* ── CALENDAR ── */
-.cal-section { background: var(--artifact-background-light); border: 1px solid var(--artifact-border-light);
-               border-radius: var(--r); overflow: hidden; }
-.cal-header  { padding: 14px 20px; border-bottom: 1px solid var(--artifact-border-light);
-               display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-.cal-title   { font-size: 14px; font-weight: 700; }
-.cal-legend  { display: flex; gap: 10px; font-size: 11px; color: var(--artifact-text-secondary); align-items: center; }
-.leg-dot     { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 3px; }
-/* ── MATRIX CALENDAR ── */
-.matrix-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.matrix-table  { border-collapse: collapse; font-size: 11px; min-width: 100%; }
-.matrix-table thead th { position: sticky; top: 0; z-index: 3;
-  background: var(--artifact-background-subtle);
-  border: 1px solid var(--artifact-border-light);
-  padding: 4px 2px; text-align: center; white-space: nowrap; }
-.m-member-hdr  { min-width: 130px; text-align: left !important; left: 0; z-index: 4 !important;
-  padding: 6px 8px !important; font-size: 10px; text-transform: uppercase;
-  letter-spacing: .05em; color: var(--artifact-text-secondary); }
-.m-day-hdr     { min-width: 36px; width: 36px; }
-.m-day-hdr .dh-dow { font-size: 8px; color: var(--artifact-text-secondary); }
-.m-day-hdr .dh-num { font-size: 12px; font-weight: 700; }
-.m-day-hdr .dh-run { font-size: 7px; font-weight: 800; border-radius: 3px;
-  padding: 0 3px; display: inline-block; margin-top: 1px; }
-.hdr-mon { background: #dbeafe !important; border-top: 3px solid #3b82f6 !important; }
-.hdr-wed { background: #dcfce7 !important; border-top: 3px solid #16a34a !important; }
-.hdr-fri { background: #ffedd5 !important; border-top: 3px solid #f97316 !important; }
-.hdr-today { outline: 2px solid var(--artifact-primary-brand); outline-offset: -2px; }
-.hdr-weekend { opacity: .55; }
-html[data-theme=dark] .hdr-mon { background: #1e3a5f !important; }
-html[data-theme=dark] .hdr-wed { background: #14532d !important; }
-html[data-theme=dark] .hdr-fri { background: #431407 !important; }
-.m-run-r { background: #dbeafe; color: #1d4ed8; }
-.m-run-g { background: #dcfce7; color: #15803d; }
-.m-run-o { background: #ffedd5; color: #c2410c; }
-html[data-theme=dark] .m-run-r { background: #1e3a5f; color: #93c5fd; }
-html[data-theme=dark] .m-run-g { background: #14532d; color: #86efac; }
-html[data-theme=dark] .m-run-o { background: #431407; color: #fdba74; }
-.m-member-cell { position: sticky; left: 0; z-index: 2;
-  background: var(--artifact-background-light);
-  border: 1px solid var(--artifact-border-light);
-  padding: 5px 8px; white-space: nowrap; font-weight: 600; font-size: 11px; min-width: 130px; }
-.m-cell { position: relative; border: 1px solid var(--artifact-border-light); text-align: center;
-  padding: 2px 1px; cursor: pointer; transition: background .1s; vertical-align: middle;
-  min-width: 36px; user-select: none; }
-.m-cell:hover { filter: brightness(.92); }
-.m-cell.cell-run-mon { background: #eff6ff; }
-.m-cell.cell-run-wed { background: #f0fdf4; }
-.m-cell.cell-run-fri { background: #fff7ed; }
-html[data-theme=dark] .m-cell.cell-run-mon { background: #0f1f33; }
-html[data-theme=dark] .m-cell.cell-run-wed { background: #0a1f0a; }
-html[data-theme=dark] .m-cell.cell-run-fri { background: #1f0f00; }
-.m-cell.cell-today { outline: 2px solid var(--artifact-primary-brand); outline-offset: -2px; }
-.m-cell.cell-weekend { background: var(--artifact-background-subtle); }
-.m-cell-icon { font-size: 13px; line-height: 1.4; display: block; }
-.m-cell-km   { font-size: 8px; color: #16a34a; font-weight: 700; line-height: 1; display: block; }
-/* ── BOTTOM SHEET ── */
-.bs-overlay {
-  display: none; position: fixed; inset: 0; z-index: 100000;
-  background: rgba(0,0,0,.45); align-items: flex-end; justify-content: center;
-}
-.bs-overlay.open { display: flex; }
-.bs-sheet {
-  background: var(--artifact-background, #fff);
-  border-radius: 18px 18px 0 0;
-  padding: 0 0 env(safe-area-inset-bottom,12px);
-  width: 100%; max-width: 480px;
-  box-shadow: 0 -4px 32px rgba(0,0,0,.2);
-  animation: bsSlideUp .22s cubic-bezier(.4,0,.2,1);
-}
-@keyframes bsSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.bs-handle {
-  width: 40px; height: 4px; background: var(--artifact-border-light);
-  border-radius: 2px; margin: 12px auto 6px;
-}
-.bs-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 20px 10px;
-  border-bottom: 1px solid var(--artifact-border-light);
-}
-.bs-title { font-size: 15px; font-weight: 700; color: var(--artifact-text-primary); }
-.bs-date  { font-size: 12px; color: var(--artifact-text-secondary); }
-.bs-body  { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-.bs-member-info { display: flex; align-items: center; gap: 12px; }
-.bs-avatar {
-  width: 52px; height: 52px; border-radius: 50%;
-  background: var(--artifact-background-light);
-  border: 2px solid var(--artifact-border-light);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 26px; flex-shrink: 0; overflow: hidden; position: relative;
-}
-.bs-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-.bs-member-name { font-size: 16px; font-weight: 700; color: var(--artifact-text-primary); }
-.bs-member-sub  { font-size: 12px; color: var(--artifact-text-secondary); margin-top: 2px; }
-.bs-km-row { display: flex; align-items: center; gap: 12px; }
-.bs-km-label { font-size: 13px; font-weight: 600; color: var(--artifact-text-primary); flex-shrink: 0; }
-.bs-km-input {
-  flex: 1; padding: 10px 14px; border: 2px solid var(--artifact-border-light);
-  border-radius: 10px; font-size: 22px; font-weight: 700; text-align: center;
-  background: var(--artifact-background); color: var(--artifact-text-primary);
-  transition: border-color .15s;
-}
-.bs-km-input:focus { outline: none; border-color: var(--artifact-primary-brand, #3559e6); }
-.bs-km-stepper { display: flex; flex-direction: column; gap: 4px; }
-.bs-km-stepper button {
-  width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--artifact-border-light);
-  background: var(--artifact-background-light); cursor: pointer; font-size: 16px;
-  display: flex; align-items: center; justify-content: center; color: var(--artifact-text-primary);
-}
-.bs-km-stepper button:active { background: var(--artifact-primary-brand, #3559e6); color: #fff; }
-.bs-btns { display: flex; gap: 10px; }
-.bs-btns button {
-  flex: 1; padding: 13px 8px; border-radius: 12px; border: none;
-  cursor: pointer; font-size: 14px; font-weight: 700;
-  transition: opacity .15s, transform .1s;
-}
-.bs-btns button:active { transform: scale(.97); opacity: .85; }
-.bs-btn-present { background: #3559e6; color: #fff; }
-.bs-btn-absent  { background: #fee2e2; color: #dc2626; }
-.bs-btn-clear   { background: var(--artifact-background-light); color: var(--artifact-text-secondary);
-  border: 1px solid var(--artifact-border-light); flex: 0.5; }
-/* ── MEMBER SUMMARY TABLE (bottom) ── */
-.sum-table-wrap   { overflow-x: auto; border-top: 1px solid var(--artifact-border-light); }
-.sum-table        { width: 100%; border-collapse: collapse; font-size: 12px; }
-.sum-table th     { padding: 8px 10px; text-align: center; font-size: 10px; font-weight: 700;
-                    text-transform: uppercase; color: var(--artifact-text-secondary);
-                    background: var(--artifact-background-subtle);
-                    border-bottom: 1px solid var(--artifact-border-light); white-space: nowrap; }
-.sum-table th.left { text-align: left; min-width: 140px; }
-.sum-table td      { padding: 7px 10px; text-align: center; border-bottom: 1px solid var(--artifact-border-light); vertical-align: middle; }
-.sum-table td.name-cell { text-align: left; font-weight: 600; font-size: 11px; white-space: nowrap; }
-.total-cell        { font-weight: 800; color: var(--artifact-primary-brand); }
-.km-total          { font-size: 11px; color: var(--artifact-pos); font-weight: 700; }
-.prog-bar-wrap     { background: var(--artifact-border-light); border-radius: 4px; height: 6px; min-width: 60px; overflow: hidden; margin: 2px auto 0; }
-.prog-bar-fill     { height: 100%; border-radius: 4px; background: var(--artifact-primary-brand); transition: width .5s; }
-/* day detail modal */
-.day-modal-header  { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
-.day-member-row    { display: flex; align-items: center; gap: 10px; padding: 8px 0;
-                     border-bottom: 1px solid var(--artifact-border-light); }
-.day-member-row:last-child { border-bottom: none; }
-.day-member-name   { flex: 1; font-size: 13px; font-weight: 600; }
-.day-status-btn    { font-size: 18px; cursor: pointer; border: 2px solid transparent;
-                     border-radius: 6px; padding: 2px 6px; transition: .12s; background: none; }
-.day-status-btn:hover { border-color: var(--artifact-primary-brand); background: var(--artifact-background-subtle); }
-.day-status-btn.active { border-color: var(--artifact-primary-brand); background: #dce7ff; }
-html[data-theme=dark] .day-status-btn.active { background: #1a2a4a; }
-.day-km-input  { width: 60px; padding: 4px 6px; border: 1px solid var(--artifact-border-light);
-                 border-radius: 5px; font-size: 13px; text-align: center;
-                 background: var(--artifact-background); color: var(--artifact-text-primary); }
-.day-km-label  { font-size: 11px; color: var(--artifact-text-secondary); }
-@media(max-width:640px){
-  .m-member-cell, .m-member-hdr { min-width: 90px; font-size: 10px; padding: 4px 5px !important; }
-  .m-day-hdr { min-width: 28px; width: 28px; }
-  .m-cell { min-width: 28px; }
-  .m-cell-icon { font-size: 11px; }
-}
-
-/* KM MODAL */
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
-           z-index: 200; align-items: center; justify-content: center; }
-.overlay.open { display: flex; }
-.modal  { background: var(--artifact-background-light); border-radius: 12px; padding: 24px;
-          width: 320px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
-.modal h3     { font-size: 16px; font-weight: 800; margin-bottom: 16px; }
-.modal-animal { text-align: center; font-size: 40px; margin-bottom: 8px; }
-.modal-name   { text-align: center; font-weight: 700; font-size: 14px; margin-bottom: 16px;
-                color: var(--artifact-text-secondary); }
-.modal-row    { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-.modal-row label { font-size: 12px; font-weight: 600; width: 100px; }
-.modal-row input { flex: 1; padding: 8px 10px; border: 1px solid var(--artifact-border-light);
-                   border-radius: 6px; background: var(--artifact-background-subtle);
-                   color: var(--artifact-text-primary); font-size: 14px; }
-.modal-btns   { display: flex; gap: 8px; margin-top: 16px; }
-.modal-btns button { flex: 1; }
-
-/* MEMBER EDITOR MODAL */
-.member-modal { width: 580px; max-width: 95vw; }
-.member-editor-header {
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--artifact-background-subtle);
-  border: 1px solid var(--artifact-border-light);
-  border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;
-}
-.member-editor-header label { font-size: 13px; font-weight: 700; }
-.count-adj { display: flex; align-items: center; gap: 8px; }
-.count-btn {
-  width: 28px; height: 28px; border-radius: 50%;
-  border: 1px solid var(--artifact-border-light);
-  background: var(--artifact-background-light);
-  color: var(--artifact-text-primary);
-  font-size: 16px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  line-height: 1;
-}
-.count-val { font-size: 18px; font-weight: 800; min-width: 22px; text-align: center;
-             color: var(--artifact-primary-brand); }
-.member-col-hdr {
-  display: grid; grid-template-columns: 52px 1fr 78px 106px;
-  gap: 6px; padding: 0 4px 6px;
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  color: var(--artifact-text-secondary); letter-spacing: .04em;
-}
-.member-edit-row {
-  display: grid; grid-template-columns: 52px 1fr 78px 106px;
-  gap: 6px; align-items: center; padding: 4px;
-  border-radius: 6px; transition: background .15s;
-}
-.member-edit-row.inactive { opacity: .4; }
-.member-edit-row input {
-  padding: 6px 8px; border: 1px solid var(--artifact-border-light);
-  border-radius: 6px; background: var(--artifact-background-subtle);
-  color: var(--artifact-text-primary); font-size: 12px; width: 100%;
-}
-.member-edit-rows { max-height: 340px; overflow-y: auto; }
-
-/* SETUP OVERLAY */
-.setup-overlay { display: none; position: fixed; inset: 0; background: var(--artifact-background);
-                 z-index: 300; align-items: center; justify-content: center; padding: 20px; }
-.setup-overlay.open { display: flex; }
-.setup-box    { background: var(--artifact-background-light); border: 1px solid var(--artifact-border-light);
-                border-radius: 16px; padding: 32px; max-width: 480px; width: 100%; }
-.setup-box h2 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
-.setup-box p  { color: var(--artifact-text-secondary); font-size: 13px; margin-bottom: 20px; }
-.setup-field  { margin-bottom: 14px; }
-.setup-field label { display: block; font-size: 11px; font-weight: 700;
-                     text-transform: uppercase; color: var(--artifact-text-secondary); margin-bottom: 4px; }
-.setup-field input { width: 100%; padding: 10px 12px; border: 1px solid var(--artifact-border-light);
-                     border-radius: 8px; background: var(--artifact-background-subtle);
-                     color: var(--artifact-text-primary); font-size: 13px; }
-.setup-note   { background: var(--artifact-warnbg); color: var(--artifact-warn);
-                border-radius: 8px; padding: 10px 14px; font-size: 12px; margin-bottom: 16px; }
-.setup-step   { display: flex; gap: 10px; margin-bottom: 10px; font-size: 12px; }
-.setup-num    { width: 20px; height: 20px; border-radius: 50%; background: var(--artifact-primary-brand);
-                color: #fff; display: flex; align-items: center; justify-content: center;
-                font-size: 10px; font-weight: 800; flex-shrink: 0; }
-.dark-btn { background: none; border: 1px solid var(--artifact-border-light); border-radius: 6px;
-            width: 30px; height: 30px; font-size: 14px; color: var(--artifact-text-secondary);
-            display: flex; align-items: center; justify-content: center; }
-.month-nav { display: flex; align-items: center; gap: 8px; }
-.month-nav button { width: 28px; height: 28px; border-radius: 50%;
-                    border: 1px solid var(--artifact-border-light); background: var(--artifact-background-subtle);
-                    color: var(--artifact-text-primary); font-size: 14px;
-                    display: flex; align-items: center; justify-content: center; }
-.month-label { font-size: 13px; font-weight: 700; min-width: 100px; text-align: center; }
-.no-data { padding: 40px; text-align: center; color: var(--artifact-text-secondary); font-size: 14px; }
-
-
-/* ═══════════════════════════════════════════════
-   MOBILE RESPONSIVE  (≤ 640 px)
-   ═══════════════════════════════════════════════ */
-@media (max-width: 640px) {
-  /* ── Topbar ── */
-  .topbar { padding: 0 12px; height: 52px; }
-  .topbar-sub   { display: none; }
-  .topbar-title { font-size: 13px; }
-  .topbar-right { gap: 4px; }
-  .btn    { padding: 5px 9px; font-size: 11px; }
-  .btn-sm { padding: 5px 9px; }
-  .month-label  { min-width: 72px; font-size: 12px; }
-  .month-nav button { width: 26px; height: 26px; }
-
-  /* ── Tabs → fixed bottom bar ── */
-  .tabs {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 101;
-    border-top: 1px solid var(--artifact-border-light); border-bottom: none;
-    padding: 0 0 env(safe-area-inset-bottom,0px);
-    box-shadow: 0 -2px 12px rgba(0,0,0,.08);
-  }
-  .tab {
-    flex: 1; padding: 10px 4px 8px; font-size: 11px;
-    border-bottom: none; border-top: 2px solid transparent;
-    margin-bottom: 0; margin-top: -1px;
-  }
-  .tab.active { border-top-color: var(--artifact-primary-brand); border-bottom-color: transparent; }
-
-  /* ── Main: pad bottom for fixed tab bar ── */
-  .main { padding: 12px 10px 76px; }
-
-  /* ── KPIs: 2-column ── */
-  .kpi-row { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .kpi     { padding: 10px 12px; }
-  .kpi-val { font-size: 20px; }
-
-  /* ── Race section ── */
-  .race-header  { padding: 12px 14px; gap: 6px; }
-  .race-title   { font-size: 14px; }
-  .race-badge   { font-size: 10px; padding: 3px 8px; }
-  .race-track   { padding: 8px 10px; }
-  .race-milestones { padding-left: 26px; padding-right: 52px; }
-  .milestone    { font-size: 9px; }
-
-  /* ── Racer row: info left, road full-width below ── */
-  .racer-row  { flex-wrap: wrap; padding-top: 28px; gap: 4px; }
-  .racer-rank { width: 18px; font-size: 10px; }
-  .racer-info { width: calc(100% - 26px); flex: none; }
-  .road-wrap  { width: 100%; padding-right: 52px; margin-left: 0; }
-  .sixpack-finish { right: -54px; }
-  .sixpack-icon { font-size: 22px; }
-  .racer-name { max-width: unset; font-size: 11px; }
-  .racer-km   { font-size: 10px; }
-  .lt-info    { max-width: unset; font-size: 9px; }
-  .lt-pbar    { max-width: 100%; }
-  .road       { height: 40px; }
-  .sprite-body-wrap .animal { font-size: 18px; }
-  .thought-bubble {
-    font-size: 8px; padding: 3px 6px;
-    max-width: 110px; white-space: normal;
-    text-align: center; line-height: 1.3;
-  }
-  .km-tag { font-size: 8px; padding: 1px 4px; }
-  .finish-flag { font-size: 18px; right: -46px; }
-  .finish-label { font-size: 8px; }
-
-  /* ── Attendance table ── */
-  .table-header { padding: 10px 14px; flex-wrap: wrap; gap: 4px; }
-  .table-wrap   { -webkit-overflow-scrolling: touch; }
-  th  { padding: 6px 7px; font-size: 9px; }
-  td  { padding: 5px 6px; }
-  td.name-cell { font-size: 10px; min-width: 100px; }
-  .run-cell { min-width: 34px; }
-  .status-icon { font-size: 13px; }
-  .km-val { font-size: 8px; }
-  .total-cell { font-size: 11px; }
-  .km-total   { font-size: 9px; }
-
-  /* ── KM Modal ── */
-  .overlay { align-items: flex-end; padding: 0; }
-  .modal {
-    width: 100%; border-bottom-left-radius: 0; border-bottom-right-radius: 0;
-    border-radius: 18px 18px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom,0px));
-  }
-  .modal h3    { font-size: 15px; }
-  .modal-row   { gap: 8px; }
-  .modal-row label { width: 90px; font-size: 11px; }
-  .modal-row input { font-size: 16px; padding: 10px; } /* 16px prevents iOS zoom */
-  .modal-btns button { padding: 12px 8px; font-size: 13px; min-height: 44px; }
-
-  /* ── Member modal ── */
-  .member-modal { width: 100%; border-radius: 18px 18px 0 0; max-height: 90vh; overflow-y: auto; }
-  .member-editor-header { flex-wrap: wrap; gap: 6px; }
-  .member-col-hdr  { grid-template-columns: 26px 1fr 60px 86px; font-size: 9px; }
-  .member-edit-row { grid-template-columns: 26px 1fr 60px 86px; }
-  .member-edit-row input { font-size: 13px; padding: 6px; }
-  .member-edit-rows { max-height: 50vh; }
-
-  /* ── Animal picker ── */
-  .animal-picker-box { min-width: unset; width: calc(100vw - 24px); max-height: 80vh; overflow-y: auto; }
-  .ap-grid { grid-template-columns: repeat(7, 1fr); gap: 4px; }
-  .ap-cell { font-size: 20px; padding: 5px 3px; }
-
-  /* ── Setup overlay ── */
-  .setup-box { padding: 20px 16px; }
-  .setup-box h2 { font-size: 17px; }
-
-  /* ── Misc ── */
-  .dark-btn { width: 36px; height: 36px; }
-}
-
-/* ── Tablet (641–900px) ── */
-@media (min-width: 641px) and (max-width: 900px) {
-  .main { padding: 16px; }
-  .kpi-row { grid-template-columns: repeat(3, 1fr); }
-  .racer-info { width: 150px; }
-}
-
-@media print {
-  body { margin: 0; padding: .4in .6in; background: #fff; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-  .topbar, .tabs, .overlay, .setup-overlay { display: none !important; }
-  .main { max-width: 100% !important; padding: 0; }
-  .kpi-row, .kpi, .race-section, .table-section { break-inside: avoid; }
-  .kpi, .race-section, .table-section { box-shadow: none !important; border: 1px solid rgba(0,0,0,.08); }
-  button { display: none !important; }
-}
-
-/* ══════════════════════════════════════════
-   RUN TO EARN  –  DLUT Token System
-   ══════════════════════════════════════════ */
-.earn-section { background: var(--artifact-background-light);
-  border: 1px solid var(--artifact-border-light);
-  border-radius: var(--r); overflow: hidden; margin-bottom: 20px; }
-.earn-header { padding: 16px 20px; border-bottom: 1px solid var(--artifact-border-light);
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-.earn-title  { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-.earn-body   { padding: 20px; }
-
-/* Wallet card */
-.wallet-card { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  border-radius: 12px; padding: 20px 24px; color: #fff; margin-bottom: 20px;
-  position: relative; overflow: hidden; }
-.wallet-card::before { content: ''; position: absolute; top: -40px; right: -40px;
-  width: 140px; height: 140px; border-radius: 50%;
-  background: rgba(255,215,0,.07); pointer-events: none; }
-.wallet-card::after { content: ''; position: absolute; bottom: -30px; left: -30px;
-  width: 100px; height: 100px; border-radius: 50%;
-  background: rgba(255,255,255,.04); pointer-events: none; }
-.wc-top    { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.wc-brand  { font-size: 13px; font-weight: 700; color: #ffd700; letter-spacing: .08em; text-transform: uppercase; }
-.wc-chain  { font-size: 11px; color: rgba(255,255,255,.5); background: rgba(255,255,255,.1);
-  padding: 3px 10px; border-radius: 20px; }
-.wc-balance { margin-bottom: 8px; }
-.wc-bal-label { font-size: 11px; color: rgba(255,255,255,.5); letter-spacing: .06em; text-transform: uppercase; }
-.wc-bal-val   { font-size: 36px; font-weight: 900; color: #ffd700; letter-spacing: -1px; line-height: 1.1; }
-.wc-bal-sym   { font-size: 16px; font-weight: 700; color: rgba(255,215,0,.7); margin-left: 4px; }
-.wc-addr   { font-size: 11px; color: rgba(255,255,255,.5); font-family: monospace; margin-bottom: 14px; }
-.wc-btns   { display: flex; gap: 8px; flex-wrap: wrap; }
-.wc-btn    { padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 700;
-  border: none; cursor: pointer; transition: opacity .15s; }
-.wc-btn:active { opacity: .7; }
-.wc-btn-connect { background: #ffd700; color: #1a1a2e; }
-.wc-btn-claim   { background: rgba(255,255,255,.12); color: #fff;
-  border: 1px solid rgba(255,255,255,.2); }
-.wc-btn-claim:disabled { opacity: .4; cursor: not-allowed; }
-.wc-not-connected { text-align: center; padding: 8px 0 4px; }
-.wc-not-connected p { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 8px; }
-
-/* Token summary grid */
-.token-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px; margin-bottom: 20px; }
-.token-kpi  { background: var(--artifact-background-subtle); border: 1px solid var(--artifact-border-light);
-  border-radius: 10px; padding: 14px 16px; }
-.token-kpi-icon  { font-size: 20px; margin-bottom: 4px; }
-.token-kpi-val   { font-size: 22px; font-weight: 800; color: var(--artifact-primary-brand); letter-spacing: -.5px; }
-.token-kpi-label { font-size: 10px; color: var(--artifact-text-secondary); text-transform: uppercase;
-  letter-spacing: .05em; margin-top: 2px; }
-
-/* Earn rate card */
-.rate-card { background: var(--artifact-background-subtle); border: 1px solid var(--artifact-border-light);
-  border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; }
-.rate-title { font-size: 12px; font-weight: 700; color: var(--artifact-text-secondary);
-  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
-.rate-rows  { display: flex; flex-direction: column; gap: 6px; }
-.rate-row   { display: flex; align-items: center; justify-content: space-between;
-  font-size: 12px; color: var(--artifact-text-primary); }
-.rate-desc  { display: flex; align-items: center; gap: 7px; }
-.rate-badge { padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 800;
-  background: #fef3c7; color: #d97706; white-space: nowrap; }
-.rate-badge.gold  { background: #fef9c3; color: #ca8a04; }
-.rate-badge.green { background: var(--artifact-posbg); color: var(--artifact-pos); }
-.rate-badge.blue   { background: #dbeafe; color: #1d4ed8; }
-.rate-badge.purple { background: #f3e8ff; color: #7e22ce; font-size: 11px; font-weight: 800; }
-html[data-theme=dark] .rate-badge.purple { background: #3b0764; color: #d8b4fe; }
-.rate-badge.orange { background: #fff7ed; color: #c2410c; font-size: 11px; font-weight: 800; }
-html[data-theme=dark] .rate-badge.orange { background: #431407; color: #fdba74; }
-html[data-theme=dark] .rate-badge.blue  { background: #1e3a5f; color: #93c5fd; }
-html[data-theme=dark] .rate-badge.green { background: #052e16; color: #4ade80; }
-
-/* Leaderboard */
-.earn-leaderboard { overflow-x: auto; }
-.earn-lb-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.earn-lb-table th { padding: 8px 12px; text-align: left; font-size: 10px; font-weight: 700;
-  text-transform: uppercase; color: var(--artifact-text-secondary);
-  background: var(--artifact-background-subtle);
-  border-bottom: 1px solid var(--artifact-border-light); white-space: nowrap; }
-.earn-lb-table th.right { text-align: right; }
-.earn-lb-table td { padding: 10px 12px; border-bottom: 1px solid var(--artifact-border-light);
-  vertical-align: middle; }
-.earn-lb-table tr:last-child td { border-bottom: none; }
-.earn-lb-table tr:hover td { background: var(--artifact-background-subtle); }
-.lb-rank  { font-size: 16px; width: 30px; }
-.lb-name  { font-weight: 600; font-size: 12px; }
-.lb-km    { color: var(--artifact-text-secondary); font-size: 11px; }
-.lb-token { font-size: 15px; font-weight: 800; color: #d97706; text-align: right; }
-.lb-token .sym { font-size: 10px; font-weight: 600; color: var(--artifact-text-secondary); margin-left: 3px; }
-.lb-bar-wrap { width: 80px; background: var(--artifact-border-light); border-radius: 4px; height: 5px;
-  display: inline-block; overflow: hidden; vertical-align: middle; margin-left: 8px; }
-.lb-bar-fill { height: 100%; background: linear-gradient(to right, #f59e0b, #ffd700);
-  border-radius: 4px; transition: width .6s; }
-.lb-breakdown { display: flex; gap: 4px; flex-wrap: wrap; }
-.lb-chip  { font-size: 9px; padding: 1px 6px; border-radius: 10px;
-  background: var(--artifact-background-subtle); color: var(--artifact-text-secondary);
-  border: 1px solid var(--artifact-border-light); white-space: nowrap; }
-.lb-chip.hi { background: #fef3c7; color: #d97706; border-color: #fde68a; }
-html[data-theme=dark] .lb-chip.hi { background: #451a03; color: #fbbf24; border-color: #92400e; }
-
-/* Wallet NOT connected state */
-.wallet-disconnected { display: flex; flex-direction: column; align-items: center; gap: 10px;
-  padding: 16px 0 4px; }
-.wallet-disconnected p { font-size: 12px; color: rgba(255,255,255,.5); text-align: center; }
-
-/* Claim modal */
-.claim-modal { max-width: 360px; }
-.claim-success { text-align: center; }
-.claim-success .big { font-size: 48px; margin-bottom: 8px; }
-.claim-success .title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
-.claim-success .sub { font-size: 12px; color: var(--artifact-text-secondary); line-height: 1.6; }
-
-@media (max-width: 640px) {
-  .wallet-card { padding: 16px; }
-  .wc-bal-val  { font-size: 28px; }
-  .token-grid  { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .earn-lb-table .lb-bar-wrap { display: none; }
-}
-
-/* ── Milestone Winners Row ──────────────────────────────────────────── */
-.race-milestone-winners {
-  display: flex; position: relative; margin-bottom: 8px;
-  padding-left: 208px; padding-right: 72px; height: 40px; align-items: center;
-}
-.mw-slot {
-  position: absolute; transform: translateX(-50%); text-align: center;
-  display: flex; flex-direction: column; align-items: center; gap: 1px;
-}
-.mw-avatar {
-  width: 22px; height: 22px; border-radius: 50%;
-  border: 2px solid #ffd700; background: var(--artifact-background-subtle);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; overflow: hidden; flex-shrink: 0;
-}
-.mw-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-.mw-avatar.unclaimed { border-color: var(--artifact-border-light); opacity: .5; }
-.mw-name { font-size: 7px; font-weight: 700; color: #d97706; white-space: nowrap; max-width: 44px; overflow: hidden; text-overflow: ellipsis; }
-.mw-name.unclaimed { color: var(--artifact-text-secondary); font-weight: 400; font-style: italic; }
-
-/* ── DLUT Token badge on racer ───────────────────────────────────────── */
-.dlut-tag {
-  font-size: 8px; font-weight: 800;
-  background: linear-gradient(135deg, #fbbf24, #d97706);
-  color: #fff; border-radius: 10px;
-  padding: 1px 5px; white-space: nowrap;
-  box-shadow: 0 1px 4px rgba(217,119,6,.4);
-  letter-spacing: .02em;
-}
-.racer-dlut {
-  font-size: 10px; font-weight: 700; color: #d97706;
-  margin-top: 2px; white-space: nowrap;
-}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;overflow-x:hidden}
+.topbar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap;position:sticky;top:0;z-index:100}
+.topbar-title{font-weight:800;font-size:15px;color:var(--accent);flex:1;min-width:120px}
+.topbar-sub{font-size:10px;color:var(--text2)}
+.tb-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tb-btn:hover{border-color:var(--accent);color:var(--accent)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#ff4444;flex-shrink:0}
+.status-dot.online{background:var(--green)}
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:49px;z-index:99}
+.tab{flex:1;padding:10px 4px;text-align:center;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:10px 12px;background:var(--bg3)}
+@media(max-width:600px){.kpi-bar{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--card);border-radius:8px;padding:8px 10px;text-align:center;border:1px solid var(--border)}
+.kpi-val{font-size:18px;font-weight:800;color:var(--accent)}
+.kpi-lbl{font-size:10px;color:var(--text2);margin-top:2px}
+.race-wrap{padding:10px 12px}
+.race-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+.race-title{font-weight:700;font-size:14px;color:var(--gold)}
+.race-sub{font-size:11px;color:var(--text2)}
+.milestone-bar{display:flex;margin-bottom:4px}
+.milestone-spacer{width:208px;flex-shrink:0}
+@media(max-width:600px){.milestone-spacer{width:26px}}
+.milestone-road{flex:1;margin-right:72px;position:relative;height:22px}
+.ms-label{position:absolute;transform:translateX(-50%);font-size:9px;font-weight:700;color:var(--text2);text-align:center;line-height:1.2;top:0}
+.winner-slots{display:flex;margin-bottom:6px}
+.winner-spacer{width:208px;flex-shrink:0}
+@media(max-width:600px){.winner-spacer{width:26px}}
+.winner-road{flex:1;margin-right:72px;position:relative;height:36px}
+.winner-slot{position:absolute;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:1px}
+.winner-avatar{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);overflow:hidden;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:14px;position:relative}
+.winner-avatar img{width:100%;height:100%;object-fit:cover}
+.winner-badge{position:absolute;top:-6px;right:-4px;font-size:10px}
+.winner-name{font-size:8px;color:var(--text2);white-space:nowrap;max-width:40px;overflow:hidden;text-overflow:ellipsis}
+.racer{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.racer-rank{width:20px;text-align:center;font-size:11px;font-weight:700;color:var(--text2);flex-shrink:0}
+.racer-info{width:172px;flex-shrink:0;background:var(--card);border-radius:8px;padding:6px 8px;border:1px solid var(--border)}
+.racer-info-top{display:flex;align-items:center;gap:6px}
+.racer-avatar{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);overflow:hidden;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0;position:relative}
+.racer-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.head-badge{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:14px;animation:floatBadge 2s ease-in-out infinite;pointer-events:none}
+@keyframes floatBadge{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
+.racer-name{font-size:11px;font-weight:700;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.racer-km{font-size:10px;color:var(--accent);font-weight:700}
+.racer-dlut{font-size:9px;color:var(--gold);margin-top:1px}
+.racer-lt{font-size:9px;color:var(--text2);margin-top:1px}
+.road-wrap{flex:1;position:relative;height:46px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);overflow:visible}
+.road-lane{position:absolute;inset:0;border-radius:8px}
+.road-lines{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-around;padding:4px 0;pointer-events:none}
+.road-line{height:1px;background:rgba(255,255,255,0.06);margin:0 8px}
+.sprite{position:absolute;top:50%;transform:translateY(-50%);transition:left 0.8s cubic-bezier(.34,1.56,.64,1);display:flex;flex-direction:column;align-items:center;gap:1px;z-index:2}
+.sprite-animal{font-size:22px;line-height:1;position:relative}
+.sprite-animal img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.sprite-km{font-size:8px;font-weight:700;color:#fff;background:rgba(0,0,0,0.6);border-radius:4px;padding:1px 4px;white-space:nowrap}
+.sprite-dlut{font-size:8px;color:var(--gold);font-weight:700;background:rgba(0,0,0,0.5);border-radius:4px;padding:1px 4px}
+.sprite-quote{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px 7px;font-size:9px;color:var(--text);white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;z-index:10}
+.sprite-quote::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--border)}
+.w-trophy{position:absolute;bottom:3px;display:flex;flex-direction:column;align-items:center;transform:translateX(-50%);z-index:3;pointer-events:none}
+.w-trophy-icon{font-size:11px;line-height:1;filter:grayscale(1);opacity:.35;transition:all .4s}
+.w-trophy-icon.reached{filter:none;opacity:1;animation:trophyPop .5s ease}
+.w-trophy-lbl{font-size:7px;color:var(--text2);font-weight:700}
+@keyframes trophyPop{0%{transform:scale(0.5)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+.goal-icon{position:absolute;right:0;top:50%;transform:translate(50%,-50%);font-size:20px;z-index:4;transition:all .4s;filter:grayscale(1);opacity:.4}
+.goal-icon.reached{filter:none;opacity:1;animation:goalPop .6s ease}
+@keyframes goalPop{0%{transform:translate(50%,-50%) scale(0.3)}60%{transform:translate(50%,-50%) scale(1.4)}100%{transform:translate(50%,-50%) scale(1)}}
+.sprite.ssj .sprite-animal{filter:drop-shadow(0 0 6px var(--ssj)) drop-shadow(0 0 12px var(--ssj))}
+.sprite.ssj3 .sprite-animal{filter:drop-shadow(0 0 6px var(--ssj3)) drop-shadow(0 0 14px var(--ssj3))}
+.sprite.god .sprite-animal{filter:drop-shadow(0 0 8px var(--god)) drop-shadow(0 0 16px var(--god))}
+.sprite.ui .sprite-animal{filter:drop-shadow(0 0 8px var(--ui)) drop-shadow(0 0 18px var(--ui))}
+.att-wrap{padding:10px 12px}
+.month-nav{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.month-nav button{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:13px}
+.month-nav button:hover{border-color:var(--accent)}
+.month-label{font-weight:700;font-size:14px;color:var(--gold);flex:1;text-align:center}
+.matrix-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.matrix{border-collapse:collapse;min-width:100%}
+.matrix th{background:var(--bg3);color:var(--text2);font-size:10px;font-weight:700;padding:6px 4px;text-align:center;border:1px solid var(--border);white-space:nowrap;position:sticky;top:0;z-index:5}
+.matrix th.th-member{position:sticky;left:0;z-index:6;background:var(--bg3);min-width:90px;text-align:left;padding-left:8px}
+.matrix td{border:1px solid var(--border);padding:3px;text-align:center;cursor:pointer;transition:background .15s;min-width:28px}
+.matrix td:hover{background:var(--card2)}
+.matrix td.td-member{position:sticky;left:0;background:var(--bg2);z-index:4;padding:4px 6px;text-align:left;white-space:nowrap}
+.matrix td.td-member .m-av{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600}
+.matrix td.td-member .m-av-icon{width:20px;height:20px;border-radius:50%;overflow:hidden;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.matrix td.td-member .m-av-icon img{width:100%;height:100%;object-fit:cover}
+.cell-icon{font-size:14px;line-height:1;display:block}
+.cell-km{font-size:8px;color:var(--text2);display:block;line-height:1}
+.cell-present{background:rgba(0,230,118,0.08)}
+.cell-absent{background:rgba(255,68,68,0.08)}
+.cell-ssj{background:rgba(255,215,0,0.1);outline:1px solid rgba(255,215,0,0.4)}
+.cell-ssj3{background:rgba(180,79,255,0.1);outline:1px solid rgba(180,79,255,0.4)}
+.summary-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}
+.summary-table th{background:var(--bg3);color:var(--text2);padding:6px 8px;text-align:left;border:1px solid var(--border);font-size:11px}
+.summary-table td{padding:6px 8px;border:1px solid var(--border)}
+.prog-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:3px}
+.prog-fill{height:100%;border-radius:3px;transition:width .4s}
+.earn-wrap{padding:10px 12px}
+.earn-section{background:var(--card);border-radius:10px;border:1px solid var(--border);margin-bottom:12px;overflow:hidden}
+.earn-section-head{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.earn-section-body{padding:12px 14px}
+.wallet-member-sel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.wm-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card2);color:var(--text2);font-size:11px;cursor:pointer;transition:all .15s}
+.wm-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,0.1)}
+.wallet-balance{text-align:center;padding:14px;background:var(--bg3);border-radius:8px;margin-bottom:10px}
+.wallet-bal-val{font-size:36px;font-weight:900;color:var(--gold)}
+.wallet-bal-lbl{font-size:11px;color:var(--text2);margin-top:2px}
+.earn-rate-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+@media(max-width:480px){.earn-rate-grid{grid-template-columns:1fr}}
+.earn-rate-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:6px;padding:7px 10px;font-size:11px}
+.earn-rate-val{font-weight:700;color:var(--gold)}
+.leaderboard-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border-radius:8px;margin-bottom:6px}
+.lb-rank{width:22px;font-size:12px;font-weight:800;text-align:center;flex-shrink:0}
+.lb-avatar{width:32px;height:32px;border-radius:50%;overflow:hidden;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.lb-avatar img{width:100%;height:100%;object-fit:cover}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:12px;font-weight:700;color:var(--text)}
+.lb-dlut{font-size:11px;color:var(--gold);font-weight:700}
+.lb-bar{height:4px;background:var(--border);border-radius:2px;margin-top:3px;overflow:hidden}
+.lb-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--accent2));border-radius:2px;transition:width .4s}
+.prize-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.prize-card{background:var(--bg3);border-radius:8px;border:1px solid var(--border);padding:10px;text-align:center}
+.prize-icon{font-size:28px;margin-bottom:4px}
+.prize-name{font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px}
+.prize-cost{font-size:12px;color:var(--gold);font-weight:700;margin-bottom:6px}
+.prize-btn{width:100%;padding:5px;border-radius:5px;border:none;background:var(--accent);color:#fff;font-size:11px;font-weight:600;cursor:pointer}
+.prize-btn:hover{opacity:.85}
+.prize-btn:disabled{background:var(--border);color:var(--text2);cursor:not-allowed}
+.tx-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px}
+.tx-row:last-child{border-bottom:none}
+.tx-icon{font-size:14px;flex-shrink:0}
+.tx-desc{flex:1;color:var(--text2)}
+.tx-amt{font-weight:700}
+.tx-amt.pos{color:var(--green)}
+.tx-amt.neg{color:var(--red)}
+.admin-wrap{padding:10px 12px}
+.admin-section{background:var(--card);border-radius:10px;border:1px solid var(--border);margin-bottom:12px;overflow:hidden}
+.admin-section-head{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;color:var(--accent2)}
+.admin-section-body{padding:12px 14px}
+.admin-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.admin-label{font-size:11px;color:var(--text2);width:160px;flex-shrink:0}
+.admin-input{flex:1;min-width:80px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px}
+.admin-btn{padding:5px 12px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-size:11px;font-weight:600;cursor:pointer}
+.admin-btn:hover{opacity:.85}
+.stepper{display:flex;align-items:center;gap:4px}
+.step-btn{width:24px;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.step-btn:hover{border-color:var(--accent);color:var(--accent)}
+.step-val{width:60px;text-align:center;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:3px 6px;font-size:12px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.overlay.hidden{display:none}
+.modal{background:var(--bg2);border-radius:12px;border:1px solid var(--border);width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
+.modal-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1}
+.modal-title{font-weight:700;font-size:14px;color:var(--accent)}
+.modal-close{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;line-height:1;padding:0 4px}
+.modal-body{padding:14px 16px}
+.member-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.member-row:last-child{border-bottom:none}
+.member-animal-btn{font-size:22px;cursor:pointer;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 8px;transition:all .15s}
+.member-animal-btn:hover{border-color:var(--accent)}
+.change-lbl{font-size:8px;color:var(--accent);display:block;text-align:center;margin-top:1px}
+.member-name-input{width:110px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px}
+.member-lt-input{width:60px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 6px;font-size:11px}
+.member-date-input{width:110px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 6px;font-size:11px;color-scheme:dark}
+.ap-inline{display:none;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px;margin-top:6px;flex-wrap:wrap;gap:4px;width:100%}
+.ap-inline.open{display:flex}
+.ap-emoji{font-size:20px;cursor:pointer;padding:4px;border-radius:4px;border:none;background:none;transition:background .1s}
+.ap-emoji:hover{background:var(--card2)}
+.ap-upload-btn{font-size:11px;padding:5px 10px;border-radius:5px;border:1px solid var(--border);background:var(--card2);color:var(--text);cursor:pointer}
+.ap-clear-btn{font-size:11px;padding:5px 10px;border-radius:5px;border:1px solid var(--red);background:transparent;color:var(--red);cursor:pointer}
+.bs-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;display:none}
+.bs-overlay.open{display:block}
+.bs-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-radius:16px 16px 0 0;border-top:1px solid var(--border);padding:16px;z-index:301;transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.56,.64,1);padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+.bs-sheet.open{transform:translateY(0)}
+.bs-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px}
+.bs-member{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.bs-avatar{width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.bs-avatar img{width:100%;height:100%;object-fit:cover}
+.bs-name{font-weight:700;font-size:15px}
+.bs-date{font-size:11px;color:var(--text2)}
+.bs-km-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;justify-content:center}
+.bs-km-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.bs-km-btn:hover{border-color:var(--accent);color:var(--accent)}
+.bs-km-input{width:80px;text-align:center;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px;font-size:18px;font-weight:700;font-size:16px}
+.bs-km-lbl{font-size:11px;color:var(--text2)}
+.bs-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.bs-action-btn{padding:10px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;min-height:44px;-webkit-tap-highlight-color:transparent}
+.bs-present{background:rgba(0,230,118,0.2);color:var(--green);border:1px solid var(--green)}
+.bs-absent{background:rgba(255,68,68,0.2);color:var(--red);border:1px solid var(--red)}
+.bs-clear{background:var(--card2);color:var(--text2);border:1px solid var(--border)}
+.bs-media-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.bs-media-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card2);color:var(--text2);font-size:11px;cursor:pointer;min-height:36px}
+.bs-media-btn:hover{border-color:var(--accent);color:var(--accent)}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--text);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hidden{display:none!important}
+.btn-primary{padding:7px 14px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+.btn-primary:hover{opacity:.85}
+.btn-secondary{padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--card2);color:var(--text2);font-size:12px;cursor:pointer}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.section-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 </style>
-
 </head>
 <body>
 
-<!-- SETUP OVERLAY -->
-<div class="setup-overlay" id="setupOverlay">
-  <div class="setup-box">
-    <h2>🔥 Firebase Setup</h2>
-    <p>Paste your Firebase Realtime Database config to enable real-time sync for all members.</p>
-    <div class="setup-note">⚠️ Go to <strong>console.firebase.google.com</strong> → your project → Project Settings → Web App → copy config</div>
-    <div class="setup-step"><div class="setup-num">1</div><span>Create project at <strong>console.firebase.google.com</strong></span></div>
-    <div class="setup-step"><div class="setup-num">2</div><span>Build → Realtime Database → Create database (test mode)</span></div>
-    <div class="setup-step"><div class="setup-num">3</div><span>Project Settings ⚙️ → Add Web App → copy config below</span></div>
-    <div class="setup-field"><label>API Key</label><input id="cfg_apiKey" placeholder="AIzaSy..."/></div>
-    <div class="setup-field"><label>Database URL</label><input id="cfg_dbUrl" placeholder="https://your-project-default-rtdb.firebaseio.com"/></div>
-    <div class="setup-field"><label>Project ID</label><input id="cfg_projectId" placeholder="your-project-id"/></div>
-    <div style="display:flex;gap:8px;margin-top:4px;">
-      <button class="btn btn-accent" style="flex:1" type="button" onclick="saveConfig()">💾 Save &amp; Connect</button>
-      <button class="btn" style="flex:1" type="button" onclick="useLocalMode()">💻 Use Local Mode</button>
-    </div>
-  </div>
-</div>
-
-<!-- KM MODAL -->
-<div class="overlay" id="kmOverlay">
+<!-- MEMBER MODAL -->
+<div class="overlay hidden" id="memberOverlay">
   <div class="modal">
-    <div class="modal-animal" id="kmAnimal">🐯</div>
-    <div class="modal-name"   id="kmName">Member</div>
-    <h3>📍 Log this Run</h3>
-    <div class="modal-row">
-      <label>Distance (km)</label>
-      <input type="number" id="kmInput" min="0" max="100" step="0.1" value="3"/>
+    <div class="modal-head">
+      <span class="modal-title">👥 Team Settings</span>
+      <button class="modal-close" onclick="window._app.closeMemberModal()">✕</button>
     </div>
-    <div class="modal-btns">
-      <button class="btn btn-danger btn-sm" type="button" onclick="setStatus(0)">❌ Absent</button>
-      <button class="btn btn-sm"            type="button" onclick="closeKm()">Cancel</button>
-      <button class="btn btn-accent btn-sm" type="button" onclick="confirmKm()">✅ Present</button>
-    </div>
-  </div>
-</div>
-
-<!-- MEMBER EDIT MODAL -->
-<div class="overlay" id="memberOverlay">
-  <div class="modal member-modal">
-    <h3>👥 Team Settings</h3>
-    <!-- Count adjuster -->
-    <div class="member-editor-header">
-      <label>Active Members (shown in race &amp; table)</label>
-      <div class="count-adj">
-        <button class="count-btn" type="button" onclick="adjustCount(-1)">−</button>
-        <span class="count-val" id="countDisplay">10</span>
-        <button class="count-btn" type="button" onclick="adjustCount(1)">+</button>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--text2)">Active Members:</span>
+        <div class="stepper">
+          <button class="step-btn" onclick="window._app.adjActive(-1)">−</button>
+          <input class="step-val" id="activeCount" type="number" min="1" max="10" value="10">
+          <button class="step-btn" onclick="window._app.adjActive(1)">+</button>
+        </div>
+      </div>
+      <div id="memberList"></div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn-secondary" onclick="window._app.closeMemberModal()">Cancel</button>
+        <button class="btn-primary" onclick="window._app.saveMembers()">💾 Save</button>
       </div>
     </div>
-    <!-- Column headers -->
-    <div class="member-col-hdr">
-      <span>Animal</span><span>Name</span><span>LT Target km</span><span>Target Date</span>
-    </div>
-    <div class="member-edit-rows" id="memberEditRows"></div>
-    <div class="modal-btns" style="margin-top:16px">
-      <button class="btn" type="button" onclick="document.getElementById('memberOverlay').classList.remove('open')">Cancel</button>
-      <button class="btn btn-accent" type="button" onclick="saveMembers()">💾 Save</button>
-    </div>
   </div>
+</div>
+
+<!-- BOTTOM SHEET -->
+<div class="bs-overlay" id="bsOverlay" onclick="window._app.closeBs()"></div>
+<div class="bs-sheet" id="bsSheet">
+  <div class="bs-handle"></div>
+  <div class="bs-member">
+    <div class="bs-avatar" id="bsAvatar"></div>
+    <div><div class="bs-name" id="bsName"></div><div class="bs-date" id="bsDate"></div></div>
+  </div>
+  <div class="bs-km-row">
+    <button class="bs-km-btn" onclick="window._app.adjBsKm(-0.5)">−</button>
+    <div style="text-align:center">
+      <input class="bs-km-input" id="bsKm" type="number" min="0" max="99" step="0.5" value="3">
+      <div class="bs-km-lbl">km</div>
+    </div>
+    <button class="bs-km-btn" onclick="window._app.adjBsKm(0.5)">+</button>
+  </div>
+  <div class="bs-actions">
+    <button class="bs-action-btn bs-present" onclick="window._app.saveBs(1)">✅ Present</button>
+    <button class="bs-action-btn bs-absent" onclick="window._app.saveBs(0)">❌ Absent</button>
+    <button class="bs-action-btn bs-clear" onclick="window._app.saveBs(-1)">⬜ Clear</button>
+  </div>
+  <div class="bs-media-row">
+    <button class="bs-media-btn" onclick="window._app.bsChangePhoto()">📸 Photo</button>
+    <button class="bs-media-btn" onclick="window._app.bsClearPhoto()">🗑 Photo</button>
+    <button class="bs-media-btn" onclick="window._app.bsChangeIcon()">🐾 Icon</button>
+    <button class="bs-media-btn" onclick="window._app.bsClearIcon()">🗑 Icon</button>
+  </div>
+  <input type="file" id="bsPhotoInput" accept="image/*" style="display:none" onchange="window._app.handleBsPhoto(event)">
 </div>
 
 <!-- TOPBAR -->
-<div class="topbar" data-glean-id="topbar">
-  <div class="topbar-left">
-    <div class="topbar-logo">🏁</div>
-    <div>
-      <div class="topbar-title" id="appTitle">TREK DLUT 50KM</div>
-      <div class="topbar-sub">Running Club Tracker</div>
-    </div>
-  </div>
-  <div class="topbar-right">
-      <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;">
-        <span id="fbStatusDot" style="width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block;transition:background .4s;" title="Connecting..."></span>
-        <span id="fbStatusLbl" style="color:var(--artifact-text-secondary)">Connecting…</span>
-      </div>
-    <div class="month-nav">
-      <button type="button" onclick="changeMonth(-1)">◀</button>
-      <span class="month-label" id="monthLabel">—</span>
-      <button type="button" onclick="changeMonth(1)">▶</button>
-    </div>
-    <button class="btn btn-sm" type="button" id="membersBtn" onclick="openMemberEditor()">👥 Members</button>
-    <button class="btn btn-sm" type="button" onclick="resetData()">🗑 Reset</button>
-    <button class="dark-btn"   type="button" onclick="toggleDark()">🌙</button>
-  </div>
+<div class="topbar">
+  <div><div class="topbar-title">🏁 TREK DLUT 50KM</div><div class="topbar-sub">Running Club Tracker</div></div>
+  <div class="status-dot" id="statusDot"></div>
+  <button class="tb-btn" onclick="window._app.prevMonth()">◀</button>
+  <span id="monthLabel" style="font-size:12px;font-weight:700;color:var(--gold);min-width:80px;text-align:center">—</span>
+  <button class="tb-btn" onclick="window._app.nextMonth()">▶</button>
+  <button class="tb-btn" onclick="window._app.openMemberModal()">👥 Members</button>
+  <button class="tb-btn" onclick="window._app.confirmReset()" style="color:var(--red);border-color:var(--red)">🗑 Reset</button>
+  <button class="tb-btn" onclick="window._app.downloadApp()" style="color:var(--green);border-color:var(--green)">⬇️ Download</button>
 </div>
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab active" type="button" onclick="switchTab('race',this)">🏁 Race</button>
-  <button class="tab"        type="button" onclick="switchTab('attendance',this)">📋 Attendance</button>
-  <button class="tab"        type="button" onclick="switchTab('earn',this)">💰 Earn</button>
+  <div class="tab active" id="tab-race-btn" onclick="window._app.switchTab('race')">🏁 Race</div>
+  <div class="tab" id="tab-att-btn" onclick="window._app.switchTab('att')">📋 Attendance</div>
+  <div class="tab" id="tab-earn-btn" onclick="window._app.switchTab('earn')">💰 Earn</div>
+  <div class="tab" id="tab-admin-btn" onclick="window._app.switchTab('admin')">🔐 Admin</div>
 </div>
 
-<!-- MAIN -->
-<div class="main" id="app">
-  <div class="kpi-row" data-glean-id="kpi-row">
-    <div class="kpi" data-glean-id="kpi-sessions"><div class="kpi-icon">🏃</div><div class="kpi-val" id="kpiRuns">0</div><div class="kpi-label">Sessions Logged</div></div>
-    <div class="kpi" data-glean-id="kpi-km"><div class="kpi-icon">📏</div><div class="kpi-val" id="kpiKm">0 km</div><div class="kpi-label">Club Total KM</div></div>
-    <div class="kpi" data-glean-id="kpi-avg"><div class="kpi-icon">📏</div><div class="kpi-val" id="kpiAvg">0 km</div><div class="kpi-label">Avg KM / Member</div></div>
-    <div class="kpi" data-glean-id="kpi-top"><div class="kpi-icon">🏆</div><div class="kpi-val" id="kpiTop">–</div><div class="kpi-label">Top Runner</div></div>
-    <div class="kpi" data-glean-id="kpi-target"><div class="kpi-icon">🎯</div><div class="kpi-val" id="kpiTarget">0/10</div><div class="kpi-label">On Track (36 km)</div></div>
-  </div>
+<!-- KPI BAR -->
+<div class="kpi-bar">
+  <div class="kpi"><div class="kpi-val" id="kpiSessions">0</div><div class="kpi-lbl">🏃 Sessions</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpiTotal">0 km</div><div class="kpi-lbl">📏 Club Total</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpiAvg">0 km</div><div class="kpi-lbl">📏 Avg / Member</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpiTop">–</div><div class="kpi-lbl">🏆 Top Runner</div></div>
+  <div class="kpi"><div class="kpi-val" id="kpiOnTrack">0/10</div><div class="kpi-lbl">🎯 On Track</div></div>
+</div>
 
-  <!-- RACE TAB -->
-  <div id="tab-race" data-glean-id="race-track-section">
-    <div class="race-section">
-      <div class="race-header">
-        <div class="race-title">🏁 Monthly Race Track</div>
-        <div class="race-meta">
-          <span class="race-badge green">🎯 Short-term: 36 km / month</span>
-          <span class="race-badge">⚡ Min: 9 km / week</span>
-          <span style="font-size:11px;color:var(--artifact-text-secondary)">Click avatar to upload face photo</span>
-        </div>
-      </div>
-      <div class="race-track">
-        <div class="race-milestones" id="raceMilestones"></div>
-        <div id="raceRows"></div>
-      </div>
+<!-- RACE TAB -->
+<div id="tab-race">
+  <div class="race-wrap">
+    <div class="race-header">
+      <div><div class="race-title">🏁 Monthly Race Track</div><div class="race-sub">🎯 Goal: 36 km/month · ⚡ Min: 9 km/week</div></div>
+      <div style="font-size:10px;color:var(--text2)">Click avatar → upload photo</div>
     </div>
-
-    <!-- Milestone winners + DLUT embedded in race track -->
+    <div class="milestone-bar"><div class="milestone-spacer"></div><div class="milestone-road" id="msRoad"></div></div>
+    <div class="winner-slots"><div class="winner-spacer"></div><div class="winner-road" id="winnerRoad"></div></div>
+    <div id="raceTrack"></div>
   </div>
+</div>
 
+<!-- ATTENDANCE TAB -->
+<div id="tab-att" class="hidden">
+  <div class="att-wrap">
+    <div class="month-nav">
+      <button onclick="window._app.prevMonth()">◀</button>
+      <span class="month-label" id="attMonthLabel">—</span>
+      <button onclick="window._app.nextMonth()">▶</button>
+    </div>
+    <div class="matrix-wrap"><table class="matrix" id="matrixTable"></table></div>
+    <div id="summaryWrap"></div>
+  </div>
+</div>
 
-  <!-- EARN TAB -->
-  <div id="tab-earn" style="display:none" data-glean-id="earn-section">
-
-    <!-- Wallet Card -->
+<!-- EARN TAB -->
+<div id="tab-earn" class="hidden">
+  <div class="earn-wrap">
     <div class="earn-section">
-      <div class="earn-header">
-        <div class="earn-title">🏦 Your DLUT Wallet</div>
-        <div style="font-size:11px;color:var(--artifact-text-secondary)">Connect MetaMask to claim tokens on-chain</div>
-      </div>
-      <div class="earn-body">
-        <div class="wallet-card">
-          <div class="wc-top">
-            <div class="wc-brand">💎 DLUT Token</div>
-            <div class="wc-chain" id="wcChain">Polygon Amoy Testnet</div>
-          </div>
-          <div id="wcConnected" style="display:none">
-            <div class="wc-balance">
-              <div class="wc-bal-label">Your DLUT Points</div>
-              <div><span class="wc-bal-val" id="wcBalance">0</span><span class="wc-bal-sym">DLUT</span></div>
-            </div>
-            <div class="wc-addr" id="wcAddr">0x...</div>
-            <div class="wc-btns">
-              <button class="wc-btn wc-btn-claim" id="wcClaimBtn" onclick="claimTokens()" disabled>
-                ⛓️ Claim On-Chain (coming soon)
-              </button>
-              <button class="wc-btn" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);font-size:11px;font-weight:600" onclick="disconnectWallet()">Disconnect</button>
-            </div>
-          </div>
-          <div id="wcDisconnected">
-            <div class="wallet-disconnected">
-              <div style="font-size:32px">🦊</div>
-              <p>Connect MetaMask to link your wallet.<br>Your DLUT points are tracked off-chain and claimable when the smart contract is deployed.</p>
-              <button class="wc-btn wc-btn-connect" onclick="connectWallet()">🦊 Connect MetaMask</button>
-              <p style="font-size:10px;margin-top:4px;opacity:.6">No MetaMask? Install from metamask.io · Or just earn points below — wallet is optional!</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Token KPIs -->
-        <div class="token-grid" id="earnKpis"></div>
-
-        <!-- Earn Rates -->
-        <div class="rate-card">
-          <div class="rate-title">💰 How to Earn DLUT Tokens</div>
-          <div class="rate-rows">
-            <div style="font-size:10px;font-weight:700;color:var(--artifact-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">🏃 Distance</div>
-            <div class="rate-row"><div class="rate-desc">🏃 Every km run</div><span class="rate-badge">10 DLUT / km</span></div>
-            <div class="rate-row"><div class="rate-desc">🎉 First run of month</div><span class="rate-badge blue">+20 DLUT</span></div>
-            <div style="height:6px"></div>
-            <div style="font-size:10px;font-weight:700;color:var(--artifact-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">🏆 Milestone Bonuses</div>
-            <div class="rate-row"><div class="rate-desc">🏆 Reach W1 — 9 km</div><span class="rate-badge gold">+100 DLUT</span></div>
-            <div class="rate-row"><div class="rate-desc">🏆 Reach W2 — 18 km</div><span class="rate-badge gold">+200 DLUT</span></div>
-            <div class="rate-row"><div class="rate-desc">🏆 Reach W3 — 27 km</div><span class="rate-badge gold">+300 DLUT</span></div>
-            <div class="rate-row"><div class="rate-desc">👸 Monthly goal — 36 km</div><span class="rate-badge gold">+500 DLUT</span></div>
-            <div style="height:6px"></div>
-            <div style="font-size:10px;font-weight:700;color:var(--artifact-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">🥇 First-to-Reach Bonus <span style="color:#7e22ce">(1 winner per milestone)</span></div>
-            <div class="rate-row"><div class="rate-desc">🥇 1st member to reach W1</div><span class="rate-badge purple">+150 DLUT</span></div>
-            <div class="rate-row"><div class="rate-desc">🥇 1st member to reach W2</div><span class="rate-badge purple">+250 DLUT</span></div>
-            <div class="rate-row"><div class="rate-desc">🥇 1st member to reach W3</div><span class="rate-badge purple">+350 DLUT</span></div>
-            <div class="rate-row"><div class="rate-desc">👑 1st to monthly goal</div><span class="rate-badge orange">+500 DLUT</span></div>
-            <div style="height:6px"></div>
-            <div style="font-size:10px;font-weight:700;color:var(--artifact-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">🔥 Consistency</div>
-            <div class="rate-row"><div class="rate-desc">🔥 Perfect week (all sessions)</div><span class="rate-badge green">+50 DLUT / week</span></div>
-          </div>
-        </div>
+      <div class="earn-section-head">🏦 Your DLUT Wallet</div>
+      <div class="earn-section-body">
+        <div class="wallet-member-sel" id="walletMemberSel"></div>
+        <div class="wallet-balance"><div class="wallet-bal-val"><span id="walletBal">0</span> <span style="font-size:16px;color:var(--text2)">DLUT</span></div><div class="wallet-bal-lbl">💎 Your DLUT Points</div></div>
+        <div id="walletBreakdown"></div>
       </div>
     </div>
-
-    <!-- Leaderboard -->
     <div class="earn-section">
-      <div class="earn-header">
-        <div class="earn-title">🏆 Token Leaderboard</div>
-        <div style="font-size:11px;color:var(--artifact-text-secondary)">Updated in real-time · 1 DLUT ≈ your pride 🏅</div>
-      </div>
-      <div id="firstMilestoneWinners" style="padding:0 20px 12px"></div>
-      <div class="earn-leaderboard" id="earnLeaderboard"></div>
+      <div class="earn-section-head">💰 How to Earn DLUT <button class="tb-btn" onclick="window._app.openRatesAdmin()" style="font-size:10px">🎛 Edit Rates</button></div>
+      <div class="earn-section-body"><div class="earn-rate-grid" id="ratesGrid"></div></div>
     </div>
-
+    <div class="earn-section">
+      <div class="earn-section-head">🎁 Redeem Prizes</div>
+      <div class="earn-section-body"><div class="prize-grid" id="prizeGrid"></div></div>
+    </div>
+    <div class="earn-section">
+      <div class="earn-section-head">🏆 Token Leaderboard</div>
+      <div class="earn-section-body"><div id="leaderboard"></div></div>
+    </div>
+    <div class="earn-section">
+      <div class="earn-section-head">📜 Transaction History</div>
+      <div class="earn-section-body"><div id="txHistory"></div></div>
+    </div>
   </div>
+</div>
 
-  <!-- ATTENDANCE TAB -->
-  <div id="tab-attendance" style="display:none" data-glean-id="attendance-section">
-    <div class="cal-section">
-      <div class="cal-header">
-        <div class="cal-title">🗓️ August 2026 — Attendance Calendar</div>
-        <div class="cal-legend">
-          <span><span class="leg-dot" style="background:#3b82f6"></span>Mon</span>
-          <span><span class="leg-dot" style="background:#16a34a"></span>Wed</span>
-          <span><span class="leg-dot" style="background:#f97316"></span>Fri</span>
-          <span style="font-size:10px">· Click a run day to log attendance</span>
+<!-- ADMIN TAB -->
+<div id="tab-admin" class="hidden">
+  <div class="admin-wrap">
+    <div class="admin-section">
+      <div class="admin-section-head">🔐 Admin Panel</div>
+      <div class="admin-section-body">
+        <div id="adminLock">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Enter admin passcode:</p>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="adminPassInput" class="admin-input" placeholder="Passcode" style="max-width:160px" onkeydown="if(event.key==='Enter')window._app.checkAdminPass()">
+            <button class="admin-btn" onclick="window._app.checkAdminPass()">Unlock</button>
+          </div>
         </div>
-      </div>
-      <div class="matrix-scroll" id="matrixWrap"></div>
-      <div class="sum-table-wrap">
-        <table class="sum-table" id="sumTable"></table>
+        <div id="adminPanel" class="hidden">
+          <div style="margin-bottom:16px">
+            <div class="section-title">💎 Award Bonus DLUT</div>
+            <div class="admin-row"><span class="admin-label">Member</span><select id="bonusMember" class="admin-input" style="max-width:160px"></select></div>
+            <div class="admin-row"><span class="admin-label">Amount (DLUT)</span><input type="number" id="bonusAmt" class="admin-input" value="50" style="max-width:100px"></div>
+            <div class="admin-row"><span class="admin-label">Reason</span><input type="text" id="bonusReason" class="admin-input" placeholder="e.g. Extra effort!"></div>
+            <button class="admin-btn" onclick="window._app.awardBonus()">💎 Award DLUT</button>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="section-title">🎁 Add Prize</div>
+            <div class="admin-row"><span class="admin-label">Emoji</span><input type="text" id="prizeEmoji" class="admin-input" value="🎁" style="max-width:60px"></div>
+            <div class="admin-row"><span class="admin-label">Name</span><input type="text" id="prizeName" class="admin-input" placeholder="e.g. Free coffee"></div>
+            <div class="admin-row"><span class="admin-label">Cost (DLUT)</span><input type="number" id="prizeCost" class="admin-input" value="100" style="max-width:100px"></div>
+            <button class="admin-btn" onclick="window._app.addPrize()">🎁 Add Prize</button>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="section-title">🎛 DLUT Token Rates</div>
+            <div id="ratesAdminGrid"></div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="admin-btn" onclick="window._app.saveRates()">💾 Save Rates</button>
+              <button class="btn-secondary" onclick="window._app.resetRates()">↺ Reset Defaults</button>
+            </div>
+          </div>
+          <div><div class="section-title">📋 Bonus Log</div><div id="bonusLog"></div></div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<script type="module">
-// ── LOAD APP DATA ─────────────────────────────────────────
-if (!window.APP_DATA || window.APP_DATA.error) {
-  document.getElementById('app').innerHTML = '<div class="no-data">⚠️ Data unavailable. Please refresh.</div>';
-  throw new Error('APP_DATA missing');
-}
-const CFG      = window.APP_DATA.config;
-const SCHEDULE = window.APP_DATA.schedule;
-const MBRS     = window.APP_DATA.members;
-const META     = window.APP_DATA.metadata;
-const TARGET_KM  = CFG.target_km;
-const DEFAULT_KM = CFG.default_km;
-let ANIMALS = (()=>{
-  try { const s=localStorage.getItem('trek_animals'); if(s){ const a=JSON.parse(s); if(Array.isArray(a)&&a.length===10) return a; } } catch(e){}
-  return MBRS.map(m => m.animal);
-})();
-const LANE_CLR   = MBRS.map(m => m.color);
-document.getElementById('appTitle').textContent = META.title.split('–')[0].trim();
+<div class="toast" id="toast"></div>
+<input type="file" id="photoInput" accept="image/*,image/gif" style="display:none" onchange="window._app.handlePhotoUpload(event)">
+<input type="file" id="iconInput" accept="image/*,image/gif" style="display:none" onchange="window._app.handleIconUpload(event)">
 
-// ── FIREBASE CONFIG ───────────────────────────────────────
+<script>
+// Firebase config
 const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyDv90xPQbxhBtZ5j0exJYWcJnmI631lkr0",
-  authDomain:        "trek-dlut-50km.firebaseapp.com",
-  databaseURL:       "https://trek-dlut-50km-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:         "trek-dlut-50km",
-  storageBucket:     "trek-dlut-50km.firebasestorage.app",
-  messagingSenderId: "842711076233",
-  appId:             "1:842711076233:web:f8db09823a3eb6b28ca558",
-  measurementId:     "G-8C13P5H088"
+  apiKey:"AIzaSyDv90xPQbxhBtZ5j0exJYWcJnmI631lkr0",
+  authDomain:"trek-dlut-50km.firebaseapp.com",
+  databaseURL:"https://trek-dlut-50km-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"trek-dlut-50km",
+  storageBucket:"trek-dlut-50km.firebasestorage.app",
+  messagingSenderId:"842711076233",
+  appId:"1:842711076233:web:f8db09823a3eb6b28ca558"
 };
 
-// ── STATE ─────────────────────────────────────────────────
-let db = null;
-let att     = {};
-let kmData  = {};
-let MEMBERS = MBRS.map(m => m.name);
-let activeCount = 10;
-let ltTargets   = {};  // ltTargets[mi] = { km, date }
-let curYear  = META.year;
-let curMonth = META.month - 1;
-let RUNS = [...SCHEDULE];
+const DEFAULT_MEMBERS=[
+  {name:'Hai Bui',animal:'🐯',ltKm:0,ltDate:''},
+  {name:'Chinh Ton',animal:'🦊',ltKm:0,ltDate:''},
+  {name:'Khoa Vo',animal:'🐸',ltKm:0,ltDate:''},
+  {name:'Truong Nguyen',animal:'🐼',ltKm:0,ltDate:''},
+  {name:'Thien Le',animal:'🐱',ltKm:0,ltDate:''},
+  {name:'Hoang Tran',animal:'🐻',ltKm:0,ltDate:''},
+  {name:'Tri Nguyen',animal:'🦁',ltKm:0,ltDate:''},
+  {name:'Member 8',animal:'🐨',ltKm:0,ltDate:''},
+  {name:'Member 9',animal:'🐮',ltKm:0,ltDate:''},
+  {name:'Member 10',animal:'🐶',ltKm:0,ltDate:''}
+];
+const ANIMALS=['🐯','🦊','🐸','🐼','🐱','🐻','🦁','🐨','🐮','🐶','🐺','🦝','🐰','🦄','🐧','🦅','🐬','🦈','🐉','🐘','🦒','🐫','🦙','🏃','🚴','⚡','🔥','💪','🥷','🦸','🎯','🌟'];
+const DEFAULT_KM=3;
+const MONTH_GOAL=36;
+const DEFAULT_RATES={perKm:10,firstRun:20,w1:100,w2:200,w3:300,monthly:500,first_w1:50,first_w2:50,first_w3:50,first_monthly:100,strong:100,super:200};
+const QUOTES=["Fear me, mortals! 🔥","My shoes are still in the box 📦","36km = 36×1km. Easy math! 📐","PANIC RUN ACTIVATED! 😱","I run so I can eat more 🍜","Pain is just weakness leaving 💪","Is this a road or a treadmill? 🤔","My legs said no but I said yes 🦵","Running late... to the run 😅","I thought this was a walking club 🚶","Sweat is just fat crying 😭","One more km... said no one ever 😤","I run because punching people is frowned upon 👊","My spirit animal is a sloth 🦥","Certified road destroyer 🛣️","Breathing is optional right? 😮‍💨","I'm not slow, I'm saving energy ⚡","Running: cheaper than therapy 💆","My GPS thinks I'm lost 📍","Fueled by spite and snacks 🍪","Why walk when you can suffer? 🏃","My knees filed a complaint 🦵","I thought this was a Netflix marathon 📺","Send help. And snacks. 🆘","Running on caffeine and regret ☕","I peaked at the starting line 🏁","My Fitbit is judging me 📱","Legs: sore. Spirit: broken. Still running. 💀","I run for the post-run food 🍕","This is fine. Everything is fine. 🔥"];
 
-// ── MISSING STATE (were never declared — root cause of all crashes) ──
-let customIcons        = {};   // mi → data URL for custom uploaded image/GIF
-let photosCache        = {};   // mi → face photo data URL (Firebase-only)
-let firstMilestonesCache = {}; // ym → { W1, W2, W3, M36 } first-reach records
+let db=null;
+let MEMBERS=DEFAULT_MEMBERS.map((m,i)=>({...m,index:i}));
+let activeCount=10;
+let att={},kmData={},photos={},customIcons={},prizes={},bonuses={},rates={...DEFAULT_RATES},firstMilestones={};
+let curYear=new Date().getFullYear(),curMonth=new Date().getMonth();
+let curTab='race',walletMi=0,editingMi=-1,bsMi=-1,bsDateKey='';
+let adminUnlocked=false;
 
-// ── HELPER: get display icon for a member ─────────────────────────────
-function isCustomIcon(mi) {
-  return !!(customIcons && customIcons[mi]);
-}
-function getIcon(mi) {
-  if (customIcons && customIcons[mi]) return customIcons[mi];
-  return ANIMALS[mi] || (MBRS[mi] && MBRS[mi].animal) || '🐾';
-}
-
-// ── QUOTE ENGINE ──────────────────────────────────────────
-const QUOTES = {
-  sleeping: [
-    "Zzz... someone say RUN? Nah. 💤",
-    "My shoes are collecting dust. AND WEB. 🕸️",
-    "Running? I thought you said RESTING 😴",
-    "Error 404: Motivation not found 🚫",
-    "I'm saving energy. Since last week. ⚡",
-    "Started from the couch. Still on the couch. 🛋️",
-    "My running schedule says: tomorrow. Always tomorrow. 📅",
-    "Technically still warming up... for 3 weeks 🔥",
-    "GPS can't track what doesn't move 📍",
-    "My spirit runs. My body disagrees. 👻",
-    "Coach said rest day. I said rest month. 💅",
-    "Zero km. Maximum excuses. World record. 🏆",
-  ],
-  done: [
-    "36km. I am the road now. 🛣️",
-    "Call an ambulance. NOT FOR ME. 👸",
-    "My legs resigned. I ignored them. 🦵",
-    "Target reached. Retirement incoming. 🎉",
-    "Ran 36km. Still not thin. Still gorgeous tho. 👸😤",
-    "I peaked. Literally and figuratively. ⛰️",
-    "Done. Where's my trophy and my food? 🥇🍜",
-    "36km and I still look this good. I am the princess now. 👸👑",
-    "Finished. Please send stretcher. 🚑",
-    "BEAST MODE: ON. Also: LEGS DEAD. 💀",
-  ],
-  leader: [
-    "Footsteps? Just my echo. 👑",
-    "Gap is growing & so is my ego 😈",
-    "Fear me, mortals 🔥",
-    "I don't sweat — I sparkle ✨",
-    "Lapped them twice. Starting to feel bad. Nah. 🚀",
-    "This road paid rent to ME 🏠",
-    "The others are running. I'm just commuting. 🚌",
-    "Distance: MAX. Humility: MIN. 📊",
-    "Not showing off. Just jogging. At Mach 2. ✈️",
-    "They call it unfair. I call it training. 😇",
-    "First place is lonely. But roomy. 🛋️",
-  ],
-  close: [
-    "Almost there... or am I? 🤔",
-    "Pain is temporary. This leaderboard is forever. 📸",
-    "36km = 36 x 1km. Easy math, hard legs. 📐",
-    "I can smell the finish line. Or is that me? 👃",
-    "Final boss incoming. The boss is also me. 😤",
-    "So close I can taste the victory pho 🍜",
-    "Body: STOP. Brain: NO. We keep going. 🧠",
-    "98% done. 2% pure suffering. Let's go. 💪",
-    "Home stretch. Ignore the crying. That's motivation. 😭",
-  ],
-  mid: [
-    "Pacing myself. Very. Very. Slowly. 😅",
-    "Saving energy for when I actually need it... still waiting 🧠",
-    "Rome wasn't built in a day. Neither is my fitness. 🏛️",
-    "Slow and steady... ish 🐢",
-    "My legs filed a formal HR complaint 📝",
-    "Half the month gone. Half my will too. 🌗",
-    "Running is 90% mental. The other 10% is also suffering. 🧠",
-    "Average pace, exceptional excuses 📋",
-    "I run because punching people is illegal 🥊",
-    "Training for the 50km. Currently at 18km. Roughly on track. Maybe. 🗺️",
-  ],
-  behind: [
-    "The road misses me. Probably. 🛣️",
-    "Running mentally. Does that count? 🧠",
-    "Great personality though 😅",
-    "In a VERY long warm-up phase 🤷",
-    "Starting soon™ ⏳",
-    "My Strava is embarrassingly empty 📭",
-    "I have a running outfit. That's step one. 👟",
-    "Technically I ran... to the fridge 🧊",
-    "Motivation level: requires reboot 🔄",
-    "The group needs a mascot. I volunteer. 🐨",
-    "I signed up for the vibes, not the km 🎵",
-    "Plot twist: I was the group chat, not the runner 💬",
-    "My shoes went for a run without me. Impressive. 👟",
-  ],
-  lt_urgent: [
-    "LT DEADLINE IN < 30 DAYS. PANIC ACTIVATED 😱",
-    "The calendar is not your friend right now 📅",
-    "At this pace you'll finish... never. RUN. 🏃",
-    "Your long-term goal called. It's concerned. 📞",
-    "Time flies. You do not. Fix that. ✈️",
-    "Fun fact: deadlines don't negotiate 🕐",
-  ],
-  lt_on_track: [
-    "Long game winner right here 📈",
-    "Quietly crushing the big goal 👸💅",
-    "Slow burn. Results incoming. 🔥",
-    "Your future self will thank you. Probably. 🙏",
-    "The tortoise wins again 🐢",
-  ],
-};
-
-// Rotate quotes based on day-of-month so they change daily
-function getQuote(s, rank, ltTotalKm) {
-  const lt = ltTargets[s.mi];
-  const monthPct   = TARGET_KM > 0 ? s.km / TARGET_KM : 0;
-  const isDone     = s.km >= TARGET_KM;
-  const isSleeping = s.km === 0;
-  const isLeader   = rank === 0 && s.km > 0;
-  const dayRotate  = new Date().getDate() + s.mi; // changes daily per member
-  const pick = (arr) => arr[dayRotate % arr.length];
-  // LT urgency
-  if (lt && lt.date && lt.km > 0) {
-    const daysLeft = Math.ceil((new Date(lt.date) - new Date()) / 86400000);
-    const ltPct    = ltTotalKm / lt.km;
-    if (daysLeft <= 30 && ltPct < 0.8) return pick(QUOTES.lt_urgent);
-    if (ltPct >= 0.9 && !isDone)       return pick(QUOTES.lt_on_track);
-  }
-  if (isSleeping)       return pick(QUOTES.sleeping);
-  if (isDone)           return pick(QUOTES.done);
-  if (isLeader)         return pick(QUOTES.leader);
-  if (monthPct > 0.75)  return pick(QUOTES.close);
-  if (monthPct > 0.25)  return pick(QUOTES.mid);
-  return pick(QUOTES.behind);
-}
-
-
-// ── RUN GENERATION ────────────────────────────────────────
-function genRuns(y, m) {
-  const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const TARGET_DAYS = {0:'Mon', 2:'Wed', 4:'Fri'};
-  const runs = []; let n = 1;
-  const d = new Date(y, m, 1);
-  while (d.getMonth() === m) {
-    const wd = d.getDay() === 0 ? 6 : d.getDay() - 1;
-    if (wd in TARGET_DAYS) {
-      const dstr = `${y}-${String(m+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      runs.push({ id:`r${dstr}`, date:dstr, day:TARGET_DAYS[wd],
-                  label:`${TARGET_DAYS[wd]} ${d.getDate()} ${MONTH_NAMES[m]}`, num:n++ });
-    }
-    d.setDate(d.getDate() + 1);
-  }
-  RUNS = runs;
-}
-
-// ── CONNECTION STATUS ────────────────────────────────────
-function updateStatus(online) {
-  const dot = document.getElementById('fbStatusDot');
-  const lbl = document.getElementById('fbStatusLbl');
-  if (!dot) return;
-  dot.style.background = online ? '#22c55e' : '#ef4444';
-  lbl.textContent = online ? 'Live' : 'Offline';
-  dot.title = online ? '🟢 Firebase connected — real-time sync active' : '🔴 Not connected to Firebase';
-}
-
-// ── FIREBASE ─────────────────────────────────────────────
-async function initFirebase() {
-  try {
-    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
-    const { getDatabase, ref, onValue, set } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
-    const app = initializeApp(FIREBASE_CONFIG);
-    db = getDatabase(app);
-    window._fbRef = ref; window._fbSet = set;
-    const rootRef = ref(db, 'trek_dlut_50km');
-    onValue(rootRef, snap => {
-      const v = snap.val() || {};
-      att     = v.att        || {};
-      kmData  = v.km         || {};
-      firstMilestonesCache = v.first_milestones || {};
-      if (v.members)     MEMBERS     = [...v.members];
-      if (v.ltTargets)   ltTargets   = {...v.ltTargets};
-      if (v.activeCount) activeCount = v.activeCount;
-      if (Array.isArray(v.animals) && v.animals.length) ANIMALS = [...v.animals];
-      if (v.customIcons && typeof v.customIcons === 'object') customIcons = {...v.customIcons};
-      // Always overwrite photosCache from Firebase — this is what syncs all devices
-      photosCache = (v.photos && typeof v.photos === 'object') ? {...v.photos} : {};
-      updateStatus(true);
+// ── Firebase ──────────────────────────────────────────────────────────────
+function initFirebase(){
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db=firebase.database();
+    document.getElementById('statusDot').classList.add('online');
+    db.ref('trek_dlut_50km').on('value',snap=>{
+      const v=snap.val()||{};
+      att=v.att||{};
+      kmData=v.km||{};
+      if(v.members)MEMBERS=Array.isArray(v.members)?v.members:Object.values(v.members);
+      if(v.activeCount!==undefined)activeCount=v.activeCount;
+      if(v.photos)photos=v.photos;
+      if(v.customIcons)customIcons=v.customIcons;
+      if(v.prizes)prizes=v.prizes;
+      if(v.bonuses)bonuses=v.bonuses;
+      if(v.rates)rates={...DEFAULT_RATES,...v.rates};
+      if(v.firstMilestones)firstMilestones=v.firstMilestones;
       renderAll();
     });
-    window._fbOn = true;
-    return true;
-  } catch(e) { console.warn('Firebase init failed', e); updateStatus(false); return false; }
-}
-function loadConfig() {
-  const s = localStorage.getItem('trek_fb_cfg');
-  return s ? JSON.parse(s) : null;
-}
-window.saveConfig = function() {
-  const cfg = {
-    apiKey:      document.getElementById('cfg_apiKey').value.trim(),
-    databaseURL: document.getElementById('cfg_dbUrl').value.trim(),
-    projectId:   document.getElementById('cfg_projectId').value.trim(),
-  };
-  if (!cfg.apiKey || !cfg.databaseURL || !cfg.projectId) { alert('Please fill all fields'); return; }
-  cfg.authDomain = cfg.projectId + '.firebaseapp.com';
-  localStorage.setItem('trek_fb_cfg', JSON.stringify(cfg));
-  document.getElementById('setupOverlay').classList.remove('open');
-  location.reload();
-};
-window.useLocalMode = function() {
-  document.getElementById('setupOverlay').classList.remove('open');
-  renderAll();
-};
-async function writeData(key, val, type='att') {
-  // Always update local state immediately (optimistic UI)
-  if (type === 'att') att[key] = val; else kmData[key] = val;
-  if (db) {
-    // Write to Firebase — onValue will re-render for all OTHER users
-    window._fbSet(window._fbRef(db, `trek_dlut_50km/${type}/${key}`), val);
-    // Also render locally right away (don't wait for round-trip)
+  }catch(e){
+    console.warn('Firebase failed',e);
     renderAll();
-  } else {
-    saveLocal(); renderAll();
   }
 }
-function saveLocal() {
-  localStorage.setItem('trek_att',          JSON.stringify(att));
-  localStorage.setItem('trek_km',           JSON.stringify(kmData));
-  localStorage.setItem('trek_members',      JSON.stringify(MEMBERS));
-  localStorage.setItem('trek_lt_targets',   JSON.stringify(ltTargets));
-  localStorage.setItem('trek_active_count', String(activeCount));
-  localStorage.setItem('trek_animals',      JSON.stringify(ANIMALS));
-}
-function loadLocal() {
-  att     = JSON.parse(localStorage.getItem('trek_att')     || '{}');
-  kmData  = JSON.parse(localStorage.getItem('trek_km')      || '{}');
-  const m = localStorage.getItem('trek_members');   if (m)  MEMBERS     = JSON.parse(m);
-  const lt= localStorage.getItem('trek_lt_targets'); if (lt) ltTargets   = JSON.parse(lt);
-  const ac= localStorage.getItem('trek_active_count'); if (ac) activeCount = parseInt(ac);
+
+function writeData(path,val){
+  if(db)db.ref('trek_dlut_50km/'+path).set(val);
 }
 
-// ── PHOTO & ICON — Firebase only, in-memory cache ────────
-function getPhoto(mi) { return photosCache[mi] || null; }
-function savePhoto(mi, url) {
-  photosCache[mi] = url;
-  // Firebase write → onValue fires → all other devices update instantly
-  try { window._fbSet(window._fbRef(db, `trek_dlut_50km/photos/${mi}`), url); } catch(e) {}
-}
-window.clearPhoto = function clearPhoto(mi) {
-  delete photosCache[mi];
-  try { window._fbSet(window._fbRef(db, `trek_dlut_50km/photos/${mi}`), null); } catch(e) {}
-  renderAll();
-}
-window.clearCustomIcon = function clearCustomIcon(mi) {
-  delete customIcons[mi];
-  try { window._fbSet(window._fbRef(db, `trek_dlut_50km/customIcons`), customIcons); } catch(e) {}
-  renderAll();
-  const ov = document.getElementById('apOverlay');
-  if (ov && ov.style.display !== 'none') openApModal(mi);
-}
-window.handleAvatarClick = function(e, mi) {
-  // Clicking avatar always opens photo upload
-  // Animal icon is changed in 👥 Members settings
-  window.uploadPhoto(mi);
-};
-window.uploadPhoto = function(mi) {
-  const input = document.createElement('input');
-  input.type = 'file'; input.accept = 'image/*';
-  input.onchange = e => {
-    const file = e.target.files[0]; if (!file) return;
-    const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = 80;
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.onload = async () => {
-      const size = Math.min(img.width, img.height);
-      ctx.drawImage(img, (img.width-size)/2, (img.height-size)/2, size, size, 0, 0, 80, 80);
-      const dataUrl = canvas.toDataURL('image/jpeg', .7);
-      savePhoto(mi, dataUrl); // writes photosCache + Firebase in one call
-      renderAll();
-    };
-    img.src = URL.createObjectURL(file);
-  };
-  input.click();
-};
+// ── Date helpers ──────────────────────────────────────────────────────────
+function getDaysInMonth(y,m){return new Date(y,m+1,0).getDate();}
+function getDateKey(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+function getDow(y,m,d){return new Date(y,m,d).getDay();}
+function getTodayKey(){const t=new Date();return getDateKey(t.getFullYear(),t.getMonth(),t.getDate());}
 
-// ── STATS ─────────────────────────────────────────────────
-function getMemberStats() {
-  const ac = Math.min(activeCount, MEMBERS.length);
-  const todayStr = new Date().toISOString().slice(0,10);
-  return MEMBERS.slice(0, ac).map((name, mi) => {
-    let runs = 0, km = 0;
-    // Only count scheduled runs up to today
-    const pastRuns = RUNS.filter(r => r.date <= todayStr);
-    const total = pastRuns.length;
-    pastRuns.forEach(r => {
-      const k = `${r.id}_${mi}`;
-      if (att[k] === 1) { runs++; km += kmData[k] ?? DEFAULT_KM; }
-    });
-    // Also count free-day entries up to today
-    Object.keys(att).forEach(key => {
-      if (!key.startsWith('free_') || !key.endsWith('_'+mi)) return;
-      const parts = key.split('_'); const dateStr = parts[1] || '';
-      if (!dateStr || dateStr > todayStr) return;
-      if (att[key] === 1) { runs++; km += kmData[key] ?? DEFAULT_KM; }
-    });
-    return { mi, name, runs, km: Math.round(km*10)/10, total,
-             pct: total > 0 ? Math.round(runs/total*100) : 0 };
-  });
-}
-function getMemberTotalKm(mi) {
-  let total = 0;
-  Object.keys(att).forEach(k => {
-    if (k.endsWith(`_${mi}`) && att[k] === 1)
-      total += (kmData[k] ?? DEFAULT_KM);
-  });
-  return Math.round(total * 10) / 10;
-}
-
-// ── RENDER KPIs ──────────────────────────────────────────
-function renderKPIs(stats) {
-  const totalRuns = RUNS.filter(r => stats.some(s => att[`${r.id}_${s.mi}`] === 1)).length;
-  const clubKm    = stats.reduce((a, s) => a + s.km, 0);
-  const avgPct    = stats.length ? Math.round(stats.reduce((a,s) => a+s.pct, 0) / stats.length) : 0;
-  const top       = stats.reduce((a, b) => b.km > a.km ? b : a, stats[0] || {name:'–', km:0});
-  const onTrack   = stats.filter(s => s.km >= TARGET_KM).length;
-  document.getElementById('kpiRuns').textContent   = totalRuns;
-  document.getElementById('kpiKm').textContent     = Math.round(clubKm*10)/10 + ' km';
-  const avgKmPerMember = stats.length > 0 ? Math.round(clubKm / stats.length * 10) / 10 : 0;
-  document.getElementById('kpiAvg').textContent    = avgKmPerMember + ' km';
-  document.getElementById('kpiTop').textContent    = top.name?.split(' ')[0] || '–';
-  document.getElementById('kpiTarget').textContent = `${onTrack}/${stats.length}`;
-  document.getElementById('membersBtn').textContent = `👥 ${stats.length} Members`;
-}
-
-// ── RENDER RACE ───────────────────────────────────────────
-function renderRace(stats) {
-  const milBox = document.getElementById('raceMilestones');
-  const rowBox = document.getElementById('raceRows');
-  milBox.innerHTML = ''; rowBox.innerHTML = '';
-  const milestones = [
-    { km: 0,  icon: '🚩',  label: 'Start' },
-    { km: 9,  icon: '🏆',  label: 'W1 9km' },
-    { km: 18, icon: '🏆',  label: 'W2 18km' },
-    { km: 27, icon: '🏆',  label: 'W3 27km' },
-    { km: 36, icon: '👸',  label: 'W4 36km' },
-  ];
-  milestones.forEach(m => {
-    const span = document.createElement('span');
-    span.className = 'milestone';
-    span.style.left = (m.km / TARGET_KM * 100) + '%';
-    span.textContent = m.km === 0 ? '🚩' : `${m.icon} ${m.label}`;
-    milBox.appendChild(span);
-  });
-
-  // ── Milestone Winners row ──────────────────────────────────────────────
-  const ym = `${curYear}_${curMonth + 1}`;
-  const fm = firstMilestonesCache[ym] || {};
-  const winnerSlots = [
-    { km: 9,  key: 'W1',  emoji: '🏆' },
-    { km: 18, key: 'W2',  emoji: '🏆' },
-    { km: 27, key: 'W3',  emoji: '🏆' },
-    { km: 36, key: 'M36', emoji: '👸' },
-  ];
-  let winnersRow = document.getElementById('raceMilestoneWinners');
-  if (!winnersRow) {
-    winnersRow = document.createElement('div');
-    winnersRow.id = 'raceMilestoneWinners';
-    winnersRow.className = 'race-milestone-winners';
-    milBox.parentNode.insertBefore(winnersRow, milBox.nextSibling);
-  }
-  winnersRow.innerHTML = winnerSlots.map(slot => {
-    const w = fm[slot.key];
-    let avHtml = '';
-    if (w) {
-      const ph = getPhoto(w.mi);
-      const ic = getIcon(w.mi);
-      avHtml = ph
-        ? `<img src="${ph}" alt="${w.name}">`
-        : isCustomIcon(w.mi)
-          ? `<img src="${ic}" alt="${w.name}">`
-          : `<span>${ic}</span>`;
-    } else {
-      avHtml = `<span style="font-size:11px;color:var(--artifact-text-secondary)">?</span>`;
+// ── Power level ───────────────────────────────────────────────────────────
+function hasStrongWeek(mi){
+  const days=getDaysInMonth(curYear,curMonth);
+  for(let d=1;d<=days-4;d++){
+    if(getDow(curYear,curMonth,d)!==1)continue;
+    let ok=true;
+    for(let i=0;i<5;i++){
+      const dk=getDateKey(curYear,curMonth,d+i);
+      if((att[`mi${mi}_${dk}`]||0)!==1){ok=false;break;}
     }
-    const pct = slot.km / TARGET_KM * 100;
-    return `<div class="mw-slot" style="left:${pct}%">
-      <div class="mw-avatar${w ? '' : ' unclaimed'}">${avHtml}</div>
-      <div class="mw-name${w ? '' : ' unclaimed'}">${w ? w.name.split(' ')[0] : 'First?'}</div>
-    </div>`;
-  }).join('');
-  const sorted = [...stats].sort((a, b) => b.km - a.km);
-  sorted.forEach((s, rank) => {
-    const pct        = Math.min(s.km / TARGET_KM * 100, 100);
-    const photo      = getPhoto(s.mi);
-    const animal     = getIcon(s.mi);
-    const color      = LANE_CLR[s.mi % LANE_CLR.length];
-    const isLeader   = rank === 0 && s.km > 0;
-    const isDone     = s.km >= TARGET_KM;
-    const isSleeping = s.km === 0;
-    const ltTotalKm  = getMemberTotalKm(s.mi);
-    const quote      = getQuote(s, rank, ltTotalKm);
-    const tokens     = calcTokens(s.mi).total;
-    const rankIcon   = rank===0&&s.km>0?'🥇':rank===1&&s.km>0?'🥈':rank===2&&s.km>0?'🥉':rank+1;
-    const lt         = ltTargets[s.mi];
+    if(ok)return true;
+  }
+  return false;
+}
 
-    // Long-term target display
-    let ltHtml = '';
-    if (lt && lt.km > 0 && lt.date) {
-      const ltPct   = Math.min(Math.round(ltTotalKm / lt.km * 100), 100);
-      const ltDate  = new Date(lt.date);
-      const ltLabel = ltDate.toLocaleDateString('en', {month:'short', year:'numeric'});
-      ltHtml = `
-        <div class="lt-info" title="Long-term: ${ltTotalKm}/${lt.km}km by ${ltLabel}">🎯 ${ltTotalKm}/${lt.km}km · ${ltLabel} (${ltPct}%)</div>
-        <div class="lt-pbar"><div class="lt-pfill" style="width:${ltPct}%"></div></div>`;
+function hasSuperWeek(mi){
+  const days=getDaysInMonth(curYear,curMonth);
+  for(let d=1;d<=days-6;d++){
+    if(getDow(curYear,curMonth,d)!==1)continue;
+    let ok=true;
+    for(let i=0;i<7;i++){
+      const nd=new Date(curYear,curMonth,d+i);
+      if(nd.getMonth()!==curMonth){ok=false;break;}
+      const dk=getDateKey(nd.getFullYear(),nd.getMonth(),nd.getDate());
+      if((att[`mi${mi}_${dk}`]||0)!==1){ok=false;break;}
     }
-
-    // Avatar: body = animal (bottom), face = photo (top)
-    const avatarInner = isCustomIcon(s.mi)
-      ? `<img class="av-body" src="${animal}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;top:0;left:0">${photo ? `<img class="av-face" src="${photo}" alt="${s.name}"/>` : ''}`
-      : `<span class="av-body">${animal}</span>${photo ? `<img class="av-face" src="${photo}" alt="${s.name}"/>` : ''}`;
-
-    // Sprite: animal body + face overlay
-    const spriteInner = isCustomIcon(s.mi)
-      ? `<img class="animal" src="${animal}" style="width:28px;height:28px;object-fit:cover;border-radius:50%;display:block;animation:run-bounce .35s infinite ease-in-out">${photo ? `<img class="sprite-face" src="${photo}" alt=""/>` : ''}`
-      : `<span class="animal">${animal}</span>${photo ? `<img class="sprite-face" src="${photo}" alt=""/>` : ''}`;
-
-    const row = document.createElement('div');
-    row.className = 'racer-row';
-    row.dataset.gleanId = `racer-row-${s.mi}`;
-    row.innerHTML = `
-      <div class="racer-rank">${rankIcon}</div>
-      <div class="racer-info">
-        <div class="avatar-wrap" title="Click to upload your face photo 📸" onclick="handleAvatarClick(event,${s.mi})">
-          <div class="avatar" style="border-color:${color}">${avatarInner}</div>
-        </div>
-        <div style="min-width:0;flex:1">
-          <div class="racer-name">${s.name}</div>
-          <div class="racer-km">${s.km}/${TARGET_KM} km this month</div>
-          <div class="racer-dlut">💎 ${tokens} DLUT</div>
-          ${ltHtml}
-        </div>
-      </div>
-      <div class="road-wrap">
-        <div class="road">
-          <div class="road-shoulder top"></div>
-          <div class="road-shoulder bottom"></div>
-          <div class="road-line"></div>
-          <div class="road-progress" style="background:${color};width:${pct}%"></div>
-          ${[
-            {km:9,  label:'W1', week:1},
-            {km:18, label:'W2', week:2},
-            {km:27, label:'W3', week:3},
-          ].map(({km, label}) => {
-            const reached = s.km >= km;
-            return `<div class="w-trophy${reached?' done':''}" style="left:${km/TARGET_KM*100}%">
-              <div class="w-trophy-icon">🏆</div>
-              <div class="w-trophy-label">${label}</div>
-            </div>`;
-          }).join('')}
-          <div class="racer-sprite ${isLeader?'leader':''} ${isDone?'winner':''} ${isSleeping?'sleeping':''}"
-               style="left:${Math.max(pct,2)}%">
-            <div class="thought-bubble">${quote}</div>
-            <div class="speed-lines">
-              <div class="speed-line" style="width:20px"></div>
-              <div class="speed-line" style="width:14px"></div>
-              <div class="speed-line" style="width:8px"></div>
-            </div>
-            <div class="sprite-body-wrap">${spriteInner}</div>
-            <div class="dlut-tag">💎${tokens}</div>
-            <div class="km-tag">${s.km} km</div>
-          </div>
-          ${isDone?'<div class="status-badge">🎉</div>':isSleeping?'<div class="status-badge">💤</div>':''}
-          <div class="sixpack-finish">
-            <div class="sixpack-icon${isDone?' done':''}">👸</div>
-            <div class="sixpack-label${isDone?' done':''}">36km<br>${isDone?'👑 SHE DID IT! 👑':'🍩 EAT LESS<br>RUN MORE 🍩'}</div>
-          </div>
-        </div>
-      </div>`;
-    rowBox.appendChild(row);
-  });
+    if(ok)return true;
+  }
+  return false;
 }
 
-// ── MATRIX CALENDAR RENDER ─────────────────────────────────
-function renderCalendar() { renderMatrix(); }
-function renderMatrix() {
-  const wrap = document.getElementById('matrixWrap');
-  const ac   = Math.min(activeCount, MEMBERS.length);
-  if (!wrap) return;
-  const year = curYear, month = curMonth;
-  const daysInMonth = new Date(year, month+1, 0).getDate();
-  const todayStr = new Date().toISOString().slice(0,10);
-  const mm = String(month+1).padStart(2,'0');
-  const DOW_S = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-  const runMap = {};
-  RUNS.forEach(r => { runMap[r.date] = r; });
-
-  // ── header row
-  let h = '<table class="matrix-table"><thead><tr>';
-  h += '<th class="m-member-hdr">Member</th>';
-  for (let d=1; d<=daysInMonth; d++) {
-    const dd = String(d).padStart(2,'0');
-    const dateStr = `${year}-${mm}-${dd}`;
-    const run = runMap[dateStr];
-    const dow = new Date(year, month, d).getDay();
-    const isToday = dateStr === todayStr;
-    const isWknd  = dow===0||dow===6;
-    let cls = 'm-day-hdr';
-    if (run) cls += run.day==='Mon'?' hdr-mon':run.day==='Wed'?' hdr-wed':' hdr-fri';
-    if (isToday) cls += ' hdr-today';
-    if (isWknd && !run) cls += ' hdr-weekend';
-    const runBadgeCls = run ? (run.day==='Mon'?' m-run-r':run.day==='Wed'?' m-run-g':' m-run-o') : '';
-    h += `<th class="${cls}">
-      <div class="dh-dow">${DOW_S[dow]}</div>
-      <div class="dh-num">${isToday?'📍':''} ${d}</div>
-      ${run ? `<div class="dh-run${runBadgeCls}">R${run.num}</div>` : ''}
-    </th>`;
+function getCellLevel(mi,dateKey){
+  const state=att[`mi${mi}_${dateKey}`]||0;
+  if(state===0)return'pending';
+  if(state===-1)return'absent';
+  const d=new Date(dateKey+'T00:00:00');
+  const dow=d.getDay();
+  const mon=new Date(d);mon.setDate(d.getDate()-(dow===0?6:dow-1));
+  let sup=true,str=true;
+  for(let i=0;i<7;i++){
+    const nd=new Date(mon);nd.setDate(mon.getDate()+i);
+    if(nd.getMonth()!==curMonth||nd.getFullYear()!==curYear){sup=false;if(i<5)str=false;continue;}
+    const dk=getDateKey(nd.getFullYear(),nd.getMonth(),nd.getDate());
+    if((att[`mi${mi}_${dk}`]||0)!==1){sup=false;if(i<5)str=false;}
   }
-  h += '</tr></thead><tbody>';
+  if(sup)return'super';
+  if(str)return'strong';
+  return'present';
+}
 
-  // ── member rows
-  for (let mi=0; mi<ac; mi++) {
-    const animal = getIcon(mi);
-    const photo  = getPhoto(mi);
-    const av = photo
-      ? `<img src="${photo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">`
-      : isCustomIcon(mi)
-        ? `<img src="${animal}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">`
-        : `<span style="font-size:15px;vertical-align:middle;margin-right:3px">${animal}</span>`;
-    h += `<tr><td class="m-member-cell">${av}${MEMBERS[mi]}</td>`;
-    for (let d=1; d<=daysInMonth; d++) {
-      const dd = String(d).padStart(2,'0');
-      const dateStr = `${year}-${mm}-${dd}`;
-      const run = runMap[dateStr];
-      const cellKey = run ? `${run.id}_${mi}` : `free_${dateStr}_${mi}`;
-      const s  = att[cellKey]  || 0;
-      const kv = kmData[cellKey] ?? DEFAULT_KM;
-      const icon = s===1?'✅':s===2?'❌':'⬜';
-      const dow  = new Date(year, month, d).getDay();
-      const isToday   = dateStr===todayStr;
-      const isWknd    = dow===0||dow===6;
-      let cls = 'm-cell';
-      if (run) cls += run.day==='Mon'?' cell-run-mon':run.day==='Wed'?' cell-run-wed':' cell-run-fri';
-      if (isToday) cls += ' cell-today';
-      if (isWknd && !run) cls += ' cell-weekend';
-      h += `<td class="${cls}"
-        onclick="matrixClick(event,'${cellKey}',${mi})"
-        title="${MEMBERS[mi]} · ${dateStr}${s===1?' · '+kv+'km':''}"
-      ><span class="m-cell-icon">${icon}</span>${s===1?`<span class="m-cell-km">${kv}km</span>`:''}</td>`;
+function getMemberPowerLevel(mi){
+  if(hasSuperWeek(mi))return'ui';
+  if(hasStrongWeek(mi))return'god';
+  const km=getMemberKm(mi);
+  if(km>=MONTH_GOAL)return'ssj3';
+  if(km>=27)return'ssj';
+  return'base';
+}
+
+function getCellIcon(level){
+  return{pending:'⬜',absent:'💀',present:'🥋',strong:'💪',super:'🦸'}[level]||'⬜';
+}
+
+// ── KM & tokens ───────────────────────────────────────────────────────────
+function getMemberKm(mi){
+  const today=getTodayKey();
+  let total=0;
+  const days=getDaysInMonth(curYear,curMonth);
+  for(let d=1;d<=days;d++){
+    const dk=getDateKey(curYear,curMonth,d);
+    if(dk>today)continue;
+    const key=`mi${mi}_${dk}`;
+    if((att[key]||0)===1)total+=parseFloat(kmData[key]||DEFAULT_KM);
+  }
+  return Math.round(total*10)/10;
+}
+
+function getMemberStats(){
+  return MEMBERS.slice(0,activeCount).map((m,mi)=>({
+    mi,name:m.name,animal:m.animal,km:getMemberKm(mi),dlut:calcTokens(mi)
+  })).sort((a,b)=>b.km-a.km);
+}
+
+function calcTokens(mi){
+  const today=getTodayKey();
+  const days=getDaysInMonth(curYear,curMonth);
+  let total=0,km=0,hasFirst=false;
+  for(let d=1;d<=days;d++){
+    const dk=getDateKey(curYear,curMonth,d);
+    if(dk>today)continue;
+    const key=`mi${mi}_${dk}`;
+    if((att[key]||0)===1){
+      const k=parseFloat(kmData[key]||DEFAULT_KM);
+      km+=k;total+=k*rates.perKm;
+      if(!hasFirst){total+=rates.firstRun;hasFirst=true;}
     }
-    h += '</tr>';
   }
-  h += '</tbody></table>';
-  wrap.innerHTML = h;
-  renderSummary(ac);
-  const MNAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const calTitle = document.querySelector('.cal-title');
-  if (calTitle) calTitle.textContent = `🗓️ ${MNAMES[month]} ${year} — Attendance`;
+  if(km>=9)total+=rates.w1;
+  if(km>=18)total+=rates.w2;
+  if(km>=27)total+=rates.w3;
+  if(km>=MONTH_GOAL)total+=rates.monthly;
+  const mk=`${curYear}-${curMonth}`;
+  const fm=firstMilestones[mk]||{};
+  if(fm.w1===mi)total+=rates.first_w1;
+  if(fm.w2===mi)total+=rates.first_w2;
+  if(fm.w3===mi)total+=rates.first_w3;
+  if(fm.goal===mi)total+=rates.first_monthly;
+  if(hasStrongWeek(mi))total+=rates.strong;
+  if(hasSuperWeek(mi))total+=rates.super;
+  Object.values(bonuses).forEach(b=>{if(b.mi===mi)total+=b.amt;});
+  Object.values(prizes).forEach(p=>{if(p.redeemedBy===mi)total-=p.cost;});
+  return Math.max(0,Math.round(total));
 }
 
-function renderSummary(ac) {
-  const tbl=document.getElementById('sumTable'); if(!tbl) return;
-  const todayStr = new Date().toISOString().slice(0,10);
-  let h=`<thead><tr><th class="left">Member</th><th>Runs</th><th>Total KM</th><th>Progress</th><th>Avg KM/Run</th></tr></thead><tbody>`;
-  for(let mi=0;mi<ac;mi++){
-    const animal=getIcon(mi), photo=getPhoto(mi);
-    const avIcon = isCustomIcon(mi)
-      ? `<img src="${animal}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;vertical-align:middle;position:absolute;bottom:-2px;left:50%;transform:translateX(-50%)">`
-      : `<span style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);font-size:16px">${animal}</span>`;
-    const av=`<span style="position:relative;display:inline-block;width:20px;height:20px;vertical-align:middle">${avIcon}${photo?`<img style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;object-fit:cover;border:1px solid var(--artifact-background-light);z-index:2" src="${photo}" alt=""/>`:''}</span>`;
-    let runs=0,km=0;
-    // Count all cells (scheduled + free) up to today only
-    Object.keys(att).forEach(key=>{
-      if(!key.endsWith('_'+mi)) return;
-      let dateStr='';
-      if(key.startsWith('free_')){const p=key.split('_');dateStr=p[1]||'';}
-      else{const runId=key.split('_')[0];dateStr=runId.substring(1);}
-      if(!dateStr||dateStr>todayStr) return;
-      const s=att[key]||0,kv=kmData[key]??DEFAULT_KM;
-      if(s===1){runs++;km+=kv;}
-    });
-    const pct=Math.min(100,Math.round(km/TARGET_KM*100));
-    const avg=runs>0?Math.round(km/runs*10)/10:0;
-    const bc=pct>=100?'#22c55e':pct>=66?'#3b82f6':pct>=33?'#f97316':'#ef4444';
-    h+=`<tr><td class="name-cell">${av} ${MEMBERS[mi]}</td><td class="total-cell">${runs}</td><td class="km-total">${Math.round(km*10)/10} km</td><td><div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%;background:${bc}"></div></div><div style="font-size:9px;color:var(--artifact-text-secondary);margin-top:2px">${pct}% of ${TARGET_KM}km (up to today)</div></td><td style="font-size:11px">${avg>0?avg+'km':'—'}</td></tr>`;
-  }
-  tbl.innerHTML=h+'</tbody>';
+function checkFirstMilestones(mi){
+  const km=getMemberKm(mi);
+  const mk=`${curYear}-${curMonth}`;
+  const fm=firstMilestones[mk]||{};
+  let updated=false;
+  if(km>=9&&fm.w1===undefined){fm.w1=mi;updated=true;}
+  if(km>=18&&fm.w2===undefined){fm.w2=mi;updated=true;}
+  if(km>=27&&fm.w3===undefined){fm.w3=mi;updated=true;}
+  if(km>=MONTH_GOAL&&fm.goal===undefined){fm.goal=mi;updated=true;}
+  if(updated){firstMilestones[mk]=fm;writeData(`firstMilestones/${mk}`,fm);}
 }
 
-// ── MATRIX CELL CLICK + BOTTOM SHEET ─────────────────────────────────────
-let _bsKey = null, _bsMi = null;
-
-window.matrixClick = function(evt, cellKey, mi) {
-  evt.stopPropagation();
-  openBs(cellKey, mi);
-};
-
-function openBs(cellKey, mi) {
-  window._bsMi = mi; // store for bottom sheet button handlers
-  _bsKey = cellKey; _bsMi = mi;
-  const animal  = getIcon(mi);
-  const name    = MEMBERS[mi];
-  const curKm   = kmData[cellKey] ?? DEFAULT_KM;
-  const curStat = att[cellKey] || 0;
-  const ltKm    = ltTargets[mi]?.km   || '—';
-  const ltDate  = ltTargets[mi]?.date || '';
-  const photo   = getPhoto(mi);
-
-  // Parse date from cellKey (format: r2026-08-03_0 or free_YYYY-MM-DD_mi)
-  let dateStr = '';
-  if (cellKey.startsWith('free_')) {
-    const parts = cellKey.split('_');
-    dateStr = parts[1] || '';
-  } else {
-    // runId = everything before last _
-    const runId = cellKey.substring(0, cellKey.lastIndexOf('_'));
-    const run = RUNS.find(r => r.id === runId);
-    if (run) dateStr = run.date;
-  }
-  const dateLabel = dateStr
-    ? new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'})
-    : '';
-
-  // Status label
-  const statusLabel = curStat === 1 ? '✅ Currently: Present' : curStat === 2 ? '❌ Currently: Absent' : '⬜ Not logged yet';
-
-  // Populate sheet
-  document.getElementById('bsTitle').textContent = animal + ' ' + name;
-  document.getElementById('bsDate').textContent  = dateLabel;
-  document.getElementById('bsMemberName').textContent = name;
-  document.getElementById('bsMemberSub').textContent  = statusLabel;
-
-  // Avatar
-  const avatarEl = document.getElementById('bsAvatar');
-  if (photo) {
-    avatarEl.innerHTML = `<img src="${photo}" alt="${name}"><span style="position:absolute;bottom:0;right:0;font-size:16px">${isCustomIcon(mi)?''  :animal}</span>`;
-  } else if (isCustomIcon(mi)) {
-    avatarEl.innerHTML = `<img src="${animal}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-  } else {
-    avatarEl.textContent = animal;
-  }
-
-  // KM input
-  const inp = document.getElementById('bsKmInput');
-  inp.value = curKm;
-
-  // Open overlay
-  // show/hide avatar action buttons
-  const clearPhotoBtn = document.getElementById('bsClearPhoto');
-  const clearIconBtn  = document.getElementById('bsClearIcon');
-  if (clearPhotoBtn) clearPhotoBtn.style.display = getPhoto(mi) ? 'block' : 'none';
-  if (clearIconBtn)  clearIconBtn.style.display  = isCustomIcon(mi) ? 'block' : 'none';
-  const ov = document.getElementById('bsOverlay');
-  ov.classList.add('open');
-  setTimeout(() => { inp.focus(); inp.select(); }, 200);
+function getGoalPodium(){
+  const mk=`${curYear}-${curMonth}`;
+  const fm=firstMilestones[mk]||{};
+  const reached=MEMBERS.slice(0,activeCount).map((_,mi)=>mi).filter(mi=>getMemberKm(mi)>=MONTH_GOAL);
+  const podium=[];
+  if(fm.goal!==undefined)podium.push(fm.goal);
+  reached.forEach(mi=>{if(!podium.includes(mi))podium.push(mi);});
+  return podium.slice(0,3);
 }
 
-window.bsUploadPhoto = function() {
-  const input = document.createElement('input');
-  input.type = 'file'; input.accept = 'image/*,.gif';
-  input.onchange = async (e) => {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      // Compress to 80×80 JPEG — keeps Firebase write tiny & fast
-      const img = new Image();
-      img.onload = async () => {
-        const cv = document.createElement('canvas'); cv.width = cv.height = 80;
-        const ct = cv.getContext('2d');
-        const s = Math.min(img.width, img.height);
-        ct.drawImage(img, (img.width-s)/2, (img.height-s)/2, s, s, 0, 0, 80, 80);
-        const dataUrl = cv.toDataURL('image/jpeg', .7);
-        savePhoto(window._bsMi, dataUrl); // photosCache + Firebase
-        renderAll();
-        const avatarEl = document.getElementById('bsAvatar');
-        if (avatarEl) avatarEl.innerHTML = `<img src="${dataUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-        const clearPhotoBtn = document.getElementById('bsClearPhoto');
-        if (clearPhotoBtn) clearPhotoBtn.style.display = 'block';
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  };
-  input.click();
-};
-window.bsClearFacePhoto = function() {
-  const mi = window._bsMi;
-  if (!confirm('Clear face photo for ' + (MEMBERS[mi] || 'Member') + '?')) return;
-  clearPhoto(mi);
-  const avatarEl = document.getElementById('bsAvatar');
-  if (avatarEl) {
-    const animal = getIcon(mi);
-    avatarEl.innerHTML = isCustomIcon(mi)
-      ? `<img src="${animal}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
-      : `<span style="font-size:40px;line-height:64px">${animal}</span>`;
-  }
-  const clearPhotoBtn = document.getElementById('bsClearPhoto');
-  if (clearPhotoBtn) clearPhotoBtn.style.display = 'none';
-};
-window.bsOpenAnimalPicker = function() {
-  closeBs();
-  setTimeout(() => openApModal(window._bsMi), 150);
-};
-window.bsClearAnimalIcon = function() {
-  const mi = window._bsMi;
-  if (!confirm('Reset icon for ' + (MEMBERS[mi] || 'Member') + ' back to default emoji?')) return;
-  clearCustomIcon(mi);
-  const clearIconBtn = document.getElementById('bsClearIcon');
-  if (clearIconBtn) clearIconBtn.style.display = 'none';
-};
-window.bsOverlayClick = function(e) {
-  if (e.target === document.getElementById('bsOverlay')) closeBs();
-};
-
-window.closeBs = function() {
-  const ov = document.getElementById('bsOverlay');
-  if (!ov) return;
-  ov.classList.remove('open');
-  _bsKey = null; _bsMi = null;
-};
-
-window.bsKmStep = function(delta) {
-  const inp = document.getElementById('bsKmInput');
-  const val = parseFloat(inp.value) || DEFAULT_KM;
-  inp.value = Math.max(0, Math.round((val + delta) * 10) / 10);
-};
-
-window.bsConfirm = function(state) {
-  if (!_bsKey) return;
-  const km = parseFloat(document.getElementById('bsKmInput')?.value) || DEFAULT_KM;
-  writeMatrixCell(_bsKey, state, state === 0 ? DEFAULT_KM : km);
-  // Update sub-label immediately
-  const statusLabel = state === 1 ? '✅ Currently: Present' : state === 2 ? '❌ Currently: Absent' : '⬜ Not logged yet';
-  document.getElementById('bsMemberSub').textContent = statusLabel;
-  closeBs();
-};
-
-document.addEventListener('keydown', e => {
-  if (!document.getElementById('bsOverlay')?.classList.contains('open')) return;
-  if (e.key === 'Enter')  { e.preventDefault(); bsConfirm(1); }
-  if (e.key === 'Escape') { e.preventDefault(); closeBs(); }
-});
-
-async function writeMatrixCell(cellKey, state, km) {
-  att[cellKey]    = state;
-  kmData[cellKey] = km;
-  localStorage.setItem('trek_att', JSON.stringify(att));
-  localStorage.setItem('trek_km',  JSON.stringify(kmData));
-  renderMatrix();
-  renderKPIs(getMemberStats());
-  renderRace(getMemberStats());
-  if (db) {
-    try {
-      window._fbSet(window._fbRef(db, `trek_dlut_50km/att/${cellKey}`), state);
-      window._fbSet(window._fbRef(db, `trek_dlut_50km/km/${cellKey}`),  km);
-    } catch(e) { console.warn('Firebase write failed', e); }
-  }
-  // Check first-milestone AFTER write, with correct scope
-  const _mi2 = parseInt(cellKey.match(/(\d+)$/)?.[1] ?? -1);
-  if (_mi2 >= 0 && state === 1) { checkAndClaimFirstMilestone(_mi2).catch(()=>{}); }
-}
-
-function renderTable() { renderMatrix(); }
-
-
-// ── RACE CHARTS ────────────────────────────────────────────────────────────
-function renderRaceCharts() {
-  // Charts replaced by inline race-road elements
-}
-
-function renderAll() {
-  const stats = getMemberStats();
+// ── Render ────────────────────────────────────────────────────────────────
+function renderAll(){
+  updateMonthLabel();
+  const stats=getMemberStats();
   renderKPIs(stats);
   renderRace(stats);
   renderMatrix();
-  try { renderRaceCharts(); } catch(e) {}
-  try { if(document.getElementById('tab-earn')?.style.display!=='none') renderEarn(); } catch(e){}
-  const MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('monthLabel').textContent = `${MNAMES[curMonth]} ${curYear}`;
-
-  refreshMemberBtns();}
-
-// ── KM MODAL ─────────────────────────────────────────────
-let kmModal_run = null, kmModal_mi = null;
-window.openKm = function(runId, mi) {
-  kmModal_run = runId; kmModal_mi = mi;
-  const _kmIcon = getIcon(mi);
-  const _kmAnimalEl = document.getElementById('kmAnimal');
-  if (_kmIcon.startsWith('data:')) {
-    _kmAnimalEl.innerHTML = '<img src="' + _kmIcon + '" style="width:40px;height:40px;object-fit:cover;border-radius:8px">';
-  } else { _kmAnimalEl.textContent = _kmIcon; }
-  document.getElementById('kmName').textContent   = MEMBERS[mi];
-  const k = `${runId}_${mi}`;
-  document.getElementById('kmInput').value = kmData[k] ?? DEFAULT_KM;
-  document.getElementById('kmOverlay').classList.add('open');
-};
-window.closeKm = function() { document.getElementById('kmOverlay').classList.remove('open'); };
-window.confirmKm = async function() {
-  const km = parseFloat(document.getElementById('kmInput').value) || DEFAULT_KM;
-  const k  = `${kmModal_run}_${kmModal_mi}`;
-  await writeData(k, 1,  'att');
-  await writeData(k, km, 'km');
-  closeKm();
-};
-window.setStatus = async function(s) {
-  const k = `${kmModal_run}_${kmModal_mi}`;
-  await writeData(k, s, 'att');
-  closeKm();
-};
-document.getElementById('kmInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') { e.preventDefault(); window.confirmKm(); }
-});
-
-// ── MEMBER EDITOR ─────────────────────────────────────────
-window.openMemberEditor = function() {
-  document.getElementById('countDisplay').textContent = activeCount;
-  const rows = document.getElementById('memberEditRows');
-  rows.innerHTML = MEMBERS.map((m, i) => {
-    const lt = ltTargets[i] || {};
-    const inactive = i >= activeCount;
-    return `<div class="member-edit-row ${inactive?'inactive':''}" id="mer_${i}">
-      <div style="position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:3px">
-      <button type="button" id="apb_${i}" data-apidx="${i}" class="ap-open-btn" title="🐾 Click to change animal / icon"
-        style="font-size:22px;background:var(--artifact-background);border:2px solid var(--artifact-border-light);border-radius:8px;padding:3px 5px;cursor:pointer;width:48px;height:48px;display:flex;align-items:center;justify-content:center;transition:border-color .15s,transform .15s;line-height:1"
-      >${customIcons[i] ? '<img src="'+customIcons[i]+'" style="width:32px;height:32px;object-fit:cover;border-radius:6px" alt="icon">' : ANIMALS[i]}</button>
-      ${customIcons[i] ? `<button type="button" onclick="clearCustomIcon(${i})" style="background:#fff8e1;border:1.5px solid #f59e0b;color:#92400e;border-radius:5px;padding:1px 5px;font-size:10px;cursor:pointer;width:48px;text-align:center;line-height:1.4">🗑 icon</button>` : ''}
-      ${getPhoto(i) ? `<button type="button" onclick="clearPhoto(${i})" style="background:#fff5f5;border:1.5px solid #ef4444;color:#dc2626;border-radius:5px;padding:1px 5px;font-size:10px;cursor:pointer;width:48px;text-align:center;line-height:1.4">🗑 photo</button>` : ''}
-      </div>
-      <input id="mi_${i}" value="${m}" placeholder="Member ${i+1}" type="text"/>
-      <input type="number" id="lt_km_${i}" value="${lt.km||''}" placeholder="e.g. 50" min="0" step="1"/>
-      <input type="date"   id="lt_dt_${i}" value="${lt.date||''}"/>
-    </div>`;
-  }).join('');
-  document.getElementById('memberOverlay').classList.add('open');
-};
-
-window.adjustCount = function(dir) {
-  activeCount = Math.max(1, Math.min(10, activeCount + dir));
-  document.getElementById('countDisplay').textContent = activeCount;
-  MEMBERS.forEach((_, i) => {
-    const row = document.getElementById(`mer_${i}`);
-    if (row) row.className = `member-edit-row ${i >= activeCount ? 'inactive' : ''}`;
-  });
-};
-
-window.saveMembers = async function() {
-  MEMBERS = MEMBERS.map((_, i) => {
-    const el = document.getElementById(`mi_${i}`);
-    return el ? (el.value.trim() || `Member ${i+1}`) : `Member ${i+1}`;
-  });
-  MEMBERS.forEach((_, i) => {
-    const kmEl   = document.getElementById(`lt_km_${i}`);
-    const dateEl = document.getElementById(`lt_dt_${i}`);
-    const ltKm   = kmEl   ? parseFloat(kmEl.value)   : 0;
-    const ltDate = dateEl ? dateEl.value              : '';
-    if (ltKm > 0 && ltDate) ltTargets[i] = { km: ltKm, date: ltDate };
-    else delete ltTargets[i];
-  });
-  localStorage.setItem('trek_lt_targets',   JSON.stringify(ltTargets));
-  localStorage.setItem('trek_active_count', String(activeCount));
-  if (db) {
-    await window._fbSet(window._fbRef(db, 'trek_dlut_50km/members'),     MEMBERS);
-    await window._fbSet(window._fbRef(db, 'trek_dlut_50km/ltTargets'),   ltTargets);
-    await window._fbSet(window._fbRef(db, 'trek_dlut_50km/activeCount'), activeCount);
-    await window._fbSet(window._fbRef(db, 'trek_dlut_50km/animals'), ANIMALS);
-  } else { saveLocal(); }
-  document.getElementById('memberOverlay').classList.remove('open');
-  renderAll();
-};
-
-// ── TABS ──────────────────────────────────────────────────
-window.switchTab = function(t, btn) {
-  if (t === 'earn') { setTimeout(renderEarn, 0); }
-  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-race').style.display       = t === 'race'       ? '' : 'none';
-  if (t === 'race') { setTimeout(() => { try { renderRaceCharts(); } catch(e){} }, 50); }
-  document.getElementById('tab-attendance').style.display = t === 'attendance' ? '' : 'none';
-  document.getElementById('tab-earn').style.display       = t === 'earn'       ? '' : 'none';
-};
-
-// ── MONTH NAV ─────────────────────────────────────────────
-window.changeMonth = function(dir) {
-  curMonth += dir;
-  if (curMonth > 11) { curMonth = 0; curYear++; }
-  if (curMonth <  0) { curMonth = 11; curYear--; }
-  genRuns(curYear, curMonth);
-  renderAll();
-};
-
-// ── MISC ─────────────────────────────────────────────────
-window.resetData = function() {
-  const code = prompt('🔒 Enter passcode to reset all data:');
-  if (code === null) return; // cancelled
-  if (code !== '1233') {
-    alert('❌ Wrong passcode. Reset cancelled.');
-    return;
-  }
-  if (!confirm('⚠️ Are you sure? This will delete ALL attendance & KM data for everyone. This cannot be undone.')) return;
-  att = {}; kmData = {};
-  if (db) {
-    window._fbSet(window._fbRef(db, 'trek_dlut_50km/att'), {});
-    window._fbSet(window._fbRef(db, 'trek_dlut_50km/km'),  {});
-  } else { saveLocal(); }
-  renderAll();
-  alert('✅ All data has been reset.');
-};
-window.toggleDark = function() {
-  const h = document.documentElement;
-  h.dataset.theme = h.dataset.theme === 'dark' ? '' : 'dark';
-  localStorage.setItem('trek_theme', h.dataset.theme);
-};
-
-
-
-// ════════════════════════════════════════════════
-// ANIMAL PICKER — fully dynamic, appended to body
-// ════════════════════════════════════════════════
-const ALL_ANIMALS_LIST = [
-  '🐯','🦊','🐸','🐼','🐱','🐻','🦁','🐨','🐮','🐶',
-  '🐺','🦝','🐭','🐹','🐰','🐇','🦄','🐧','🦅','🦆',
-  '🐬','🦈','🐊','🦖','🐉','🦕','🐔','🦜','🦓','🦒',
-  '🐘','🦏','🦛','🐃','🦬','🐗','🦌','🐿️','🦔','🦦',
-  '🦥','🦘','🦙','🐪','🐫','🐓','🦃','🕊️','🦢','🦩',
-  '🦚','🐢','🦎','🐍','🦋','🐝','🐛','🐞','🦗','🦂',
-  '🏃','🚴','🧗','🏊','🤸','🚵','⚡','🔥','💪','🥷',
-];
-
-let _apIdx = -1;
-let _apOverlay = null;
-
-function _buildApOverlay() {
-  const ov = document.createElement('div');
-  ov.id = 'apOverlayDyn';
-  ov.style.cssText = [
-    'display:none',
-    'position:fixed',
-    'inset:0',
-    'background:rgba(0,0,0,.6)',
-    'z-index:2147483647',
-    'align-items:center',
-    'justify-content:center',
-    'padding:16px',
-  ].join(';');
-  document.body.appendChild(ov);
-
-  ov.addEventListener('click', e => {
-    if (e.target === ov) _closeAp();
-  });
-  return ov;
+  renderSummary(stats);
+  renderEarn(stats);
+  if(adminUnlocked)renderAdminPanel();
 }
 
-function _getApOverlay() {
-  if (!_apOverlay || !document.body.contains(_apOverlay)) {
-    _apOverlay = _buildApOverlay();
-  }
-  return _apOverlay;
+function updateMonthLabel(){
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const lbl=`${months[curMonth]} ${curYear}`;
+  document.getElementById('monthLabel').textContent=lbl;
+  const al=document.getElementById('attMonthLabel');
+  if(al)al.textContent=`🗓️ ${months[curMonth]} ${curYear}`;
 }
 
-function openApModal(idx) {
-  _apIdx = idx;
-  const name = MEMBERS[idx] || ('Member ' + (idx + 1));
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const bg   = isDark ? '#1e1e2e' : '#ffffff';
-  const text = isDark ? '#e0e0e0' : '#1b1b1b';
-  const brd  = isDark ? '#374151' : '#e4e4e7';
+function renderKPIs(stats){
+  const today=getTodayKey();
+  let sessions=0,clubKm=0,onTrack=0;
+  const days=getDaysInMonth(curYear,curMonth);
+  MEMBERS.slice(0,activeCount).forEach((_,mi)=>{
+    for(let d=1;d<=days;d++){
+      const dk=getDateKey(curYear,curMonth,d);
+      if(dk>today)continue;
+      const key=`mi${mi}_${dk}`;
+      if((att[key]||0)===1){sessions++;clubKm+=parseFloat(kmData[key]||DEFAULT_KM);}
+    }
+    if(getMemberKm(mi)>=MONTH_GOAL)onTrack++;
+  });
+  clubKm=Math.round(clubKm*10)/10;
+  const avg=activeCount>0?Math.round(clubKm/activeCount*10)/10:0;
+  document.getElementById('kpiSessions').textContent=sessions;
+  document.getElementById('kpiTotal').textContent=clubKm+' km';
+  document.getElementById('kpiAvg').textContent=avg+' km';
+  document.getElementById('kpiTop').textContent=stats.length>0?stats[0].name.split(' ')[0]:'–';
+  document.getElementById('kpiOnTrack').textContent=onTrack+'/'+activeCount;
+}
 
-  // Build box HTML
-  const currentIcon = getIcon(idx);
-  const isCustom    = isCustomIcon(idx);
-  const curRowHtml  = isCustom
-    ? `<div id="_apCurRow" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff8e1;border:1.5px solid #f59e0b;border-radius:8px;margin-bottom:6px">
-         <img src="${currentIcon}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;flex-shrink:0">
-         <div style="flex:1;font-size:12px;font-weight:600;color:#92400e">Current: custom image/GIF</div>
-         <button id="_apClearBtn" style="background:#dc2626;color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer">🗑 Clear</button>
-       </div>`
-    : '';
+function avatarHtml(mi,size){
+  const m=MEMBERS[mi];
+  // Firebase returns numeric keys as strings — check both
+  const photo=photos[mi]||photos[String(mi)];
+  const customIcon=customIcons[mi]||customIcons[String(mi)];
+  const icon=customIcon||m.animal;
+  const isCustom=!!customIcon;
+  if(photo)return`<img src="${photo}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  if(isCustom)return`<img src="${icon}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  return icon;
+}
 
-  const gridBtns = ALL_ANIMALS_LIST.map(e => {
-    const isCur = !isCustom && e === ANIMALS[idx];
-    return `<button data-emoji="${e}" style="font-size:20px;background:${isCur ? '#dce7ff' : 'transparent'};border:2px solid ${isCur ? '#3559e6' : 'transparent'};border-radius:8px;padding:3px;cursor:pointer;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;line-height:1">${e}</button>`;
-  }).join('');
-
-  const boxHtml = `
-    <div id="_apBox" style="background:${bg};color:${text};border-radius:14px;padding:16px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);overflow:hidden">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-        <span style="font-weight:700;font-size:14px">🐾 Change icon for ${name}</span>
-        <button id="_apClose" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
-      </div>
-      ${curRowHtml}
-      <div style="display:flex;gap:8px;align-items:center;padding:8px;background:${isDark ? '#1a2a3a' : '#f6f8ff'};border-radius:8px;border:1.5px dashed #3559e6;flex-shrink:0">
-        <span style="font-size:20px">📁</span>
-        <div style="flex:1">
-          <div style="font-size:12px;font-weight:600;color:#3559e6">Upload image / GIF</div>
-          <div style="font-size:11px;color:#888">JPG PNG GIF WEBP supported</div>
+function renderRace(stats){
+  // Milestone labels
+  const msRoad=document.getElementById('msRoad');
+  if(msRoad){
+    msRoad.innerHTML=[{p:25,l:'🏆 W1<br>9km'},{p:50,l:'🏆 W2<br>18km'},{p:75,l:'🏆 W3<br>27km'},{p:100,l:'🎯 Goal<br>36km'}]
+      .map(m=>`<div class="ms-label" style="left:${m.p}%">${m.l}</div>`).join('');
+  }
+  // Winner slots
+  const wr=document.getElementById('winnerRoad');
+  if(wr){
+    const mk=`${curYear}-${curMonth}`;
+    const fm=firstMilestones[mk]||{};
+    wr.innerHTML=[{p:25,mi:fm.w1,b:'🥇'},{p:50,mi:fm.w2,b:'🥇'},{p:75,mi:fm.w3,b:'🥇'},{p:100,mi:fm.goal,b:'👑'}]
+      .map(s=>{
+        const has=s.mi!==undefined;
+        const av=has?avatarHtml(s.mi,26):'?';
+        return`<div class="winner-slot" style="left:${s.p}%">
+          <div class="winner-avatar" style="${has?'border-color:var(--gold)':''}">
+            ${av}${has?`<span class="winner-badge">${s.b}</span>`:''}
+          </div>
+          <div class="winner-name">${has?MEMBERS[s.mi].name.split(' ')[0]:'?'}</div>
+        </div>`;
+      }).join('');
+  }
+  // Race lanes
+  const track=document.getElementById('raceTrack');
+  if(!track)return;
+  const podium=getGoalPodium();
+  track.innerHTML=stats.map((s,rank)=>{
+    const m=MEMBERS[s.mi];
+    const pct=Math.min(100,(s.km/MONTH_GOAL)*100);
+    const pl=getMemberPowerLevel(s.mi);
+    const podiumPlace=podium.indexOf(s.mi);
+    const headBadge=podiumPlace===0?'👑':podiumPlace===1?'🎉':podiumPlace===2?'🧻':'';
+    const quote=QUOTES[(s.mi+Math.floor(Date.now()/86400000))%QUOTES.length];
+    const rankEmoji=rank===0?'🥇':rank===1?'🥈':rank===2?'🥉':`${rank+1}`;
+    const photo=photos[s.mi]||photos[String(s.mi)];
+    const customIcon=customIcons[s.mi]||customIcons[String(s.mi)];
+    const icon=customIcon||m.animal;
+    const isCustom=!!customIcon;
+    const spriteInner=photo?`<img src="${photo}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`:isCustom?`<img src="${icon}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`:`<span style="font-size:22px">${icon}</span>`;
+    const trophies=[{p:25,km:9,l:'W1'},{p:50,km:18,l:'W2'},{p:75,km:27,l:'W3'}]
+      .map(t=>`<div class="w-trophy" style="left:${t.p}%"><div class="w-trophy-icon ${s.km>=t.km?'reached':''}">🏆</div><div class="w-trophy-lbl">${t.l}</div></div>`).join('');
+    return`<div class="racer">
+      <div class="racer-rank">${rankEmoji}</div>
+      <div class="racer-info">
+        <div class="racer-info-top">
+          <div class="racer-avatar" onclick="window._app.openPhotoUpload(${s.mi})">
+            ${avatarHtml(s.mi,36)}
+            ${headBadge?`<span class="head-badge">${headBadge}</span>`:''}
+          </div>
+          <div>
+            <div class="racer-name">${m.name}</div>
+            <div class="racer-km">${s.km} km</div>
+            <div class="racer-dlut">💎 ${s.dlut} DLUT</div>
+            ${m.ltKm?`<div class="racer-lt">🎯 ${s.km}/${m.ltKm}km</div>`:''}
+          </div>
         </div>
-        <label for="_apFile" style="background:#3559e6;color:#fff;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Browse 📂</label>
-        <input type="file" id="_apFile" accept="image/*,.gif" style="display:none">
       </div>
-      <div style="font-size:10px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em;flex-shrink:0">— or pick an emoji —</div>
-      <div id="_apGrid" style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px;overflow-y:auto;flex:1">${gridBtns}</div>
+      <div class="road-wrap">
+        <div class="road-lane" style="background:linear-gradient(90deg,rgba(108,99,255,0.08),rgba(108,99,255,0.02))"></div>
+        <div class="road-lines"><div class="road-line"></div><div class="road-line"></div></div>
+        ${trophies}
+        <div class="goal-icon ${s.km>=MONTH_GOAL?'reached':''}">🎯</div>
+        <div class="sprite ${pl}" style="left:calc(${Math.max(2,pct)}% - 16px)">
+          <div class="sprite-quote">${quote}</div>
+          <div class="sprite-animal">${spriteInner}</div>
+          <div class="sprite-km">${s.km}km</div>
+          <div class="sprite-dlut">💎${s.dlut}</div>
+        </div>
+      </div>
     </div>`;
+  }).join('');
+}
 
-  const ov = _getApOverlay();
-  ov.innerHTML = boxHtml;
-  ov.style.display = 'flex';
-  // Move to very end of body to guarantee top z-index
-  document.body.removeChild(ov);
-  document.body.appendChild(ov);
-
-  // Wire close button
-  document.getElementById('_apClose').addEventListener('click', _closeAp);
-
-  // Wire clear button if custom icon
-  const clearBtn = document.getElementById('_apClearBtn');
-  if (clearBtn) {
-    clearBtn.addEventListener('click', () => {
-      clearCustomIcon(idx);
-      _closeAp();
-    });
+function renderMatrix(){
+  const table=document.getElementById('matrixTable');
+  if(!table)return;
+  const days=getDaysInMonth(curYear,curMonth);
+  const today=getTodayKey();
+  const dayNames=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  let html='<thead><tr><th class="th-member">Member</th>';
+  for(let d=1;d<=days;d++){
+    const dk=getDateKey(curYear,curMonth,d);
+    const dow=getDow(curYear,curMonth,d);
+    const isToday=dk===today;
+    html+=`<th style="${isToday?'color:var(--accent)':''}">${d}<br><span style="font-size:8px;font-weight:400">${dayNames[dow]}</span></th>`;
   }
-
-  // Wire file upload
-  document.getElementById('_apFile').addEventListener('change', async e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const isGif = file.type === 'image/gif';
-    if (isGif && file.size > 500 * 1024) {
-      alert('⚠️ GIF is ' + (file.size/1024).toFixed(0) + 'KB — max 500KB recommended. Use a smaller GIF.');
-      e.target.value = '';
-      return;
+  html+='</tr></thead><tbody>';
+  MEMBERS.slice(0,activeCount).forEach((m,mi)=>{
+    html+=`<tr><td class="td-member"><div class="m-av"><div class="m-av-icon">${avatarHtml(mi,20)}</div>${m.name.split(' ')[0]}</div></td>`;
+    for(let d=1;d<=days;d++){
+      const dk=getDateKey(curYear,curMonth,d);
+      const key=`mi${mi}_${dk}`;
+      const state=att[key]||0;
+      const km=kmData[key]||'';
+      const level=getCellLevel(mi,dk);
+      const isFuture=dk>today;
+      const cellClass=state===1?(level==='super'?'cell-ssj3':level==='strong'?'cell-ssj':'cell-present'):state===-1?'cell-absent':'';
+      const cellIcon=state===1?(level==='super'?'🦸':level==='strong'?'💪':'🥋'):state===-1?'💀':'⬜';
+      html+=`<td class="${cellClass}" ${isFuture?'style="opacity:.3;cursor:default"':`onclick="window._app.openBs(${mi},'${dk}')"`}>
+        <span class="cell-icon">${cellIcon}</span>${km?`<span class="cell-km">${km}km</span>`:''}
+      </td>`;
     }
-    const reader = new FileReader();
-    reader.onload = async ev => {
-      if (isGif) {
-        await _apSaveCustom(idx, ev.target.result);
-      } else {
-        const img = new Image();
-        img.onload = async () => {
-          const cv = document.createElement('canvas');
-          cv.width = cv.height = 120;
-          const ct = cv.getContext('2d');
-          const s = Math.min(img.width, img.height);
-          ct.drawImage(img, (img.width-s)/2, (img.height-s)/2, s, s, 0, 0, 120, 120);
-          await _apSaveCustom(idx, cv.toDataURL('image/png'));
-        };
-        img.src = ev.target.result;
-      }
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
+    html+='</tr>';
   });
-
-  // Wire emoji grid clicks — direct addEventListener on each button
-  const grid = document.getElementById('_apGrid');
-  grid.querySelectorAll('button[data-emoji]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      _apSelectEmoji(idx, btn.dataset.emoji);
-    });
-    btn.addEventListener('mouseenter', () => {
-      btn.style.background = '#f0f4ff';
-      btn.style.borderColor = '#3559e6';
-      btn.style.transform = 'scale(1.15)';
-    });
-    btn.addEventListener('mouseleave', () => {
-      const isCur = !isCustom && btn.dataset.emoji === ANIMALS[idx];
-      btn.style.background = isCur ? '#dce7ff' : 'transparent';
-      btn.style.borderColor = isCur ? '#3559e6' : 'transparent';
-      btn.style.transform = 'scale(1)';
-    });
-  });
+  html+='</tbody>';
+  table.innerHTML=html;
 }
 
-function _closeAp() {
-  const ov = document.getElementById('apOverlayDyn');
-  if (ov) ov.style.display = 'none';
-  _apIdx = -1;
+function renderSummary(stats){
+  const wrap=document.getElementById('summaryWrap');
+  if(!wrap)return;
+  let html='<table class="summary-table"><thead><tr><th>Member</th><th>KM</th><th>Progress</th><th>DLUT</th></tr></thead><tbody>';
+  stats.forEach(s=>{
+    const pct=Math.min(100,Math.round(s.km/MONTH_GOAL*100));
+    const color=pct>=100?'var(--green)':pct>=66?'var(--accent)':pct>=33?'var(--orange)':'var(--red)';
+    html+=`<tr><td>${MEMBERS[s.mi].animal} ${MEMBERS[s.mi].name}</td><td>${s.km} km</td>
+      <td><div>${pct}%</div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${color}"></div></div></td>
+      <td>💎 ${s.dlut}</td></tr>`;
+  });
+  wrap.innerHTML=html+'</tbody></table>';
 }
 
-async function _apSelectEmoji(idx, emoji) {
-  delete customIcons[idx];
-  ANIMALS[idx] = emoji;
-  _closeAp();
-  renderAll();
-  if (db) {
-    try {
-      await window._fbSet(window._fbRef(db, 'trek_dlut_50km/animals'), ANIMALS);
-      await window._fbSet(window._fbRef(db, 'trek_dlut_50km/customIcons'), customIcons);
-    } catch(e) {}
+function renderEarn(stats){
+  const sel=document.getElementById('walletMemberSel');
+  if(sel)sel.innerHTML=MEMBERS.slice(0,activeCount).map((m,mi)=>
+    `<button class="wm-btn ${mi===walletMi?'active':''}" onclick="window._app.setWalletMi(${mi})">${m.animal} ${m.name.split(' ')[0]}</button>`
+  ).join('');
+  const dlut=calcTokens(walletMi);
+  const wb=document.getElementById('walletBal');if(wb)wb.textContent=dlut;
+  const bd=document.getElementById('walletBreakdown');
+  if(bd){
+    const km=getMemberKm(walletMi);
+    bd.innerHTML=[
+      {icon:'🏃',label:'Distance',val:`+${Math.round(km*rates.perKm)} DLUT`},
+      {icon:'🏆',label:'Milestones',val:`+${[9,18,27,36].filter(t=>km>=t).reduce((a,t,i)=>a+[rates.w1,rates.w2,rates.w3,rates.monthly][i],0)} DLUT`},
+      {icon:'💎',label:'Total',val:`${dlut} DLUT`}
+    ].map(i=>`<div class="tx-row"><span class="tx-icon">${i.icon}</span><span class="tx-desc">${i.label}</span><span class="tx-amt pos">${i.val}</span></div>`).join('');
   }
-}
-
-async function _apSaveCustom(idx, dataUrl) {
-  customIcons[idx] = dataUrl;
-  delete ANIMALS[idx]; // will fall back to MBRS default
-  _closeAp();
-  renderAll();
-  if (db) {
-    try {
-      await window._fbSet(window._fbRef(db, 'trek_dlut_50km/customIcons'), customIcons);
-    } catch(e) {}
+  const rg=document.getElementById('ratesGrid');
+  if(rg)rg.innerHTML=[
+    {icon:'🏃',label:'Per km',val:`${rates.perKm} DLUT/km`},
+    {icon:'🎉',label:'First run',val:`+${rates.firstRun} DLUT`},
+    {icon:'🏆',label:'W1 (9km)',val:`+${rates.w1} DLUT`},
+    {icon:'🏆',label:'W2 (18km)',val:`+${rates.w2} DLUT`},
+    {icon:'🏆',label:'W3 (27km)',val:`+${rates.w3} DLUT`},
+    {icon:'🎯',label:'Monthly goal',val:`+${rates.monthly} DLUT`},
+    {icon:'🥇',label:'1st to W3',val:`+${rates.first_w3} DLUT`},
+    {icon:'👑',label:'1st to goal',val:`+${rates.first_monthly} DLUT`},
+    {icon:'💪',label:'Strong week',val:`+${rates.strong} DLUT`},
+    {icon:'🦸',label:'Super week',val:`+${rates.super} DLUT`},
+  ].map(r=>`<div class="earn-rate-item"><span>${r.icon} ${r.label}</span><span class="earn-rate-val">${r.val}</span></div>`).join('');
+  const pg=document.getElementById('prizeGrid');
+  if(pg){
+    const list=Object.entries(prizes).filter(([,p])=>!p.redeemedBy);
+    pg.innerHTML=list.length===0?'<div style="color:var(--text2);font-size:12px">No prizes yet. Ask admin!</div>':
+      list.map(([id,p])=>`<div class="prize-card"><div class="prize-icon">${p.emoji}</div><div class="prize-name">${p.name}</div><div class="prize-cost">💎 ${p.cost} DLUT</div>
+        <button class="prize-btn" ${dlut<p.cost?'disabled':''} onclick="window._app.redeemPrize('${id}')">Redeem</button></div>`).join('');
   }
-}
-
-// Wire up .ap-open-btn via event delegation on document
-document.addEventListener('click', e => {
-  const btn = e.target.closest('.ap-open-btn');
-  if (!btn) return;
-  const idx = parseInt(btn.getAttribute('data-apidx'), 10);
-  if (!isNaN(idx)) {
-    // Close member modal first to avoid any stacking context conflict
-    document.getElementById('memberOverlay').classList.remove('open');
-    setTimeout(() => openApModal(idx), 50);
-  }
-});
-
-function refreshMemberBtns() {
-  MEMBERS.forEach((_, i) => {
-    const btn = document.getElementById('apb_' + i);
-    if (!btn) return;
-    const ci = customIcons[i];
-    if (ci) {
-      btn.innerHTML = '<img src="' + ci + '" style="width:32px;height:32px;object-fit:cover;border-radius:6px" alt="icon">';
-    } else {
-      btn.textContent = ANIMALS[i] || MBRS[i].animal;
-    }
-  });
-}
-
-// ════════════════════════════════════════════════
-// RUN TO EARN — DLUT Token System (inside module)
-// ════════════════════════════════════════════════
-const TOKEN_RATES = {
-  perKm:10, milestone9:100, milestone18:200, milestone27:300, milestone36:500,
-  perfectWeek:50, firstRun:20,
-  first9:150, first18:250, first27:350, first36:500,
-};
-
-function calcTokens(mi) {
-  const todayStr = new Date().toISOString().slice(0,10);
-  let runs=0, km=0;
-  Object.keys(att).forEach(key => {
-    if (!key.endsWith('_'+mi)) return;
-    let dateStr='';
-    if (key.startsWith('free_')) { dateStr=key.split('_')[1]||''; }
-    else { dateStr=key.replace(/^r/,'').split('_')[0]; }
-    if (!dateStr||dateStr>todayStr) return;
-    if (att[key]===1) { runs++; km+=(kmData[key]??DEFAULT_KM); }
-  });
-  km=Math.round(km*10)/10;
-  const history=[];
-  const base=Math.floor(km*TOKEN_RATES.perKm);
-  if (base>0) history.push({emoji:'🏃',desc:`${km} km × ${TOKEN_RATES.perKm}`,amount:base,type:'base'});
-  let milestone=0;
-  [{km:9,bonus:TOKEN_RATES.milestone9,label:'W1 trophy 🏆'},
-   {km:18,bonus:TOKEN_RATES.milestone18,label:'W2 trophy 🏆'},
-   {km:27,bonus:TOKEN_RATES.milestone27,label:'W3 trophy 🏆'},
-   {km:36,bonus:TOKEN_RATES.milestone36,label:'Monthly goal 👸'}
-  ].forEach(m=>{ if(km>=m.km){milestone+=m.bonus;history.push({emoji:'🏆',desc:m.label,amount:m.bonus,type:'milestone'});} });
-  let streak=0;
-  const weekMap={};
-  RUNS.forEach(r=>{
-    if(r.date>todayStr) return;
-    const d=new Date(r.date);
-    const wKey=`${d.getFullYear()}-W${String(Math.ceil(d.getDate()/7)).padStart(2,'0')}`;
-    if(!weekMap[wKey]) weekMap[wKey]={total:0,present:0,label:wKey};
-    weekMap[wKey].total++;
-    if(att[`${r.id}_${mi}`]===1) weekMap[wKey].present++;
-  });
-  Object.values(weekMap).forEach(w=>{
-    if(w.total>=2&&w.present===w.total){streak+=TOKEN_RATES.perfectWeek;history.push({emoji:'🔥',desc:`Perfect week ${w.label}`,amount:TOKEN_RATES.perfectWeek,type:'streak'});}
-  });
-  const firstRun=runs>0?TOKEN_RATES.firstRun:0;
-  if(firstRun>0) history.push({emoji:'🎉',desc:'First run of month',amount:firstRun,type:'first'});
-  const ym=`${new Date().getFullYear()}_${new Date().getMonth()+1}`;
-  const fm=firstMilestonesCache[ym]||{};
-  let firstReach=0;
-  [{key:'W1',threshold:9,rate:TOKEN_RATES.first9,label:'🥇 1st to W1 (9km)',emoji:'🥇'},
-   {key:'W2',threshold:18,rate:TOKEN_RATES.first18,label:'🥇 1st to W2 (18km)',emoji:'🥇'},
-   {key:'W3',threshold:27,rate:TOKEN_RATES.first27,label:'🥇 1st to W3 (27km)',emoji:'🥇'},
-   {key:'M36',threshold:36,rate:TOKEN_RATES.first36,label:'🥇 1st to Monthly Goal',emoji:'👑'}
-  ].forEach(f=>{
-    if(km>=f.threshold&&fm[f.key]&&fm[f.key].mi===mi){firstReach+=f.rate;history.push({emoji:f.emoji,desc:f.label,amount:f.rate,type:'first_reach'});}
-  });
-  const total=base+milestone+streak+firstRun+firstReach;
-  return {base,milestone,streak,firstRun,firstReach,total,km,runs,history};
-}
-
-async function checkAndClaimFirstMilestone(mi) {
-  if (!db) return;
-  const ym=`${new Date().getFullYear()}_${new Date().getMonth()+1}`;
-  const {set,ref:rr}=await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
-  const milestones=[{key:'W1',threshold:9},{key:'W2',threshold:18},{key:'W3',threshold:27},{key:'M36',threshold:36}];
-  const {km}=calcTokens(mi);
-  for (const m of milestones) {
-    const existing=firstMilestonesCache[ym]?.[m.key];
-    if(km>=m.threshold&&!existing){
-      const rec={mi,name:MEMBERS[mi],date:new Date().toISOString().slice(0,10)};
-      if(!firstMilestonesCache[ym]) firstMilestonesCache[ym]={};
-      firstMilestonesCache[ym][m.key]=rec;
-      try { await set(rr(db,`trek_dlut_50km/first_milestones/${ym}/${m.key}`),rec); showFirstMilestoneToast(MEMBERS[mi],m.key,mi); } catch(e){}
-    }
-  }
-}
-
-function showFirstMilestoneToast(name,key,mi){
-  const labels={W1:'Week 1 (9km) 🏆',W2:'Week 2 (18km) 🏆',W3:'Week 3 (27km) 🏆',M36:'Monthly Goal 👸'};
-  const bonuses={W1:TOKEN_RATES.first9,W2:TOKEN_RATES.first18,W3:TOKEN_RATES.first27,M36:TOKEN_RATES.first36};
-  const div=document.createElement('div');
-  div.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7e22ce,#d97706);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:999999;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.3);pointer-events:none;';
-  div.innerHTML=`🥇 ${name} is FIRST to reach ${labels[key]}!<br><span style="font-size:11px;opacity:.9">+${bonuses[key]} DLUT bonus awarded! 🎉</span>`;
-  document.body.appendChild(div);
-  setTimeout(()=>div.remove(),4000);
-}
-
-function renderEarn(){
-  const ac=Math.min(activeCount,MEMBERS.length);
-  const stats=[];
-  for(let mi=0;mi<ac;mi++){
-    const tokenData=calcTokens(mi);
-    const ym2=`${new Date().getFullYear()}_${new Date().getMonth()+1}`;
-    const fm2=firstMilestonesCache[ym2]||{};
-    const firstBadges=['W1','W2','W3','M36'].filter(k=>fm2[k]?.mi===mi).length;
-    stats.push({mi,name:MEMBERS[mi],firstBadges,...tokenData});
-  }
-  stats.sort((a,b)=>b.total-a.total);
-  const maxTok=stats[0]?.total||1;
-  const clubKm=stats.reduce((s,m)=>s+m.km,0);
-  const myTokens=walletMemberIdx>=0?(stats.find(s=>s.mi===walletMemberIdx)?.total||0):0;
-  const kpiBox=document.getElementById('earnKpis');
-  if(kpiBox){
-    kpiBox.innerHTML=`
-      <div class="token-kpi"><div class="token-kpi-icon">💎</div><div class="token-kpi-val">${myTokens>0?myTokens:stats.reduce((a,s)=>a+s.total,0)}</div><div class="token-kpi-label">${myTokens>0?'Your DLUT':'Club Total DLUT'}</div></div>
-      <div class="token-kpi"><div class="token-kpi-icon">🏆</div><div class="token-kpi-val">${stats[0]?.name?.split(' ')[0]||'—'}</div><div class="token-kpi-label">Token Leader</div></div>
-      <div class="token-kpi"><div class="token-kpi-icon">📏</div><div class="token-kpi-val">${Math.round(clubKm*10)/10} km</div><div class="token-kpi-label">Club Distance</div></div>
-      <div class="token-kpi"><div class="token-kpi-icon">🔥</div><div class="token-kpi-val">${stats.filter(s=>s.streak>0).length}</div><div class="token-kpi-label">Perfect Weeks</div></div>`;
-  }
-  const wcBal=document.getElementById('wcBalance');
-  if(wcBal&&walletMemberIdx>=0) wcBal.textContent=myTokens;
-  const ym3=`${new Date().getFullYear()}_${new Date().getMonth()+1}`;
-  const fm3=firstMilestonesCache[ym3]||{};
-  const wmDiv=document.getElementById('firstMilestoneWinners');
-  if(wmDiv){
-    const mList=[{key:'W1',label:'W1 — 9km',emoji:'🏆',color:'#d97706',bonus:TOKEN_RATES.first9},{key:'W2',label:'W2 — 18km',emoji:'🏆',color:'#ca8a04',bonus:TOKEN_RATES.first18},{key:'W3',label:'W3 — 27km',emoji:'🏆',color:'#b45309',bonus:TOKEN_RATES.first27},{key:'M36',label:'Monthly Goal',emoji:'👑',color:'#7e22ce',bonus:TOKEN_RATES.first36}];
-    const rows=mList.map(m=>{
-      const w=fm3[m.key];
-      const ico=w?(getPhoto(w.mi)?`<img src="${getPhoto(w.mi)}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">`:isCustomIcon(w.mi)?`<img src="${getIcon(w.mi)}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">`:`<span style="font-size:16px">${getIcon(w.mi)}</span>`):'';
-      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--artifact-border-light)">
-        <span style="font-size:18px">${m.emoji}</span>
-        <div style="flex:1"><span style="font-size:11px;font-weight:700;color:${m.color}">${m.label}</span>
-        <div style="font-size:12px;margin-top:1px">${w?`${ico}<span style="font-weight:600">${w.name}</span> <span style="color:var(--artifact-text-secondary);font-size:11px">on ${w.date}</span>`:'<span style="color:var(--artifact-text-secondary);font-style:italic">Not yet claimed — be first! 🏃</span>'}</div></div>
-        <span style="font-size:11px;font-weight:800;color:${w?'#7e22ce':'var(--artifact-text-secondary)'}">${w?`+${m.bonus} DLUT 🥇`:`+${m.bonus} DLUT`}</span></div>`;
+  const lb=document.getElementById('leaderboard');
+  if(lb){
+    const sorted=[...stats].sort((a,b)=>b.dlut-a.dlut);
+    const maxD=Math.max(...sorted.map(s=>s.dlut),1);
+    lb.innerHTML=sorted.map((s,i)=>{
+      const rankEmoji=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;
+      return`<div class="leaderboard-row">
+        <div class="lb-rank">${rankEmoji}</div>
+        <div class="lb-avatar">${avatarHtml(s.mi,32)}</div>
+        <div class="lb-info">
+          <div class="lb-name">${MEMBERS[s.mi].name}</div>
+          <div class="lb-dlut">💎 ${s.dlut} DLUT · ${s.km} km</div>
+          <div class="lb-bar"><div class="lb-bar-fill" style="width:${Math.round(s.dlut/maxD*100)}%"></div></div>
+        </div>
+      </div>`;
     }).join('');
-    wmDiv.innerHTML=`<div style="font-size:12px;font-weight:700;color:var(--artifact-text-primary);margin-bottom:4px;padding-top:4px">🥇 First-to-Reach Hall of Fame <span style="font-size:10px;font-weight:400;color:var(--artifact-text-secondary);margin-left:6px">One winner per milestone · resets monthly</span></div>${rows}`;
   }
-  const lb=document.getElementById('earnLeaderboard');
-  if(!lb) return;
-  const rankIcons=['🥇','🥈','🥉'];
-  let lbRows='';
-  stats.forEach((s,i)=>{
-    const photo=getPhoto(s.mi),animal=getIcon(s.mi);
-    const pct=maxTok>0?Math.round(s.total/maxTok*100):0;
-    const rankIco=rankIcons[i]||(i+1);
-    const chips=s.history.map(h=>`<span class="lb-chip ${h.type==='base'?'':'hi'}">${h.emoji} ${h.desc}: +${h.amount}</span>`).join('');
-    const avHtml=photo?`<img src="${photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px">`:isCustomIcon(s.mi)?`<img src="${animal}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px">`:`<span style="font-size:20px;vertical-align:middle;margin-right:5px">${animal}</span>`;
-    lbRows+=`<tr><td class="lb-rank">${rankIco}</td><td><div style="display:flex;align-items:center;margin-bottom:4px">${avHtml}<div><div class="lb-name">${s.name}</div><div class="lb-km">${s.km} km · ${s.runs} runs</div></div></div><div class="lb-breakdown">${chips||'<span class="lb-chip">No runs yet 💤</span>'}</div></td><td style="text-align:right;vertical-align:top"><div class="lb-token">${s.firstBadges>0?`<span style="font-size:11px;color:#7e22ce;margin-right:4px">${'🥇'.repeat(s.firstBadges)}</span>`:''} ${s.total}<span class="sym">DLUT</span></div><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:4px"><span style="font-size:9px;color:var(--artifact-text-secondary)">${pct}%</span><div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${pct}%"></div></div></div></td></tr>`;
-  });
-  lb.innerHTML=`<table class="earn-lb-table"><thead><tr><th style="width:30px">#</th><th>Member & Earnings</th><th class="right">DLUT Tokens</th></tr></thead><tbody>${lbRows}</tbody></table>`;
+  const tx=document.getElementById('txHistory');
+  if(tx){
+    const list=Object.values(bonuses).filter(b=>b.mi===walletMi);
+    tx.innerHTML=list.length===0?'<div style="color:var(--text2);font-size:12px">No transactions yet.</div>':
+      list.map(b=>`<div class="tx-row"><span class="tx-icon">💎</span><span class="tx-desc">${b.reason||'Admin bonus'}</span><span class="tx-amt pos">+${b.amt} DLUT</span></div>`).join('');
+  }
 }
 
-// Web3 / MetaMask
-let walletAddress=null, walletMemberIdx=-1, ethersLib=null;
-async function _loadEthers(){
-  if(ethersLib) return ethersLib;
-  return new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js';s.onload=()=>{ethersLib=window.ethers;res(ethersLib);};s.onerror=()=>rej(new Error('ethers.js failed'));document.head.appendChild(s);});
-}
-window.connectWallet=async function(){
-  if(typeof window.ethereum==='undefined'){alert('MetaMask not found!\n\nInstall from metamask.io and refresh.\n\nYour DLUT points are tracked — wallet is optional!');return;}
-  try{
-    await _loadEthers();
-    const provider=new ethers.providers.Web3Provider(window.ethereum);
-    const accounts=await provider.send('eth_requestAccounts',[]);
-    walletAddress=accounts[0];
-    const short=walletAddress.slice(0,6)+'...'+walletAddress.slice(-4);
-    document.getElementById('wcAddr').textContent=short;
-    document.getElementById('wcConnected').style.display='';
-    document.getElementById('wcDisconnected').style.display='none';
-    if(db) window._fbSet(window._fbRef(db,'trek_dlut_50km/wallets/'+walletAddress.toLowerCase()),{address:walletAddress,connectedAt:Date.now()});
-    const ac=Math.min(activeCount,MEMBERS.length);
-    const name=prompt(`Which member are you?\n\n${MEMBERS.slice(0,ac).map((n,i)=>(i+1)+'. '+n).join('\n')}\n\nEnter your number (1-${ac}):`);
-    const idx=parseInt(name)-1;
-    if(!isNaN(idx)&&idx>=0&&idx<ac){walletMemberIdx=idx;localStorage.setItem('trek_wallet_mi',String(idx));localStorage.setItem('trek_wallet_addr',walletAddress);}
-    renderEarn();
-  }catch(e){console.warn('Wallet connect error',e);}
-};
-window.disconnectWallet=function(){
-  walletAddress=null;walletMemberIdx=-1;
-  localStorage.removeItem('trek_wallet_mi');localStorage.removeItem('trek_wallet_addr');
-  document.getElementById('wcConnected').style.display='none';
-  document.getElementById('wcDisconnected').style.display='';
-  renderEarn();
-};
-window.claimTokens=function(){
-  const mi=walletMemberIdx>=0?walletMemberIdx:0;
-  const tok=calcTokens(mi).total;
-  const m=document.querySelector('#kmOverlay .modal');
-  if(m){document.getElementById('kmOverlay').classList.add('open');m.innerHTML=`<div style="text-align:center"><div style="font-size:48px;margin-bottom:8px">💎</div><div style="font-size:18px;font-weight:800;margin-bottom:6px">${tok} DLUT ready!</div><div style="font-size:12px;color:var(--artifact-text-secondary);line-height:1.6">Smart contract not yet deployed.<br>Deploy on Polygon → airdrop to:<br><code style="font-size:10px;word-break:break-all">${walletAddress||'(connect wallet first)'}</code></div><button class="btn btn-accent" style="margin-top:16px;width:100%" onclick="document.getElementById('kmOverlay').classList.remove('open')">Got it 👍</button></div>`;}
-};
-// Restore wallet on load
-(()=>{const m=localStorage.getItem('trek_wallet_mi'),a=localStorage.getItem('trek_wallet_addr');if(m&&a){walletMemberIdx=parseInt(m);walletAddress=a;const short=a.slice(0,6)+'...'+a.slice(-4);const wc=document.getElementById('wcConnected'),wd=document.getElementById('wcDisconnected'),wa=document.getElementById('wcAddr');if(wc&&wd&&wa){wc.style.display='';wd.style.display='none';wa.textContent=short;}}})();
-
-
-
-// ── BOOT ─────────────────────────────────────────────────
-(async () => {
-  const th = localStorage.getItem('trek_theme');
-  if (th) document.documentElement.dataset.theme = th;
-  loadLocal();
-  renderAll(); // render immediately with local data while Firebase connects
-  const isDefault = FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY';
-  if (isDefault) {
-    document.getElementById('setupOverlay').classList.add('open');
-  } else {
-    const ok = await initFirebase();
-    if (!ok) { updateStatus(false); }
+function renderAdminPanel(){
+  const bm=document.getElementById('bonusMember');
+  if(bm)bm.innerHTML=MEMBERS.slice(0,activeCount).map((m,mi)=>`<option value="${mi}">${m.animal} ${m.name}</option>`).join('');
+  const rag=document.getElementById('ratesAdminGrid');
+  if(rag)rag.innerHTML=[
+    {key:'perKm',label:'Per km (DLUT)'},{key:'firstRun',label:'First run of month'},
+    {key:'w1',label:'W1 milestone (9km)'},{key:'w2',label:'W2 milestone (18km)'},
+    {key:'w3',label:'W3 milestone (27km)'},{key:'monthly',label:'Monthly goal (36km)'},
+    {key:'first_w1',label:'1st to W1'},{key:'first_w2',label:'1st to W2'},
+    {key:'first_w3',label:'1st to W3'},{key:'first_monthly',label:'1st to monthly goal'},
+    {key:'strong',label:'Strong week (Mon-Fri)'},{key:'super',label:'Super week (Mon-Sun)'},
+  ].map(f=>`<div class="admin-row">
+    <span class="admin-label">${f.label}</span>
+    <div class="stepper">
+      <button class="step-btn" onclick="window._app.adjRate('${f.key}',-10)">−</button>
+      <input class="step-val" id="rate_${f.key}" type="number" value="${rates[f.key]}" onchange="rates['${f.key}']=+this.value;renderAll()">
+      <button class="step-btn" onclick="window._app.adjRate('${f.key}',10)">+</button>
+    </div>
+  </div>`).join('');
+  const bl=document.getElementById('bonusLog');
+  if(bl){
+    const list=Object.values(bonuses);
+    bl.innerHTML=list.length===0?'<div style="color:var(--text2);font-size:12px">No bonuses yet.</div>':
+      list.map(b=>`<div class="tx-row"><span class="tx-icon">💎</span><span class="tx-desc">${MEMBERS[b.mi]?.name||'?'} — ${b.reason||'Bonus'}</span><span class="tx-amt pos">+${b.amt} DLUT</span></div>`).join('');
   }
-})();
+}
 
-// ── SWIPE GESTURES (mobile month nav) ─────────────────────
-(function() {
-  let startX = 0, startY = 0;
-  document.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-  }, { passive: true });
-  document.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - startX;
-    const dy = e.changedTouches[0].clientY - startY;
-    // Only horizontal swipe on main area
-    if (Math.abs(dx) > 55 && Math.abs(dy) < 40) {
-      const overlay = document.getElementById('kmOverlay');
-      const memberOverlay = document.getElementById('memberOverlay');
-      if (!overlay.classList.contains('open') && !memberOverlay.classList.contains('open')) {
-        window.changeMonth(dx < 0 ? 1 : -1);
-      }
-    }
-  }, { passive: true });
-})();
+// ── Bottom sheet ──────────────────────────────────────────────────────────
+function openBs(mi,dateKey){
+  bsMi=mi;bsDateKey=dateKey;
+  const m=MEMBERS[mi];
+  document.getElementById('bsAvatar').innerHTML=avatarHtml(mi,44);
+  document.getElementById('bsName').textContent=m.name;
+  const d=new Date(dateKey+'T00:00:00');
+  document.getElementById('bsDate').textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  document.getElementById('bsKm').value=kmData[`mi${mi}_${dateKey}`]||DEFAULT_KM;
+  document.getElementById('bsOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('bsSheet').classList.add('open'),10);
+}
 
-// ── CLOSE MODALS BY TAPPING BACKDROP ──────────────────────
-document.getElementById('kmOverlay').addEventListener('click', function(e) {
-  if (e.target === this) window.closeKm();
-});
-document.getElementById('memberOverlay').addEventListener('click', function(e) {
-  if (e.target === this) this.classList.remove('open');
-});
+function closeBs(){
+  document.getElementById('bsSheet').classList.remove('open');
+  document.getElementById('bsOverlay').classList.remove('open');
+  bsMi=-1;bsDateKey='';
+}
 
-</script>
+function saveBs(state){
+  if(bsMi<0||!bsDateKey)return;
+  const key=`mi${bsMi}_${bsDateKey}`;
+  const km=parseFloat(document.getElementById('bsKm').value)||DEFAULT_KM;
+  if(state===-1){att[key]=0;delete kmData[key];writeData(`att/${key}`,0);writeData(`km/${key}`,null);}
+  else if(state===0){att[key]=-1;kmData[key]=km;writeData(`att/${key}`,-1);writeData(`km/${key}`,km);}
+  else{att[key]=1;kmData[key]=km;writeData(`att/${key}`,1);writeData(`km/${key}`,km);checkFirstMilestones(bsMi);}
+  closeBs();renderAll();
+}
 
-<script>
-  window.GleanBridge.postMessage({
-    actionId: 'export-pdf',
-    type: 'glean-add-menu',
-    metadata: { label: 'Export as PDF', icon: 'export' }
-  });
-  window.GleanBridge.onMessage('action', function(data) {
-    if (data.actionId === 'export-pdf') window.print();
-  });
-</script>
+function adjBsKm(delta){
+  const inp=document.getElementById('bsKm');
+  inp.value=Math.max(0,Math.round((parseFloat(inp.value)+delta)*10)/10);
+}
 
+function bsChangePhoto(){editingMi=bsMi;document.getElementById('bsPhotoInput').click();}
+function handleBsPhoto(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const canvas=document.createElement('canvas');
+    const img=new Image();
+    img.onload=()=>{
+      canvas.width=80;canvas.height=80;
+      const ctx=canvas.getContext('2d');
+      const s=Math.min(img.width,img.height);
+      ctx.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,80,80);
+      const data=canvas.toDataURL('image/jpeg',0.8);
+      photos[editingMi]=data;writeData(`photos/${editingMi}`,data);renderAll();
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);e.target.value='';
+}
+function bsClearPhoto(){if(bsMi<0)return;if(!confirm('Clear photo?'))return;delete photos[bsMi];writeData(`photos/${bsMi}`,null);renderAll();}
+function bsChangeIcon(){editingMi=bsMi;document.getElementById('iconInput').click();}
+function bsClearIcon(){if(bsMi<0)return;if(!confirm('Clear icon?'))return;delete customIcons[bsMi];writeData(`customIcons/${bsMi}`,null);renderAll();}
 
-<!-- ── BOTTOM SHEET ── -->
-<div class="bs-overlay" id="bsOverlay" onclick="bsOverlayClick(event)">
-  <div class="bs-sheet" id="bsSheet">
-    <div class="bs-handle"></div>
-    <div class="bs-header">
+// ── Member modal ──────────────────────────────────────────────────────────
+function openMemberModal(){
+  document.getElementById('activeCount').value=activeCount;
+  renderMemberList();
+  document.getElementById('memberOverlay').classList.remove('hidden');
+}
+function closeMemberModal(){document.getElementById('memberOverlay').classList.add('hidden');}
+
+function renderMemberList(){
+  document.getElementById('memberList').innerHTML=MEMBERS.map((m,mi)=>`
+    <div class="member-row" style="${mi>=activeCount?'opacity:.4':''}">
       <div>
-        <div class="bs-title" id="bsTitle">Member Name</div>
-        <div class="bs-date"  id="bsDate">Date</div>
-      </div>
-      <button onclick="closeBs()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--artifact-text-secondary)">✕</button>
-    </div>
-    <div class="bs-body">
-      <div class="bs-member-info">
-        <div class="bs-avatar" id="bsAvatar"></div>
-        <div>
-          <div class="bs-member-name" id="bsMemberName"></div>
-          <div class="bs-member-sub"  id="bsMemberSub"></div>
+        <button class="member-animal-btn" onclick="window._app.toggleAp(${mi})">
+          ${customIcons[mi]?`<img src="${customIcons[mi]}" style="width:22px;height:22px;border-radius:50%;object-fit:cover">`:m.animal}
+          <span class="change-lbl">Change 🐾</span>
+        </button>
+        <div class="ap-inline" id="ap_${mi}">
+          ${ANIMALS.map(a=>`<button class="ap-emoji" onclick="window._app.selectAnimal(${mi},'${a}')">${a}</button>`).join('')}
+          <button class="ap-upload-btn" onclick="window._app.uploadIcon(${mi})">📂 Browse</button>
+          ${customIcons[mi]?`<button class="ap-clear-btn" onclick="window._app.clearIcon(${mi})">🗑 Clear</button>`:''}
         </div>
       </div>
-      <div class="bs-km-row">
-        <span class="bs-km-label">🏃 Distance (km)</span>
-        <input type="number" class="bs-km-input" id="bsKmInput"
-          min="0" max="99" step="0.5" value="3"
-          inputmode="decimal" pattern="[0-9]*">
-        <div class="bs-km-stepper">
-          <button onclick="bsKmStep(0.5)">＋</button>
-          <button onclick="bsKmStep(-0.5)">－</button>
-        </div>
-      </div>
-      <div class="bs-btns">
-        <button class="bs-btn-present" onclick="bsConfirm(1)">✅ Present</button>
-        <button class="bs-btn-absent"  onclick="bsConfirm(2)">❌ Absent</button>
-        <button class="bs-btn-clear"   onclick="bsConfirm(0)">⬜ Clear</button>
-      </div>
-      <!-- Photo & icon management row -->
-      <div id="bsAvatarActions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;padding-top:10px;border-top:1px solid var(--artifact-border-light,#e5e5e5)">
-        <button id="bsChangePhoto" onclick="bsUploadPhoto()" style="flex:1;min-width:120px;padding:8px 10px;background:#f0f9ff;border:1.5px solid #3b82f6;color:#1d4ed8;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">📸 Change photo</button>
-        <button id="bsClearPhoto"  onclick="bsClearFacePhoto()" style="flex:1;min-width:120px;padding:8px 10px;background:#fff5f5;border:1.5px solid #ef4444;color:#dc2626;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:none">🗑 Clear photo</button>
-        <button id="bsChangeIcon"  onclick="bsOpenAnimalPicker()" style="flex:1;min-width:120px;padding:8px 10px;background:#f5f3ff;border:1.5px solid #7c3aed;color:#6d28d9;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">🐾 Change icon</button>
-        <button id="bsClearIcon"   onclick="bsClearAnimalIcon()" style="flex:1;min-width:120px;padding:8px 10px;background:#fff8e1;border:1.5px solid #f59e0b;color:#92400e;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:none">🗑 Clear icon</button>
-      </div>
-    </div>
-  </div>
-</div>
+      <input class="member-name-input" value="${m.name}" onchange="MEMBERS[${mi}].name=this.value" placeholder="Name">
+      <input class="member-lt-input" type="number" value="${m.ltKm||''}" onchange="MEMBERS[${mi}].ltKm=+this.value" placeholder="LT km">
+      <input class="member-date-input" type="date" value="${m.ltDate||''}" onchange="MEMBERS[${mi}].ltDate=this.value">
+    </div>`).join('');
+}
 
+function toggleAp(mi){document.getElementById(`ap_${mi}`).classList.toggle('open');}
+function selectAnimal(mi,animal){MEMBERS[mi].animal=animal;delete customIcons[mi];writeData(`customIcons/${mi}`,null);document.getElementById(`ap_${mi}`).classList.remove('open');renderMemberList();}
+function uploadIcon(mi){editingMi=mi;document.getElementById('iconInput').click();}
+function clearIcon(mi){delete customIcons[mi];writeData(`customIcons/${mi}`,null);renderMemberList();}
+function adjActive(delta){
+  const inp=document.getElementById('activeCount');
+  activeCount=Math.max(1,Math.min(10,parseInt(inp.value)+delta));
+  inp.value=activeCount;renderMemberList();
+}
+function saveMembers(){
+  activeCount=parseInt(document.getElementById('activeCount').value)||10;
+  writeData('members',MEMBERS);writeData('activeCount',activeCount);
+  closeMemberModal();renderAll();
+}
 
+// ── Photo/icon upload ─────────────────────────────────────────────────────
+function openPhotoUpload(mi){editingMi=mi;document.getElementById('photoInput').click();}
+function handlePhotoUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const canvas=document.createElement('canvas');
+    const img=new Image();
+    img.onload=()=>{
+      canvas.width=80;canvas.height=80;
+      const ctx=canvas.getContext('2d');
+      const s=Math.min(img.width,img.height);
+      ctx.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,80,80);
+      const data=canvas.toDataURL('image/jpeg',0.8);
+      photos[editingMi]=data;writeData(`photos/${editingMi}`,data);renderAll();
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);e.target.value='';
+}
+function handleIconUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{customIcons[editingMi]=ev.target.result;writeData(`customIcons/${editingMi}`,ev.target.result);renderMemberList();renderAll();};
+  reader.readAsDataURL(file);e.target.value='';
+}
+
+// ── Admin ─────────────────────────────────────────────────────────────────
+function checkAdminPass(){
+  if(document.getElementById('adminPassInput').value==='1233'){
+    adminUnlocked=true;
+    document.getElementById('adminLock').classList.add('hidden');
+    document.getElementById('adminPanel').classList.remove('hidden');
+    renderAdminPanel();
+  }else showToast('❌ Wrong passcode');
+}
+function awardBonus(){
+  const mi=parseInt(document.getElementById('bonusMember').value);
+  const amt=parseInt(document.getElementById('bonusAmt').value)||0;
+  const reason=document.getElementById('bonusReason').value||'Admin bonus';
+  if(amt<=0)return showToast('Enter valid amount');
+  const id=`bonus_${Date.now()}`;
+  const bonus={mi,amt,reason,date:new Date().toISOString()};
+  bonuses[id]=bonus;writeData(`bonuses/${id}`,bonus);
+  showToast(`💎 +${amt} DLUT → ${MEMBERS[mi].name}!`);renderAll();
+}
+function addPrize(){
+  const emoji=document.getElementById('prizeEmoji').value||'🎁';
+  const name=document.getElementById('prizeName').value;
+  const cost=parseInt(document.getElementById('prizeCost').value)||100;
+  if(!name)return showToast('Enter prize name');
+  const id=`prize_${Date.now()}`;
+  prizes[id]={emoji,name,cost};writeData(`prizes/${id}`,{emoji,name,cost});
+  showToast(`🎁 "${name}" added!`);renderAll();
+}
+function redeemPrize(id){
+  const p=prizes[id];if(!p)return;
+  if(calcTokens(walletMi)<p.cost)return showToast('Not enough DLUT!');
+  if(!confirm(`Redeem "${p.name}" for ${p.cost} DLUT?`))return;
+  prizes[id].redeemedBy=walletMi;writeData(`prizes/${id}/redeemedBy`,walletMi);
+  showToast(`🎁 Redeemed "${p.name}"!`);renderAll();
+}
+function adjRate(key,delta){
+  rates[key]=Math.max(0,(rates[key]||0)+delta);
+  const inp=document.getElementById(`rate_${key}`);
+  if(inp)inp.value=rates[key];
+  renderAll();
+}
+function saveRates(){writeData('rates',rates);showToast('💾 Rates saved!');renderAll();}
+function resetRates(){rates={...DEFAULT_RATES};writeData('rates',rates);renderAdminPanel();renderAll();showToast('↺ Rates reset');}
+function openRatesAdmin(){switchTab('admin');}
+
+// ── Tabs & nav ────────────────────────────────────────────────────────────
+function switchTab(t){
+  curTab=t;
+  ['race','att','earn','admin'].forEach(id=>{
+    document.getElementById(`tab-${id}`).classList.toggle('hidden',id!==t);
+    document.getElementById(`tab-${id}-btn`).classList.toggle('active',id===t);
+  });
+}
+function prevMonth(){curMonth--;if(curMonth<0){curMonth=11;curYear--;}renderAll();}
+function nextMonth(){curMonth++;if(curMonth>11){curMonth=0;curYear++;}renderAll();}
+function setWalletMi(mi){walletMi=mi;renderAll();}
+
+function confirmReset(){
+  const pass=prompt('Enter passcode to reset all data:');
+  if(pass!=='1233')return showToast('❌ Wrong passcode');
+  if(!confirm('Reset ALL data? Cannot be undone!'))return;
+  att={};kmData={};photos={};customIcons={};prizes={};bonuses={};firstMilestones={};
+  if(db)db.ref('trek_dlut_50km').set({members:MEMBERS,activeCount});
+  renderAll();showToast('🗑 All data reset');
+}
+
+function showToast(msg,dur=2500){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+// ── Download ──────────────────────────────────────────────────────────────
+function downloadApp(){
+  const html=document.documentElement.outerHTML;
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='index.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('⬇️ Downloading index.html...');
+}
+
+// ── Swipe ─────────────────────────────────────────────────────────────────
+let touchStartX=0;
+document.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  if(Math.abs(dx)>60){if(dx<0)nextMonth();else prevMonth();}
+},{passive:true});
+
+// ── Expose to window ──────────────────────────────────────────────────────
+window._app={
+  openBs,closeBs,saveBs,adjBsKm,
+  bsChangePhoto,handleBsPhoto,bsClearPhoto,bsChangeIcon,bsClearIcon,
+  openMemberModal,closeMemberModal,saveMembers,adjActive,
+  toggleAp,selectAnimal,uploadIcon,clearIcon,
+  openPhotoUpload,handlePhotoUpload,handleIconUpload,
+  checkAdminPass,awardBonus,addPrize,redeemPrize,adjRate,saveRates,resetRates,openRatesAdmin,
+  switchTab,prevMonth,nextMonth,setWalletMi,confirmReset,downloadApp
+};
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+initFirebase();
+</script>
 </body>
 </html>
