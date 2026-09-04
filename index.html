@@ -585,7 +585,13 @@ function powerLevel(mi){
 // ─── KM & TOKENS ───────────────────────────────────────────────────────────
 function memberKm(mi){
   const td=today();let t=0;const days=daysInMonth(Y,Mo);
-  for(let d=1;d<=days;d++){const k2=dk(Y,Mo,d);if(k2>td)continue;if((att[`mi${mi}_${k2}`]||0)===1)t+=parseFloat(km[`mi${mi}_${k2}`]||DEF_KM);}
+  const isPast=(Y<new Date().getFullYear())||(Y===new Date().getFullYear()&&Mo<new Date().getMonth());
+  for(let d=1;d<=days;d++){
+    const k2=dk(Y,Mo,d);
+    // For past months count ALL days; for current month only count up to today
+    if(!isPast&&k2>td)continue;
+    if((att[`mi${mi}_${k2}`]||0)===1)t+=parseFloat(km[`mi${mi}_${k2}`]||DEF_KM);
+  }
   return Math.round(t*10)/10;
 }
 function stats(){
@@ -699,6 +705,8 @@ function renderRace(st){
 function renderMatrix(){
   const tbl=document.getElementById('matrixTable');if(!tbl)return;
   const days=daysInMonth(Y,Mo),td=today(),dn=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  // For past months, don't grey out any cells — all are clickable
+  const isPastMonth=(Y<new Date().getFullYear())||(Y===new Date().getFullYear()&&Mo<new Date().getMonth());
   let h='<thead><tr><th>Member</th>';
   for(let d=1;d<=days;d++){const k2=dk(Y,Mo,d),dw2=dow(Y,Mo,d),isT=k2===td;h+=`<th style="${isT?'color:var(--accent)':''}">${d}<br><span style="font-size:7px;font-weight:400">${dn[dw2]}</span></th>`;}
   h+='</tr></thead><tbody>';
@@ -706,7 +714,9 @@ function renderMatrix(){
     const m=gm(mi);
     h+=`<tr><td><div class="m-av"><div class="m-av-ico">${avHtml(mi,'100%')}</div>${(m.name||'').split(' ')[0]}</div></td>`;
     for(let d=1;d<=days;d++){
-      const k2=dk(Y,Mo,d),key=`mi${mi}_${k2}`,s=att[key]||0,kv=km[key]||'',lv=cellLevel(mi,k2),fut=k2>td;
+      const k2=dk(Y,Mo,d),key=`mi${mi}_${k2}`,s=att[key]||0,kv=km[key]||'',lv=cellLevel(mi,k2);
+      // Only grey out future dates in current month; past months are all accessible
+      const fut=!isPastMonth&&k2>td;
       const cc=s===1?(lv==='super'?'c-ssj3':lv==='strong'?'c-ssj':'c-present'):s===-1?'c-absent':'';
       const ci=s===1?(lv==='super'?'🦸':lv==='strong'?'💪':'🥋'):s===-1?'💀':'⬜';
       const isT=k2===td;
