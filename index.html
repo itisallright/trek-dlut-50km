@@ -37,7 +37,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .scroll-area::-webkit-scrollbar{width:3px}
 .scroll-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-/* RACE */
+/* RACE — default style */
 .race-header{padding:10px 14px 6px;display:flex;align-items:center;justify-content:space-between}
 .race-title{font-size:12px;font-weight:700;color:var(--gold)}
 .race-hint{font-size:9px;color:var(--text2)}
@@ -88,6 +88,87 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .runner.ssj3 .runner-body{filter:drop-shadow(0 0 5px #b44fff) drop-shadow(0 0 12px #b44fff)}
 .runner.god .runner-body{filter:drop-shadow(0 0 6px #ff4500) drop-shadow(0 0 14px #ff4500)}
 .runner.ui .runner-body{filter:drop-shadow(0 0 6px #c0c0ff) drop-shadow(0 0 16px #c0c0ff)}
+
+/* ── OLYMPUS THEME (September only) ── */
+.olympus-wrap{padding:0 0 16px}
+.olympus-hero{position:relative;width:100%;height:160px;overflow:hidden;margin-bottom:0;flex-shrink:0}
+.olympus-sky{position:absolute;inset:0;background:linear-gradient(180deg,#0a0a2e 0%,#1a1040 30%,#2d1b5e 55%,#4a2060 70%,#6b3070 85%,#8b4080 100%)}
+/* stars */
+.olympus-stars{position:absolute;inset:0;pointer-events:none}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite var(--delay,0s)}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+/* mountain silhouette */
+.olympus-mountain{position:absolute;bottom:0;left:0;right:0}
+/* clouds */
+.olympus-cloud{position:absolute;border-radius:50px;background:rgba(255,255,255,.08);filter:blur(6px);animation:cloudDrift var(--cd,20s) linear infinite}
+@keyframes cloudDrift{0%{transform:translateX(-120%)}100%{transform:translateX(120vw)}}
+/* lightning */
+.olympus-lightning{position:absolute;top:10px;font-size:22px;animation:lightningFlash 4s ease-in-out infinite;opacity:0}
+@keyframes lightningFlash{0%,85%,100%{opacity:0}87%,91%{opacity:1}89%,93%{opacity:0}95%{opacity:.7}}
+/* title */
+.olympus-title{position:absolute;top:12px;left:0;right:0;text-align:center;z-index:10}
+.olympus-title-main{font-size:16px;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(180,100,255,.8),0 2px 4px rgba(0,0,0,.8);letter-spacing:2px;text-transform:uppercase}
+.olympus-title-sub{font-size:9px;color:rgba(255,255,255,.6);letter-spacing:3px;text-transform:uppercase;margin-top:2px}
+/* month badge */
+.olympus-badge{position:absolute;top:12px;right:12px;background:linear-gradient(135deg,#7c6fff,#b44fff);border-radius:20px;padding:3px 10px;font-size:9px;font-weight:800;color:#fff;letter-spacing:.5px;box-shadow:0 2px 10px rgba(124,111,255,.5)}
+/* peak icon */
+.olympus-peak{position:absolute;top:28px;left:50%;transform:translateX(-50%);font-size:28px;filter:drop-shadow(0 0 12px rgba(255,215,0,.8));animation:peakGlow 2s ease-in-out infinite}
+@keyframes peakGlow{0%,100%{filter:drop-shadow(0 0 8px rgba(255,215,0,.6))}50%{filter:drop-shadow(0 0 20px rgba(255,215,0,1)) drop-shadow(0 0 40px rgba(255,215,0,.4))}}
+
+/* racer row — olympus style */
+.oly-racer{display:flex;align-items:center;gap:6px;padding:4px 14px;margin-bottom:4px}
+.oly-rank{width:16px;text-align:center;font-size:11px;font-weight:800;flex-shrink:0}
+.oly-card{width:168px;flex-shrink:0;border-radius:var(--radius-sm);padding:6px 7px;display:flex;align-items:center;gap:6px;position:relative;overflow:hidden}
+@media(max-width:480px){.oly-card{width:100px}}
+.oly-card::before{content:'';position:absolute;inset:0;border-radius:var(--radius-sm);opacity:.15}
+.oly-av{width:32px;height:32px;border-radius:50%;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;flex-shrink:0;position:relative;-webkit-tap-highlight-color:transparent;border:2px solid rgba(255,255,255,.2)}
+.oly-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.oly-name{font-size:10px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.oly-km{font-size:11px;font-weight:800}
+.oly-dlut{font-size:8px;color:var(--gold);font-weight:600}
+
+/* mountain road */
+.oly-road-wrap{flex:1;position:relative;height:52px;border-radius:var(--radius-sm);overflow:visible}
+/* SVG mountain path inside road */
+.oly-road-svg{position:absolute;inset:0;width:100%;height:100%}
+/* checkpoints */
+.oly-checkpoint{position:absolute;bottom:4px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;z-index:3;pointer-events:none}
+.oly-cp-icon{font-size:11px;filter:grayscale(1);opacity:.35;transition:all .5s;line-height:1}
+.oly-cp-icon.reached{filter:none;opacity:1;animation:cpReach .6s ease}
+.oly-cp-lbl{font-size:6px;font-weight:700;line-height:1;margin-top:1px;opacity:.6}
+.oly-cp-icon.reached+.oly-cp-lbl{opacity:1;color:var(--gold)}
+@keyframes cpReach{0%{transform:scale(.3) rotate(-20deg)}60%{transform:scale(1.5) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+/* peak flag */
+.oly-peak-flag{position:absolute;right:-4px;top:2px;font-size:22px;filter:grayscale(1);opacity:.3;transition:all .5s;z-index:4;transform-origin:bottom center}
+.oly-peak-flag.reached{filter:none;opacity:1;animation:peakReach .8s ease forwards}
+@keyframes peakReach{0%{transform:scale(.2) translateY(10px)}50%{transform:scale(1.3) translateY(-4px)}70%{transform:scale(.9)}100%{transform:scale(1)}}
+/* runner on mountain */
+.oly-runner{position:absolute;transition:left .9s cubic-bezier(.34,1.56,.64,1),bottom .9s cubic-bezier(.34,1.56,.64,1);display:flex;flex-direction:column;align-items:center;gap:1px;z-index:5}
+.oly-runner-body{font-size:18px;line-height:1;transition:filter .4s}
+.oly-runner-body img{width:24px;height:24px;border-radius:50%;object-fit:cover}
+.oly-runner-tag{font-size:6px;font-weight:700;color:#fff;background:rgba(0,0,0,.7);border-radius:3px;padding:1px 3px;white-space:nowrap;line-height:1.4}
+.oly-runner-dlut{font-size:6px;color:var(--gold);font-weight:700;background:rgba(0,0,0,.6);border-radius:3px;padding:1px 3px;line-height:1.4}
+.oly-runner-quote{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:rgba(20,10,40,.95);border:1px solid rgba(124,111,255,.4);border-radius:var(--radius-sm);padding:2px 6px;font-size:7px;color:#e0d0ff;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;z-index:10;box-shadow:0 2px 12px rgba(124,111,255,.3)}
+.oly-runner-quote::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:3px solid transparent;border-top-color:rgba(124,111,255,.4)}
+/* power glows on olympus */
+.oly-runner.ssj .oly-runner-body{filter:drop-shadow(0 0 5px #ffd700) drop-shadow(0 0 10px #ffd700)}
+.oly-runner.ssj3 .oly-runner-body{filter:drop-shadow(0 0 5px #b44fff) drop-shadow(0 0 12px #b44fff)}
+.oly-runner.god .oly-runner-body{filter:drop-shadow(0 0 6px #ff4500) drop-shadow(0 0 14px #ff4500)}
+.oly-runner.ui .oly-runner-body{filter:drop-shadow(0 0 8px #fff) drop-shadow(0 0 20px #c0c0ff)}
+/* winner slots — olympus */
+.oly-winners{display:flex;padding:4px 14px 6px}
+.oly-winner-spacer{width:186px;flex-shrink:0}
+@media(max-width:480px){.oly-winner-spacer{width:108px}}
+.oly-winner-road{flex:1;margin-right:42px;position:relative;height:32px}
+/* story banner */
+.oly-story{margin:0 14px 8px;padding:8px 12px;background:linear-gradient(135deg,rgba(124,111,255,.12),rgba(180,79,255,.08));border:1px solid rgba(124,111,255,.25);border-radius:var(--radius-sm);font-size:9px;color:rgba(200,180,255,.8);line-height:1.6;text-align:center;font-style:italic}
+.oly-story strong{color:#c8b4ff;font-style:normal}
+/* zone labels */
+.oly-zone-bar{display:flex;padding:0 14px 2px}
+.oly-zone-spacer{width:186px;flex-shrink:0}
+@media(max-width:480px){.oly-zone-spacer{width:108px}}
+.oly-zone-road{flex:1;margin-right:42px;position:relative;height:14px}
+.oly-zone-lbl{position:absolute;transform:translateX(-50%);font-size:6px;font-weight:700;text-align:center;line-height:1.2;bottom:0;text-transform:uppercase;letter-spacing:.3px}
 /* ATTENDANCE */
 .att-wrap{padding:10px 12px}
 .matrix-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius-sm);border:1px solid var(--border)}
@@ -413,6 +494,11 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
                 <button class="btn-ghost" onclick="_a.resetRates()">↺ Reset</button>
               </div>
             </div>
+            <div style="margin-bottom:16px">
+              <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🎯 Monthly Goal (km)</div>
+              <div style="font-size:10px;color:var(--text2);margin-bottom:8px">Set the km goal for each month. Default is 36km.</div>
+              <div id="monthGoalAdmin"></div>
+            </div>
             <div>
               <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📋 Bonus Log</div>
               <div id="bonusLog"></div>
@@ -468,14 +554,15 @@ function translateOldKeys(rawAtt, rawKm){
 const DEF_M=[{name:'Hai Bui',animal:'🐯',ltKm:0,ltDate:''},{name:'Chinh Ton',animal:'🦊',ltKm:0,ltDate:''},{name:'Khoa Vo',animal:'🐸',ltKm:0,ltDate:''},{name:'Truong Nguyen',animal:'🐼',ltKm:0,ltDate:''},{name:'Thien Le',animal:'🐱',ltKm:0,ltDate:''},{name:'Hoang Tran',animal:'🐻',ltKm:0,ltDate:''},{name:'Tri Nguyen',animal:'🦁',ltKm:0,ltDate:''},{name:'Member 8',animal:'🐨',ltKm:0,ltDate:''},{name:'Member 9',animal:'🐮',ltKm:0,ltDate:''},{name:'Member 10',animal:'🐶',ltKm:0,ltDate:''}];
 const ANIMALS=['🐯','🦊','🐸','🐼','🐱','🐻','🦁','🐨','🐮','🐶','🐺','🦝','🐰','🦄','🐧','🦅','🐬','🦈','🐉','🐘','🦒','🐫','🦙','🏃','🚴','⚡','🔥','💪','🥷','🦸','🎯','🌟'];
 const DEF_R={perKm:10,firstRun:20,w1:100,w2:200,w3:300,monthly:500,first_w1:50,first_w2:50,first_w3:50,first_monthly:100,strong:100,super:200};
-const GOAL=36,DEF_KM=3;
+let GOAL=36; // default, overridden per-month by admin
+const DEF_KM=3;
 const QT=["Fear me, mortals! 🔥","My shoes are still in the box 📦","PANIC RUN ACTIVATED! 😱","I run so I can eat more 🍜","Pain is just weakness leaving 💪","My legs said no but I said yes 🦵","Running late... to the run 😅","Sweat is just fat crying 😭","My spirit animal is a sloth 🦥","Breathing is optional right? 😮‍💨","Running: cheaper than therapy 💆","Fueled by spite and snacks 🍪","Why walk when you can suffer? 🏃","My knees filed a complaint 🦵","Send help. And snacks. 🆘","Running on caffeine and regret ☕","I peaked at the starting line 🏁","Legs: sore. Spirit: broken. Still running. 💀","I run for the post-run food 🍕","36km = 36×1km. Easy math! 📐","Is this a road or a treadmill? 🤔","One more km... said no one ever 😤","Certified road destroyer 🛣️","My GPS thinks I'm lost 📍"];
 
 // ─── STATE ─────────────────────────────────────────────────────────────────
 let db=null;
 let M=DEF_M.map((m,i)=>({...m,i})),AC=10;
 // att/km use Firebase keys: att[mi0_2026-08-03] = 1/-1/0
-let att={},km={},photos={},icons={},prizes={},bonuses={},rates={...DEF_R},fm={};
+let att={},km={},photos={},icons={},prizes={},bonuses={},rates={...DEF_R},fm={},monthGoals={};
 const now=new Date();
 let Y=now.getFullYear(),Mo=now.getMonth(); // boot to current month
 let tab='race',wMi=0,eMi=-1,bsMi=-1,bsDk='',adminOk=false;
@@ -501,8 +588,8 @@ function initFB(){
       prizes = v.prizes  || {};
       bonuses= v.bonuses || {};
       if(v.rates) rates={...DEF_R,...v.rates};
-      // CRITICAL: Firebase stores as "firstMilestones" not "fm"
-      fm     = v.firstMilestones || v.fm || {};
+      fm         = v.firstMilestones || v.fm || {};
+      monthGoals = v.monthGoals || {};
       // Update status
       document.getElementById('statusDot').classList.add('online');
       document.getElementById('statusLbl').textContent='Live';
@@ -538,6 +625,11 @@ function dkey(y,m,d){return`${y}-${String(m+1).padStart(2,'0')}-${String(d).padS
 function dowOf(y,m,d){return new Date(y,m,d).getDay();}
 function todayKey(){const t=new Date();return dkey(t.getFullYear(),t.getMonth(),t.getDate());}
 function isPastMonth(){return Y<now.getFullYear()||(Y===now.getFullYear()&&Mo<now.getMonth());}
+// Returns the goal km for the currently viewed month (admin-adjustable per month)
+function getGoal(){
+  const mk=`${Y}-${Mo}`;
+  return Number(monthGoals[mk]||36);
+}
 
 // ─── POWER LEVEL ───────────────────────────────────────────────────────────
 function strongWeek(mi){
@@ -652,7 +744,38 @@ function renderKPIs(st){
   document.getElementById('kpiOnTrack').textContent=ot+'/'+AC;
 }
 
+// ── Olympus zone config ────────────────────────────────────────────────────
+const OLY_ZONES=[
+  {pct:0,  label:'🌊 Shore',   color:'#1a3a5c', textColor:'#7ab8e8'},
+  {pct:25, label:'🌲 Forest',  color:'#1a3d1a', textColor:'#6dbf6d'},
+  {pct:50, label:'⛰️ Cliffs',  color:'#3d2a1a', textColor:'#c8956a'},
+  {pct:75, label:'❄️ Summit',  color:'#2a2a4a', textColor:'#a0a0e0'},
+  {pct:100,label:'⚡ Olympus', color:'#3a1a5c', textColor:'#c8a0ff'},
+];
+const OLY_QUOTES=[
+  "The gods are watching 👁️","Zeus approves this run ⚡","Hercules started here too 💪",
+  "Every step echoes in Olympus 🏔️","The mountain calls... 🗻","Mortals don't climb this high 😤",
+  "Lightning in my veins ⚡","Poseidon pushed me here 🌊","Ares fuels my legs 🔥",
+  "The summit awaits, warrior! 🏆","Even gods had to train 💪","Fear the runner who smiles 😈",
+  "Olympus or bust! 🏔️","The path is steep. Good. 😤","Clouds below, glory above ☁️",
+];
+const OLY_CHECKPOINTS=[
+  {pct:25, icon:'🌲', label:'Forest\n9km',  km:9 },
+  {pct:50, icon:'⛰️', label:'Cliffs\n18km', km:18},
+  {pct:75, icon:'❄️', label:'Summit\n27km', km:27},
+];
+
+function isOlympusMonth(){return Mo===8;} // September = index 8
+
 function renderRace(st){
+  if(isOlympusMonth()){
+    renderOlympusRace(st);
+  } else {
+    renderDefaultRace(st);
+  }
+}
+
+function renderDefaultRace(st){
   const msr=document.getElementById('msRoad');
   if(msr)msr.innerHTML=[{p:25,l:'🏆W1<br>9km'},{p:50,l:'🏆W2<br>18km'},{p:75,l:'🏆W3<br>27km'},{p:100,l:'🎯<br>36km'}].map(m=>`<div class="ms-lbl" style="left:${m.p}%">${m.l}</div>`).join('');
   const wr2=document.getElementById('winnerRoad');
@@ -672,7 +795,7 @@ function renderRace(st){
     const re=rank===0?'🥇':rank===1?'🥈':rank===2?'🥉':`${rank+1}`;
     const p2=gp(s.mi),ic=gi(s.mi),m2=gm(s.mi);
     const si=p2?`<img src="${p2}" alt="" style="width:24px;height:24px;border-radius:50%;object-fit:cover">`:ic?`<img src="${ic}" alt="" style="width:24px;height:24px;border-radius:50%;object-fit:cover">`:`<span style="font-size:18px">${m2.animal||'🏃'}</span>`;
-    const tr=[{p:25,k:9,l:'W1'},{p:50,k:18,l:'W2'},{p:75,k:27,l:'W3'}].map(t=>`<div class="trophy" style="left:${t.p}%"><div class="trophy-icon ${s.km>=t.k?'hit':''}">🏆</div><div class="trophy-lbl">${t.l}</div></div>`).join('');
+    const tr=OLY_CHECKPOINTS.map(t=>`<div class="trophy" style="left:${t.pct}%"><div class="trophy-icon ${s.km>=t.km?'hit':''}">🏆</div><div class="trophy-lbl">${t.km}km</div></div>`).join('');
     return`<div class="racer">
       <div class="racer-rank">${re}</div>
       <div class="racer-card">
@@ -700,6 +823,161 @@ function renderRace(st){
       </div>
     </div>`;
   }).join('');
+}
+
+function renderOlympusRace(st){
+  const track=document.getElementById('raceTrack');if(!track)return;
+  const pod=podium();
+  const mk=`${Y}-${Mo}`,f=fm[mk]||{};
+
+  // Generate stars HTML
+  const stars=Array.from({length:30},(_,i)=>{
+    const x=Math.random()*100,y=Math.random()*70;
+    const size=Math.random()*2+1;
+    const d=(2+Math.random()*3).toFixed(1)+'s';
+    const delay=(Math.random()*3).toFixed(1)+'s';
+    return`<div class="star" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;--d:${d};--delay:${delay}"></div>`;
+  }).join('');
+
+  // Mountain SVG silhouette
+  const mountainSvg=`<svg class="olympus-mountain" viewBox="0 0 400 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,80 L0,60 Q20,55 40,58 L80,40 L100,45 L140,20 L160,25 L200,5 L240,25 L260,20 L300,40 L320,35 L360,55 L380,50 L400,55 L400,80 Z" fill="#1a0a30" opacity="0.9"/>
+    <path d="M0,80 L0,70 Q30,65 60,68 L100,55 L130,58 L170,38 L190,42 L220,28 L250,42 L280,38 L310,52 L340,48 L370,60 L400,58 L400,80 Z" fill="#120820" opacity="0.95"/>
+    <path d="M180,5 L200,0 L220,5 L215,12 L205,8 L195,12 Z" fill="#f5c842" opacity="0.6"/>
+  </svg>`;
+
+  // Hero banner
+  const heroHtml=`<div class="olympus-hero">
+    <div class="olympus-sky"></div>
+    <div class="olympus-stars">${stars}</div>
+    <div class="olympus-cloud" style="width:120px;height:30px;top:30%;--cd:18s;left:-120px"></div>
+    <div class="olympus-cloud" style="width:80px;height:20px;top:50%;--cd:25s;left:-80px;animation-delay:-8s"></div>
+    <div class="olympus-cloud" style="width:100px;height:25px;top:20%;--cd:22s;left:-100px;animation-delay:-14s"></div>
+    <div class="olympus-lightning" style="left:15%">⚡</div>
+    <div class="olympus-lightning" style="right:18%;animation-delay:-2s">⚡</div>
+    ${mountainSvg}
+    <div class="olympus-title">
+      <div class="olympus-title-main">⚡ Road to Olympus ⚡</div>
+      <div class="olympus-title-sub">September 2026 · 36km to the Peak</div>
+    </div>
+    <div class="olympus-badge">SEP 2026</div>
+    <div class="olympus-peak" style="top:auto;bottom:32px">🏔️</div>
+  </div>`;
+
+  // Story banner
+  const topKm=st.length>0?st[0].km:0;
+  const zone=OLY_ZONES.slice().reverse().find(z=>topKm/(GOAL/100)>=z.pct)||OLY_ZONES[0];
+  const storyHtml=`<div class="oly-story">
+    <strong>⚡ The Legend of September</strong><br>
+    The gods of Olympus have issued a challenge — <strong>36km</strong> through forest, cliffs, and eternal snow to reach the peak where Zeus awaits.<br>
+    The leader has reached <strong>${zone.label}</strong>. The summit is ${Math.max(0,GOAL-topKm).toFixed(1)}km away...
+  </div>`;
+
+  // Zone labels bar
+  const zoneBarHtml=`<div class="oly-zone-bar">
+    <div class="oly-zone-spacer"></div>
+    <div class="oly-zone-road">
+      ${OLY_CHECKPOINTS.map(cp=>`<div class="oly-zone-lbl" style="left:${cp.pct}%;color:${OLY_ZONES.find(z=>z.pct===cp.pct)?.textColor||'#888'}">${cp.icon}</div>`).join('')}
+      <div class="oly-zone-lbl" style="left:100%;color:#c8a0ff">⚡</div>
+    </div>
+  </div>`;
+
+  // Winner slots
+  const winnersHtml=`<div class="oly-winners">
+    <div class="oly-winner-spacer"></div>
+    <div class="oly-winner-road">
+      ${[{p:25,mi:f.w1,b:'🥇'},{p:50,mi:f.w2,b:'🥇'},{p:75,mi:f.w3,b:'🥇'},{p:100,mi:f.goal,b:'👑'}].map(s=>{
+        const has=s.mi!==undefined&&s.mi!==null,mi=has?Number(s.mi):null;
+        return`<div class="w-slot" style="left:${s.p}%"><div class="w-av" style="${has?'border-color:var(--gold)':''}">${has?avHtml(mi):'?'}${has?`<span class="w-badge">${s.b}</span>`:''}</div><div class="w-name">${has?(gm(mi).name||'?').split(' ')[0]:'?'}</div></div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  // Racer rows
+  const racerRows=st.map((s,rank)=>{
+    const m=gm(s.mi);
+    const pct=Math.min(100,(s.km/GOAL)*100);
+    const pl=powerLevel(s.mi);
+    const pp=pod.indexOf(s.mi);
+    const hb=pp===0?'👑':pp===1?'🎉':pp===2?'🧻':'';
+    const re=rank===0?'🥇':rank===1?'🥈':rank===2?'🥉':`${rank+1}`;
+    const q=OLY_QUOTES[(s.mi+Math.floor(Date.now()/86400000))%OLY_QUOTES.length];
+    const p2=gp(s.mi),ic=gi(s.mi),m2=gm(s.mi);
+    const si=p2?`<img src="${p2}" alt="" style="width:24px;height:24px;border-radius:50%;object-fit:cover">`:ic?`<img src="${ic}" alt="" style="width:24px;height:24px;border-radius:50%;object-fit:cover">`:`<span style="font-size:18px">${m2.animal||'🏃'}</span>`;
+
+    // Zone-based road background
+    const curZone=OLY_ZONES.slice().reverse().find(z=>pct>=z.pct)||OLY_ZONES[0];
+    const nextZone=OLY_ZONES[OLY_ZONES.findIndex(z=>z.pct===curZone.pct)+1]||curZone;
+    const roadBg=`linear-gradient(90deg,${OLY_ZONES[0].color},${OLY_ZONES[1].color} 25%,${OLY_ZONES[2].color} 50%,${OLY_ZONES[3].color} 75%,${OLY_ZONES[4].color})`;
+
+    // Card gradient based on zone
+    const cardBg=`linear-gradient(135deg,${curZone.color}cc,${curZone.color}66)`;
+    const cardBorder=curZone.textColor;
+
+    // Mountain path SVG (the road curves upward)
+    const pathSvg=`<svg class="oly-road-svg" viewBox="0 0 300 52" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="roadGrad${s.mi}" x1="0%" y1="0%" x2="100%" y2="0%">
+          ${OLY_ZONES.map((z,i)=>`<stop offset="${z.pct}%" stop-color="${z.color}"/>`).join('')}
+        </linearGradient>
+      </defs>
+      <rect width="300" height="52" fill="url(#roadGrad${s.mi})" rx="6"/>
+      <!-- mountain path line -->
+      <path d="M0,42 Q75,38 150,28 Q225,18 300,8" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2" stroke-dasharray="4 3"/>
+      <!-- progress fill -->
+      <path d="M0,42 Q${pct*0.75},${42-(pct*0.34)} ${pct*3},${42-(pct*0.34)}" fill="none" stroke="${curZone.textColor}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+      <!-- zone dividers -->
+      <line x1="75" y1="0" x2="75" y2="52" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <line x1="150" y1="0" x2="150" y2="52" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <line x1="225" y1="0" x2="225" y2="52" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    </svg>`;
+
+    // Checkpoints
+    const checkpoints=OLY_CHECKPOINTS.map(cp=>`<div class="oly-checkpoint" style="left:${cp.pct}%">
+      <div class="oly-cp-icon ${s.km>=cp.km?'reached':''}">${cp.icon}</div>
+      <div class="oly-cp-lbl">${cp.km}km</div>
+    </div>`).join('');
+
+    // Runner vertical position on mountain path (higher pct = higher up)
+    const runnerBottom=Math.round(4+(pct*0.34))+'px';
+
+    return`<div class="oly-racer">
+      <div class="oly-rank">${re}</div>
+      <div class="oly-card" style="background:${cardBg};border:1px solid ${cardBorder}44">
+        <div class="oly-av" onclick="_a.uploadPhoto(${s.mi})" style="border-color:${cardBorder}66">
+          ${avHtml(s.mi)}
+          ${hb?`<span class="head-badge">${hb}</span>`:''}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="oly-name">${m.name||'Warrior'}</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:2px">
+            <span class="oly-km" style="color:${curZone.textColor}">${s.km}km</span>
+            <span class="oly-dlut">💎${s.dlut}</span>
+          </div>
+          <div style="font-size:7px;color:${curZone.textColor};margin-top:1px;opacity:.8">${curZone.label}</div>
+        </div>
+      </div>
+      <div class="oly-road-wrap">
+        ${pathSvg}
+        ${checkpoints}
+        <div class="oly-peak-flag ${s.km>=GOAL?'reached':''}">⚡</div>
+        <div class="oly-runner ${pl}" style="left:calc(${Math.max(2,pct)}% - 13px);bottom:${runnerBottom}">
+          <div class="oly-runner-quote">${q}</div>
+          <div class="oly-runner-body">${si}</div>
+          <div class="oly-runner-tag">${s.km}km</div>
+          <div class="oly-runner-dlut">💎${s.dlut}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  track.innerHTML=`<div class="olympus-wrap">
+    ${heroHtml}
+    ${storyHtml}
+    ${zoneBarHtml}
+    ${winnersHtml}
+    ${racerRows}
+  </div>`;
 }
 
 function renderMatrix(){
@@ -768,6 +1046,27 @@ function renderAdmin(){
   const ra=document.getElementById('ratesAdmin');
   if(ra)ra.innerHTML=[{k:'perKm',l:'Per km'},{k:'firstRun',l:'First run'},{k:'w1',l:'W1 (9km)'},{k:'w2',l:'W2 (18km)'},{k:'w3',l:'W3 (27km)'},{k:'monthly',l:'Monthly goal'},{k:'first_w1',l:'1st to W1'},{k:'first_w2',l:'1st to W2'},{k:'first_w3',l:'1st to W3'},{k:'first_monthly',l:'1st to goal'},{k:'strong',l:'Strong week'},{k:'super',l:'Super week'}].map(f=>`<div class="admin-row"><span class="admin-lbl">${f.l}</span><div class="stepper"><button class="step-btn" onclick="_a.adjRate('${f.k}',-10)">−</button><input class="step-val" id="r_${f.k}" type="number" value="${rates[f.k]}" onchange="rates['${f.k}']=+this.value;renderAll()"><button class="step-btn" onclick="_a.adjRate('${f.k}',10)">+</button></div></div>`).join('');
   const bl=document.getElementById('bonusLog');if(bl){const list=Object.values(bonuses);bl.innerHTML=list.length===0?'<div style="color:var(--text2);font-size:11px;padding:6px 0">No bonuses yet.</div>':list.map(b=>`<div class="tx-row"><span class="tx-ico">💎</span><span class="tx-desc">${gm(b.mi).name||'?'} — ${b.reason||'Bonus'}</span><span class="tx-amt">+${b.amt}</span></div>`).join('');}
+  // Monthly goal admin
+  const mga=document.getElementById('monthGoalAdmin');
+  if(mga){
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    // Show current month + next 3 months for easy editing
+    const rows=[];
+    for(let i=0;i<6;i++){
+      let m=(now.getMonth()+i)%12, y=now.getFullYear()+Math.floor((now.getMonth()+i)/12);
+      const mk=`${y}-${m}`, cur=Number(monthGoals[mk]||36);
+      rows.push(`<div class="admin-row">
+        <span class="admin-lbl" style="color:${m===Mo&&y===Y?'var(--gold)':'var(--text2)'}">${months[m]} ${y}${m===Mo&&y===Y?' ← current':''}</span>
+        <div class="stepper">
+          <button class="step-btn" onclick="_a.adjGoal('${mk}',-1)">−</button>
+          <input class="step-val" id="mg_${mk}" type="number" min="1" max="200" value="${cur}" style="width:52px" onchange="_a.setGoalVal('${mk}',+this.value)">
+          <button class="step-btn" onclick="_a.adjGoal('${mk}',1)">+</button>
+        </div>
+        <button class="admin-btn" style="padding:4px 10px;font-size:10px" onclick="_a.saveMonthGoal('${mk}')">💾</button>
+      </div>`);
+    }
+    mga.innerHTML=rows.join('');
+  }
 }
 
 // ─── BOTTOM SHEET ──────────────────────────────────────────────────────────
@@ -871,6 +1170,20 @@ function redeem(id){
 function adjRate(k,d){rates[k]=Math.max(0,(rates[k]||0)+d);const i=document.getElementById(`r_${k}`);if(i)i.value=rates[k];renderAll();}
 function saveRates(){wr('rates',rates);toast('💾 Rates saved!');renderAll();}
 function resetRates(){rates={...DEF_R};wr('rates',rates);renderAdmin();renderAll();toast('↺ Rates reset');}
+function adjGoal(mk,d){
+  const cur=Number(monthGoals[mk]||36);
+  const nv=Math.max(1,cur+d);
+  monthGoals[mk]=nv;
+  const inp=document.getElementById(`mg_${mk}`);if(inp)inp.value=nv;
+}
+function setGoalVal(mk,v){monthGoals[mk]=Math.max(1,v||36);}
+function saveMonthGoal(mk){
+  const inp=document.getElementById(`mg_${mk}`);
+  if(inp)monthGoals[mk]=Math.max(1,Number(inp.value)||36);
+  wr(`monthGoals/${mk}`,monthGoals[mk]);
+  toast(`🎯 Goal for ${mk} set to ${monthGoals[mk]}km!`);
+  renderAll();
+}
 
 // ─── TABS & NAV ─────────────────────────────────────────────────────────────
 function switchTab(t){
@@ -990,6 +1303,7 @@ window._a={
   openMembers,closeMemberModal,saveMembers,adjActive,toggleAp,pickAnimal,pickIconFile,clearIconM,
   uploadPhoto,onPhoto,onIcon,
   unlockAdmin,awardBonus,addPrize,redeem,adjRate,saveRates,resetRates,
+  adjGoal,setGoalVal,saveMonthGoal,
   switchTab,prevMonth,nextMonth,setWallet,confirmReset,download,debugInfo
 };
 
