@@ -507,20 +507,32 @@ function initFB(){
   try{
     firebase.initializeApp(FB);
     db=firebase.database();
-    db.ref('trek_dlut_50km').on('value',s=>{
-      const v=s.val()||{};
-      att=v.att||{};km=v.km||{};
-      if(v.members)M=Array.isArray(v.members)?v.members:Object.values(v.members);
-      if(v.activeCount!==undefined)AC=Number(v.activeCount);
-      if(v.photos)photos=v.photos;
-      if(v.icons)icons=v.icons;
-      if(v.prizes)prizes=v.prizes;
-      if(v.bonuses)bonuses=v.bonuses;
-      if(v.rates)rates={...DEF_R,...v.rates};
-      if(v.fm)fm=v.fm;
-      const dot=document.getElementById('statusDot'),lbl=document.getElementById('statusLbl');
-      dot.classList.add('online');lbl.textContent='Live';
-      renderAll();
+    // Try trek_dlut_50km first, fall back to root if empty
+    db.ref('trek_dlut_50km').once('value').then(snap=>{
+      const v=snap.val()||{};
+      const hasData=v.att||v.km||v.members;
+      const rootPath=hasData?'trek_dlut_50km':'';
+      db.ref(rootPath).on('value',s=>{
+        const v2=s.val()||{};
+        // support both nested (trek_dlut_50km.att) and flat (att) structures
+        const base=v2.trek_dlut_50km||v2;
+        att=base.att||v2.att||{};
+        km=base.km||v2.km||{};
+        const rawM=base.members||v2.members;
+        if(rawM)M=Array.isArray(rawM)?rawM:Object.values(rawM);
+        const rawAC=base.activeCount!==undefined?base.activeCount:v2.activeCount;
+        if(rawAC!==undefined)AC=Number(rawAC);
+        photos=base.photos||v2.photos||{};
+        icons=base.icons||v2.icons||base.customIcons||v2.customIcons||{};
+        prizes=base.prizes||v2.prizes||{};
+        bonuses=base.bonuses||v2.bonuses||{};
+        const rawR=base.rates||v2.rates;
+        if(rawR)rates={...DEF_R,...rawR};
+        fm=base.fm||v2.fm||base.firstMilestones||v2.firstMilestones||{};
+        const dot=document.getElementById('statusDot'),lbl=document.getElementById('statusLbl');
+        dot.classList.add('online');lbl.textContent='Live';
+        renderAll();
+      });
     });
   }catch(e){console.warn(e);renderAll();}
 }
