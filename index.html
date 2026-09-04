@@ -434,6 +434,37 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 const FB_CFG={apiKey:"AIzaSyDv90xPQbxhBtZ5j0exJYWcJnmI631lkr0",authDomain:"trek-dlut-50km.firebaseapp.com",databaseURL:"https://trek-dlut-50km-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"trek-dlut-50km",storageBucket:"trek-dlut-50km.firebasestorage.app",messagingSenderId:"842711076233",appId:"1:842711076233:web:f8db09823a3eb6b28ca558"};
 const FB_PATH='trek_dlut_50km'; // confirmed from Firebase console screenshot
 
+// ─── KEY FORMAT TRANSLATION ────────────────────────────────────────────────
+// Old app used: free_2026-08-06_0  (free/absent_date_memberIndex)
+// New app uses: mi0_2026-08-06     (mi+memberIndex+_+date)
+// We must read OLD format and translate to new format internally
+function translateOldKeys(rawAtt, rawKm){
+  const newAtt={}, newKm={};
+  Object.entries(rawAtt||{}).forEach(([k,v])=>{
+    // Old format: free_2026-08-06_0 or absent_2026-08-06_0
+    const m1=k.match(/^(free|absent|present)_(\d{4}-\d{2}-\d{2})_(\d+)$/);
+    if(m1){
+      const status=m1[1], date=m1[2], mi=m1[3];
+      const newKey=`mi${mi}_${date}`;
+      newAtt[newKey] = status==='free'?1 : status==='absent'?-1 : 1;
+      if(rawKm&&rawKm[k]) newKm[newKey]=rawKm[k];
+      return;
+    }
+    // New format: mi0_2026-08-06 — keep as is
+    const m2=k.match(/^mi(\d+)_(\d{4}-\d{2}-\d{2})$/);
+    if(m2){ newAtt[k]=v; if(rawKm&&rawKm[k]) newKm[k]=rawKm[k]; return; }
+    // Any other format — keep as is
+    newAtt[k]=v;
+  });
+  // Also translate km keys
+  Object.entries(rawKm||{}).forEach(([k,v])=>{
+    const m1=k.match(/^(free|absent|present)_(\d{4}-\d{2}-\d{2})_(\d+)$/);
+    if(m1){ const newKey=`mi${m1[3]}_${m1[2]}`; if(!newKm[newKey]) newKm[newKey]=v; return; }
+    if(!newKm[k]) newKm[k]=v;
+  });
+  return {att:newAtt, km:newKm};
+}
+
 const DEF_M=[{name:'Hai Bui',animal:'🐯',ltKm:0,ltDate:''},{name:'Chinh Ton',animal:'🦊',ltKm:0,ltDate:''},{name:'Khoa Vo',animal:'🐸',ltKm:0,ltDate:''},{name:'Truong Nguyen',animal:'🐼',ltKm:0,ltDate:''},{name:'Thien Le',animal:'🐱',ltKm:0,ltDate:''},{name:'Hoang Tran',animal:'🐻',ltKm:0,ltDate:''},{name:'Tri Nguyen',animal:'🦁',ltKm:0,ltDate:''},{name:'Member 8',animal:'🐨',ltKm:0,ltDate:''},{name:'Member 9',animal:'🐮',ltKm:0,ltDate:''},{name:'Member 10',animal:'🐶',ltKm:0,ltDate:''}];
 const ANIMALS=['🐯','🦊','🐸','🐼','🐱','🐻','🦁','🐨','🐮','🐶','🐺','🦝','🐰','🦄','🐧','🦅','🐬','🦈','🐉','🐘','🦒','🐫','🦙','🏃','🚴','⚡','🔥','💪','🥷','🦸','🎯','🌟'];
 const DEF_R={perKm:10,firstRun:20,w1:100,w2:200,w3:300,monthly:500,first_w1:50,first_w2:50,first_w3:50,first_monthly:100,strong:100,super:200};
@@ -457,8 +488,10 @@ function initFB(){
     // Listen to the confirmed path: trek_dlut_50km
     db.ref(FB_PATH).on('value',snap=>{
       const v=snap.val()||{};
-      att   = v.att   || {};
-      km    = v.km    || {};
+      // Translate old key format (free_2026-08-06_0) to new (mi0_2026-08-06)
+      const translated = translateOldKeys(v.att||{}, v.km||{});
+      att = translated.att;
+      km  = translated.km;
       // members: Firebase may return object instead of array
       if(v.members) M=Array.isArray(v.members)?v.members:Object.values(v.members);
       if(v.activeCount!==undefined) AC=Number(v.activeCount);
