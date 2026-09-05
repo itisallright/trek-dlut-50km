@@ -272,6 +272,38 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .bs-media{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
 .bs-media-btn{padding:5px 10px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--text2);font-size:10px;cursor:pointer;font-weight:600;-webkit-tap-highlight-color:transparent}
 .bs-media-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* CHAPTER STORY MODAL */
+.story-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:400;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)}
+.story-overlay.open{display:flex}
+.story-sheet{width:100%;max-width:520px;max-height:88vh;overflow-y:auto;border-radius:20px 20px 0 0;position:relative}
+.story-hero{position:relative;padding:32px 20px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;overflow:hidden;min-height:180px;justify-content:flex-end}
+.story-hero-bg{position:absolute;inset:0;opacity:.25}
+.story-hero-stars{position:absolute;inset:0;overflow:hidden}
+.story-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.4);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
+.story-badge{font-size:52px;margin-bottom:8px;z-index:1;filter:drop-shadow(0 0 16px rgba(255,255,255,.4));animation:badgePop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes badgePop{0%{transform:scale(0) rotate(-20deg)}100%{transform:scale(1) rotate(0)}}
+.story-chapter-num{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;z-index:1}
+.story-title{font-size:20px;font-weight:900;color:#fff;z-index:1;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.story-god{font-size:12px;color:rgba(255,255,255,.7);z-index:1;margin-top:2px}
+.story-terrain{font-size:10px;color:rgba(255,255,255,.45);z-index:1;margin-top:1px}
+.story-body{padding:18px 18px 24px;background:var(--bg2)}
+.story-quote-block{background:var(--bg3);border-left:3px solid;border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 14px;margin-bottom:16px;font-style:italic;font-size:13px;color:var(--text);line-height:1.6}
+.story-narrative{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:18px}
+.story-goal-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);font-size:12px;font-weight:700;margin-bottom:18px}
+/* medal board */
+.medal-board{background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);overflow:hidden}
+.medal-board-head{padding:10px 14px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.medal-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border)}
+.medal-row:last-child{border-bottom:none}
+.medal-av{width:30px;height:30px;border-radius:50%;overflow:hidden;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:2px solid var(--border)}
+.medal-av img{width:100%;height:100%;object-fit:cover}
+.medal-info{flex:1;min-width:0}
+.medal-name{font-size:11px;font-weight:700}
+.medal-km{font-size:10px;color:var(--text2);margin-top:1px}
+.medal-bar{height:3px;background:var(--border);border-radius:2px;margin-top:3px;overflow:hidden}
+.medal-fill{height:100%;border-radius:2px;transition:width .6s}
+.medal-badge{font-size:18px;flex-shrink:0}
+.story-only-note{text-align:center;padding:14px;font-size:11px;color:var(--text2);font-style:italic}
 /* DEBUG PANEL */
 .debug-panel{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:999;display:none;flex-direction:column;padding:14px}
 .debug-panel.open{display:flex}
@@ -293,6 +325,28 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 </style>
 </head>
 <body>
+
+<!-- CHAPTER STORY MODAL -->
+<div class="story-overlay" id="storyOverlay" onclick="_a.closeStory(event)">
+  <div class="story-sheet" id="storySheet">
+    <div class="story-hero" id="storyHero">
+      <div class="story-hero-bg" id="storyHeroBg"></div>
+      <div class="story-hero-stars" id="storyHeroStars"></div>
+      <button class="story-close" onclick="_a.closeStory()">✕</button>
+      <div class="story-badge" id="storyBadge"></div>
+      <div class="story-chapter-num" id="storyChapterNum"></div>
+      <div class="story-title" id="storyTitle2"></div>
+      <div class="story-god" id="storyGod"></div>
+      <div class="story-terrain" id="storyTerrain"></div>
+    </div>
+    <div class="story-body">
+      <div class="story-quote-block" id="storyQuote" style="border-color:#fff"></div>
+      <div class="story-narrative" id="storyNarrative"></div>
+      <div class="story-goal-pill" id="storyGoalPill"></div>
+      <div id="storyMedalSection"></div>
+    </div>
+  </div>
+</div>
 
 <!-- DEBUG PANEL -->
 <div class="debug-panel" id="debugPanel">
@@ -878,7 +932,7 @@ function renderMatrix(){
       const k2=dkey(Y,Mo,d),key=`mi${mi}_${k2}`,s=att[key]||0,kv=km[key]||'',lv=cellLevel(mi,k2);
       const fut=!past&&k2>td;
       const cc=s===1?(lv==='super'?'c-ssj3':lv==='strong'?'c-ssj':'c-present'):s===-1?'c-absent':'';
-      const ci=s===1?(lv==='super'?'🦸':lv==='strong'?'💪':'🥋'):s===-1?'💀':'⬜';
+      const ci=s===1?(lv==='super'?'🦸':lv==='strong'?'💪':'🏃'):s===-1?'💀':'⬜';
       const isT=k2===td;
       h+=`<td class="${cc}${isT?' c-today':''}" ${fut?'style="opacity:.2;cursor:default"':`onclick="_a.openBs(${mi},'${k2}')"`}><span class="cell-ico">${ci}</span>${kv?`<span class="cell-km">${kv}km</span>`:''}</td>`;
     }h+='</tr>';
@@ -977,7 +1031,7 @@ function renderEpic(){
       const done=assumed||memberKm(mi,cy,cm)>=goal;
       return`<div class="chapter-av ${done?'done-av':''}">${avHtml(mi)}</div>`;
     }).join('');
-    return`<div class="chapter-card ${cardClass}">
+    return`<div class="chapter-card ${cardClass}" onclick="_a.showChapterStory('${key}')" style="cursor:pointer">
       <div class="chapter-card-bg" style="background:${ch.color}"></div>
       <div class="chapter-card-inner">
         <div class="chapter-num">${MONTHS_SHORT[cm]} ${cy} · Ch.${cm+1}</div>
@@ -1231,6 +1285,89 @@ function debugCopy(){
   navigator.clipboard.writeText(ta.value).then(()=>toast('📋 Copied!')).catch(()=>{document.execCommand('copy');toast('📋 Copied!');});
 }
 
+// ─── CHAPTER STORY ────────────────────────────────────────────────────────
+// Full narrative per chapter
+const NARRATIVES={
+  '2026-0':"The year begins at the Harbor of Athens. Poseidon's waves crash against the docks as your team laces up for the first time. The sea air fills your lungs — salty, cold, electric. This is where legends begin. Every great odyssey starts with a single step off the shore.",
+  '2026-1':"The plains of Thessaly stretch endlessly before you. Demeter watches from the golden fields as your feet pound the earth. The harvest is coming — but only for those who plant their miles now. Run through the wheat, feel the soil, earn your place at the table.",
+  '2026-2':"Aphrodite's gardens bloom in every direction. The air smells of jasmine and ambition. This is the month of beauty — not just in the scenery, but in the discipline of showing up every single day. Love the run. Love the struggle. Love the person you're becoming.",
+  '2026-3':"The Spartan War Grounds. Ares himself watches from the hilltop, arms crossed, unimpressed — until you prove otherwise. This is the trial month. No shortcuts. No excuses. The warriors who survive this chapter carry scars that become stories.",
+  '2026-4':"Artemis's forest is dark and deep. The trees whisper your name. The hunt is on — but you are both hunter and prey. Chase your personal best through the undergrowth. The goddess of the moon lights your path only if you dare to run in the dark.",
+  '2026-5':"The summer solstice. Apollo's chariot blazes overhead at its highest point. The longest day of the year — and you will use every minute of it. The temple steps are steep, but the view from the top is worth every burning breath.",
+  '2026-6':"Hephaestus's volcano rumbles beneath your feet. The forge is hot. The work is hard. But this is where champions are made — hammered, heated, shaped by suffering into something extraordinary. Your legs are iron. Your will is steel.",
+  '2026-7':"Eagle's Ridge. Hermes himself lends you his winged sandals for this chapter. The air is thin up here, the path narrow, the drop terrifying. But look — you can see all of Greece from here. The summit of Olympus is visible for the first time. You are close.",
+  '2026-8':"The Gates of Olympus. Thunder rolls. Lightning splits the sky. Zeus himself has descended to watch. This is the storm chapter — the hardest, the most glorious. The gates will only open for those who have earned it. Run through the rain. Run through the fear. Run.",
+  '2026-9':"Athena's temple stands silent and wise. The owl watches from the rafters. This is the month of strategy — not just running harder, but running smarter. Pace yourself. Study your body. Wisdom is the weapon that carries you through the final stretch.",
+  '2026-10':"Dionysus has prepared a feast — but only for those who finish. The vineyard stretches across the hillside, heavy with grapes, rich with reward. This is the penultimate chapter. The celebration is within reach. One more push.",
+  '2026-11':"The Peak of Olympus. All twelve gods stand in a circle, watching. The clouds part. The summit glows. This is the final chapter of the Odyssey — the moment everything was building toward. Every kilometer from January lives in your legs right now. Ascend. Become legend."
+};
+
+function showChapterStory(key){
+  const ch=getChapter(2026,parseInt(key.split('-')[1]));
+  const [cy,cm]=key.split('-').map(Number);
+  const assumed=isAssumedComplete(cy,cm);
+  const isCurrent=cy===Y&&cm===Mo;
+  const isPast2=isPastMonth(cy,cm);
+  const goal=getGoal(cy,cm);
+  // Hero
+  document.getElementById('storyHeroBg').style.background=`linear-gradient(135deg,${ch.color},#0a0a12)`;
+  document.getElementById('storyBadge').textContent=ch.emoji;
+  document.getElementById('storyChapterNum').textContent=`Chapter ${cm+1} · ${MONTHS_SHORT[cm]} 2026`;
+  document.getElementById('storyTitle2').textContent=ch.name;
+  document.getElementById('storyGod').textContent=`Guardian: ${ch.god}`;
+  document.getElementById('storyTerrain').textContent=ch.terrain;
+  // Quote
+  const qEl=document.getElementById('storyQuote');
+  qEl.textContent=`"${ch.quote}"`;
+  qEl.style.borderColor=ch.color;
+  // Narrative
+  document.getElementById('storyNarrative').textContent=NARRATIVES[key]||ch.quote;
+  // Goal pill
+  document.getElementById('storyGoalPill').innerHTML=`🎯 <span style="color:${ch.color}">${goal} km</span> &nbsp;·&nbsp; ${assumed?'✅ Completed':isCurrent?'🔥 In Progress':isPast2?'⚠️ Past':'🔒 Upcoming'}`;
+  // Medal board — only for Aug onwards (not assumed complete)
+  const medalSec=document.getElementById('storyMedalSection');
+  if(assumed){
+    medalSec.innerHTML=`<div class="story-only-note">🏛️ All members completed this chapter.<br>The gods are pleased.</div>`;
+  } else {
+    // Build medal board sorted by km
+    const members=Array.from({length:AC},(_,mi)=>{
+      const k=memberKm(mi,cy,cm);
+      const done=k>=goal;
+      return{mi,name:gm(mi).name||`M${mi+1}`,km:k,done};
+    }).sort((a,b)=>b.km-a.km);
+    const maxKm=Math.max(...members.map(m=>m.km),goal);
+    const medalEmoji=(i,done)=>done?(i===0?'🥇':i===1?'🥈':i===2?'🥉':'✅'):'🏃';
+    medalSec.innerHTML=`<div class="medal-board">
+      <div class="medal-board-head">🏅 Member Progress · ${goal}km goal</div>
+      ${members.map((m,i)=>`<div class="medal-row">
+        <div class="medal-av">${avHtml(m.mi)}</div>
+        <div class="medal-info">
+          <div class="medal-name">${m.name}</div>
+          <div class="medal-km">${m.km} km ${m.done?'· Goal reached!':''}</div>
+          <div class="medal-bar"><div class="medal-fill" style="width:${Math.min(100,Math.round(m.km/goal*100))}%;background:${m.done?'var(--green)':ch.color}"></div></div>
+        </div>
+        <div class="medal-badge">${medalEmoji(i,m.done)}</div>
+      </div>`).join('')}
+    </div>`;
+  }
+  // Stars in hero
+  const hs=document.getElementById('storyHeroStars');
+  if(!hs.dataset.built){
+    hs.dataset.built='1';
+    let s='';
+    for(let i=0;i<30;i++){
+      const x=Math.random()*100,y=Math.random()*100,sz=Math.random()*1.5+.5,d=(Math.random()*2+1).toFixed(1);
+      s+=`<div class="epic-star" style="left:${x}%;top:${y}%;width:${sz}px;height:${sz}px;--d:${d}s;animation-delay:${(Math.random()*2).toFixed(1)}s"></div>`;
+    }
+    hs.innerHTML=s;
+  }
+  document.getElementById('storyOverlay').classList.add('open');
+}
+function closeStory(e){
+  if(e&&e.target!==document.getElementById('storyOverlay'))return;
+  document.getElementById('storyOverlay').classList.remove('open');
+}
+
 // ─── SWIPE ─────────────────────────────────────────────────────────────────
 let tx0=0;
 document.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;},{passive:true});
@@ -1243,6 +1380,7 @@ window._a={
   uploadPhoto,onPhoto,onIcon,
   unlockAdmin,awardBonus,addPrize,redeem,adjRate,saveRates,resetRates,
   adjGoal,setGoalVal,saveGoal,
+  showChapterStory,closeStory,
   switchTab,prevMonth,nextMonth,setWallet,confirmReset,download,
   debugOpen,debugClose,debugCopy
 };
