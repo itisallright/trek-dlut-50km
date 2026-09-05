@@ -394,6 +394,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
   <div class="tab active" id="tab-race-btn" onclick="_a.switchTab('race')">🏁 Race</div>
   <div class="tab" id="tab-att-btn" onclick="_a.switchTab('att')">📋 Log</div>
   <div class="tab" id="tab-earn-btn" onclick="_a.switchTab('earn')">💎 DLUT</div>
+  <div class="tab" id="tab-epic-btn" onclick="_a.switchTab('epic')">🏛️ Epic</div>
   <div class="tab" id="tab-admin-btn" onclick="_a.switchTab('admin')">⚙️ Admin</div>
 </div>
 
@@ -458,6 +459,9 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
     </div>
   </div>
 
+  <!-- EPIC TAB -->
+  <div id="tab-epic" class="hidden"></div>
+
   <!-- ADMIN TAB -->
   <div id="tab-admin" class="hidden">
     <div class="admin-wrap">
@@ -516,6 +520,29 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 <input type="file" id="iconFile" accept="image/*,image/gif" style="display:none" onchange="_a.onIcon(event)">
 
 <script>
+// ─── OLYMPUS EPIC ──────────────────────────────────────────────────────────
+const CHAPTERS=[
+  {mo:0,title:'The Awakening',terrain:'Harbor of Athens',god:'Poseidon',godIco:'🌊',goal:20,color:'#1a6fa8',bg:'#0a1f35',emoji:'⚓',desc:'The gods summon you from the harbor. Your journey begins at the edge of the sea.'},
+  {mo:1,title:'The Fields',terrain:'Plains of Thessaly',god:'Demeter',godIco:'🌾',goal:22,color:'#5a8a2a',bg:'#1a2a0a',emoji:'🌾',desc:'Demeter blesses your stride across golden fields. Run with the harvest wind.'},
+  {mo:2,title:'The Bloom',terrain:'Gardens of Aphrodite',god:'Aphrodite',godIco:'🌸',goal:25,color:'#c45a8a',bg:'#2a0a1a',emoji:'🌸',desc:'Beauty and strength unite. Aphrodite watches as you run through eternal gardens.'},
+  {mo:3,title:'The Trial',terrain:'Spartan War Grounds',god:'Ares',godIco:'⚔️',goal:27,color:'#c43a2a',bg:'#2a0a0a',emoji:'⚔️',desc:'Ares demands blood and sweat. Only the strongest survive the Spartan grounds.'},
+  {mo:4,title:'The Hunt',terrain:'Forest of Artemis',god:'Artemis',godIco:'🏹',goal:30,color:'#2a8a5a',bg:'#0a1a10',emoji:'🌿',desc:'Artemis leads you through ancient forests. Run swift as the silver arrow.'},
+  {mo:5,title:'The Solstice',terrain:'Temple of Apollo',god:'Apollo',godIco:'☀️',goal:32,color:'#c8a020',bg:'#2a1a00',emoji:'☀️',desc:'At the peak of summer, Apollo lights your path. Run under the eternal sun.'},
+  {mo:6,title:'The Forge',terrain:'Volcano of Hephaestus',god:'Hephaestus',godIco:'🔥',goal:34,color:'#c85a10',bg:'#2a0f00',emoji:'🔥',desc:'Hephaestus forges your will in volcanic fire. Pain is just metal being shaped.'},
+  {mo:7,title:'The Ascent',terrain:"Eagle's Ridge",god:'Hermes',godIco:'🦅',goal:36,color:'#5a7ac8',bg:'#0a1030',emoji:'🦅',desc:'Hermes guides you up the eagle\'s ridge. The summit grows closer with every step.'},
+  {mo:8,title:'The Storm',terrain:'Gates of Olympus',god:'Zeus',godIco:'⚡',goal:38,color:'#8a5ac8',bg:'#1a0a30',emoji:'⚡',desc:'Zeus unleashes his storm. Only the worthy may pass through the Gates of Olympus.'},
+  {mo:9,title:'The Wisdom',terrain:'Temple of Athena',god:'Athena',godIco:'🦉',goal:40,color:'#5a8ac8',bg:'#0a1525',emoji:'🌙',desc:'Athena grants wisdom to those who persist. Run with mind and body as one.'},
+  {mo:10,title:'The Feast',terrain:'Vineyard of Dionysus',god:'Dionysus',godIco:'🍇',goal:44,color:'#8a3a8a',bg:'#1a0a1a',emoji:'🍇',desc:'Dionysus celebrates your journey. The finish line is a feast of glory.'},
+  {mo:11,title:'The Ascension',terrain:'Peak of Olympus',god:'All Gods',godIco:'👑',goal:50,color:'#c8a830',bg:'#1a1500',emoji:'👑',desc:'All twelve gods witness your final ascent. Reach the peak and become Olympian.'},
+];
+function getChapter(mo){return CHAPTERS[mo]||CHAPTERS[8];}
+function getGoal(y,m){
+  if(monthGoals[`${y}-${m}`]!==undefined)return monthGoals[`${y}-${m}`];
+  return getChapter(m).goal;
+}
+// Jan-Jul 2026 assumed completed for all members
+function isAssumedComplete(y,m){return y===2026&&m<=6;}
+
 // ─── CONFIG ────────────────────────────────────────────────────────────────
 const FB_CFG={apiKey:"AIzaSyDv90xPQbxhBtZ5j0exJYWcJnmI631lkr0",authDomain:"trek-dlut-50km.firebaseapp.com",databaseURL:"https://trek-dlut-50km-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"trek-dlut-50km",storageBucket:"trek-dlut-50km.firebasestorage.app",messagingSenderId:"842711076233",appId:"1:842711076233:web:f8db09823a3eb6b28ca558"};
 const FB_PATH='trek_dlut_50km'; // confirmed from Firebase console screenshot
@@ -1186,11 +1213,146 @@ function saveMonthGoal(mk){
 }
 
 // ─── TABS & NAV ─────────────────────────────────────────────────────────────
+// ─── EPIC TAB ──────────────────────────────────────────────────────────────
+function renderEpic(){
+  const el=document.getElementById('tab-epic');if(!el)return;
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const curMo=now.getMonth(),curY=now.getFullYear();
+
+  // Year hero
+  const heroHtml=`<div style="position:relative;width:100%;height:130px;overflow:hidden;background:linear-gradient(180deg,#05050f,#0a0520 40%,#150a30 70%,#1a0a35);margin-bottom:0">
+    ${Array.from({length:40},(_,i)=>{const x=Math.random()*100,y=Math.random()*80,s=(Math.random()*1.5+.5).toFixed(1),d=(2+Math.random()*4).toFixed(1),dl=(Math.random()*4).toFixed(1);return`<div style="position:absolute;left:${x}%;top:${y}%;width:${s}px;height:${s}px;border-radius:50%;background:#fff;animation:twinkle ${d}s ease-in-out infinite ${dl}s"></div>`;}).join('')}
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2">
+      <div style="font-size:22px;font-weight:900;color:#fff;text-shadow:0 0 30px rgba(180,100,255,.9),0 2px 4px rgba(0,0,0,.8);letter-spacing:3px;text-transform:uppercase">⚡ ODYSSEY 2026 ⚡</div>
+      <div style="font-size:10px;color:rgba(200,180,255,.7);letter-spacing:4px;text-transform:uppercase;margin-top:4px">Road to Olympus</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:6px">12 Chapters · 12 Gods · 1 Destiny</div>
+    </div>
+  </div>`;
+
+  // Year progress bar
+  const completedChapters=CHAPTERS.filter(c=>c.mo<curMo||(c.mo===curMo)).length;
+  const yearPct=Math.round(completedChapters/12*100);
+  const yearProgressHtml=`<div style="padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+      <span style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">📅 2026 Progress</span>
+      <span style="font-size:10px;font-weight:700;color:var(--gold)">${completedChapters}/12 Chapters</span>
+    </div>
+    <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+      <div style="height:100%;width:${yearPct}%;background:linear-gradient(90deg,#1a6fa8,#c45a8a,#c8a020,#8a5ac8);border-radius:3px;transition:width .5s"></div>
+    </div>
+  </div>`;
+
+  // Chapter cards
+  const chapterCards=CHAPTERS.map((ch,i)=>{
+    const isPast=ch.mo<curMo&&curY===2026;
+    const isCurrent=ch.mo===curMo&&curY===2026;
+    const isFuture=ch.mo>curMo||curY>2026;
+    const goal=getGoal(2026,ch.mo);
+
+    // Member completion for this chapter
+    const completions=Array.from({length:AC},(_,mi)=>{
+      if(isPast||isAssumedComplete(2026,ch.mo)) return{mi,done:true,km:goal};
+      if(isCurrent){const k=memberKm(mi);return{mi,done:k>=goal,km:k};}
+      return{mi,done:false,km:0};
+    });
+    const doneCount=completions.filter(c=>c.done).length;
+    const allDone=doneCount===AC;
+
+    // Card state
+    const stateIcon=isPast||isAssumedComplete(2026,ch.mo)?'✅':isCurrent?'🔥':'🔒';
+    const cardOpacity=isFuture?'.45':'1';
+    const cardBorder=isCurrent?`border:1.5px solid ${ch.color};box-shadow:0 0 12px ${ch.color}44`:`border:1px solid var(--border)`;
+    const glowAnim=isCurrent?`animation:chapterGlow 2s ease-in-out infinite`:'';
+
+    // Member avatars
+    const memberAvatars=completions.slice(0,AC).map(c=>{
+      const av=avHtml(c.mi);
+      return`<div style="width:20px;height:20px;border-radius:50%;overflow:hidden;background:var(--card);display:inline-flex;align-items:center;justify-content:center;font-size:11px;border:1.5px solid ${c.done?ch.color:'var(--border)'};flex-shrink:0;position:relative;${c.done?`box-shadow:0 0 6px ${ch.color}66`:'filter:grayscale(.8);opacity:.5'}">${av}</div>`;
+    }).join('');
+
+    return`<div style="margin:0 14px 10px;border-radius:var(--radius);overflow:hidden;opacity:${cardOpacity};${cardBorder};${glowAnim};transition:all .3s">
+      <!-- Card header -->
+      <div style="padding:10px 12px;background:linear-gradient(135deg,${ch.bg},${ch.color}22);display:flex;align-items:center;gap:10px">
+        <div style="font-size:28px;line-height:1;filter:${isFuture?'grayscale(1)':'none'}">${ch.emoji}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <span style="font-size:8px;font-weight:700;color:${ch.color};text-transform:uppercase;letter-spacing:.8px">Chapter ${i+1} · ${months[ch.mo]} 2026</span>
+            <span style="font-size:10px">${stateIcon}</span>
+          </div>
+          <div style="font-size:13px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)">${ch.title}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:1px">${ch.terrain} · ${ch.god} ${ch.godIco}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:16px;font-weight:900;color:${ch.color}">${goal}km</div>
+          <div style="font-size:8px;color:rgba(255,255,255,.4)">Goal</div>
+        </div>
+      </div>
+      <!-- Card body -->
+      <div style="padding:8px 12px;background:var(--card)">
+        <div style="font-size:8px;color:var(--text2);font-style:italic;margin-bottom:7px;line-height:1.5">"${ch.desc}"</div>
+        <!-- Progress bar -->
+        ${isCurrent?`<div style="margin-bottom:7px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+            <span style="font-size:8px;color:var(--text2)">Team Progress</span>
+            <span style="font-size:8px;font-weight:700;color:${ch.color}">${doneCount}/${AC} completed</span>
+          </div>
+          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+            <div style="height:100%;width:${Math.round(doneCount/AC*100)}%;background:${ch.color};border-radius:2px;transition:width .5s"></div>
+          </div>
+        </div>`:''}
+        <!-- Member avatars -->
+        <div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap">
+          ${memberAvatars}
+          ${allDone&&!isFuture?`<span style="font-size:9px;color:${ch.color};font-weight:700;margin-left:4px">All Warriors! 🏆</span>`:''}
+          ${isFuture?`<span style="font-size:9px;color:var(--text2);margin-left:4px">Unlocks ${months[ch.mo]} 2026</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Year leaderboard — total km across all months
+  const yearStats=Array.from({length:AC},(_,mi)=>{
+    let totalKm=0,totalDlut=0,chaptersCompleted=0;
+    CHAPTERS.forEach(ch=>{
+      const goal=getGoal(2026,ch.mo);
+      if(isAssumedComplete(2026,ch.mo)){totalKm+=goal;chaptersCompleted++;}
+      else if(ch.mo===curMo){const k=memberKm(mi);totalKm+=k;if(k>=goal)chaptersCompleted++;}
+    });
+    return{mi,totalKm,chaptersCompleted};
+  }).sort((a,b)=>b.chaptersCompleted-a.chaptersCompleted||b.totalKm-a.totalKm);
+
+  const lbHtml=`<div style="padding:0 14px 14px">
+    <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin:12px 0 8px;display:flex;align-items:center;gap:6px">🏆 Olympian Leaderboard <span style="flex:1;height:1px;background:var(--border);display:block"></span></div>
+    ${yearStats.map((s,i)=>{
+      const re=i===0?'👑':i===1?'🥇':i===2?'🥈':`${i+1}`;
+      const isOlympian=s.chaptersCompleted>=12;
+      return`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:${isOlympian?'linear-gradient(135deg,rgba(200,168,48,.15),rgba(180,79,255,.1))':'var(--bg3)'};border-radius:var(--radius-sm);margin-bottom:5px;border:1px solid ${isOlympian?'rgba(200,168,48,.3)':'var(--border)'}">
+        <div style="width:20px;font-size:13px;font-weight:800;text-align:center;flex-shrink:0">${re}</div>
+        <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${avHtml(s.mi)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;font-weight:700;color:${isOlympian?'var(--gold)':'var(--text)'}">${gm(s.mi).name||'?'}${isOlympian?' ⚡':''}</div>
+          <div style="font-size:9px;color:var(--text2);margin-top:1px">${s.chaptersCompleted} chapters · ${s.totalKm}km total</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:11px;font-weight:800;color:var(--gold)">${s.chaptersCompleted}/12</div>
+          <div style="font-size:8px;color:var(--text2)">chapters</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  el.innerHTML=`<style>@keyframes chapterGlow{0%,100%{box-shadow:0 0 8px rgba(138,90,200,.3)}50%{box-shadow:0 0 20px rgba(138,90,200,.6)}}</style>
+    ${heroHtml}${yearProgressHtml}
+    <div style="padding:10px 14px 4px"><div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:6px">📖 The 12 Chapters <span style="flex:1;height:1px;background:var(--border);display:block"></span></div></div>
+    ${chapterCards}${lbHtml}`;
+}
+
 function switchTab(t){
-  tab=t;['race','att','earn','admin'].forEach(id=>{
+  tab=t;['race','att','earn','epic','admin'].forEach(id=>{
     document.getElementById(`tab-${id}`).classList.toggle('hidden',id!==t);
     document.getElementById(`tab-${id}-btn`).classList.toggle('active',id===t);
   });
+  if(t==='epic') renderEpic();
 }
 function prevMonth(){Mo--;if(Mo<0){Mo=11;Y--;}renderAll();}
 function nextMonth(){Mo++;if(Mo>11){Mo=0;Y++;}renderAll();}
