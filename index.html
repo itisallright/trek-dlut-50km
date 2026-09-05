@@ -112,6 +112,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .c-ssj{background:rgba(255,215,0,.08);outline:1px solid rgba(255,215,0,.3)}
 .c-ssj3{background:rgba(180,79,255,.08);outline:1px solid rgba(180,79,255,.3)}
 .c-today{outline:2px solid var(--accent)!important;outline-offset:-1px}
+.ci-strong{display:inline-block;font-size:14px;filter:brightness(4) drop-shadow(0 0 5px #ffd700) drop-shadow(0 0 10px #ffd700)}
+.ci-super{display:inline-block;font-size:14px;filter:brightness(5) drop-shadow(0 0 7px #b44fff) drop-shadow(0 0 14px #fff);animation:ciSuperBlink 1s ease-in-out infinite;background:rgba(180,79,255,.22);border-radius:3px;padding:0 2px}
+@keyframes ciSuperBlink{0%,100%{filter:brightness(5) drop-shadow(0 0 7px #b44fff) drop-shadow(0 0 14px #fff);background:rgba(180,79,255,.22);transform:scale(1)}50%{filter:brightness(6) drop-shadow(0 0 12px #ff00ff) drop-shadow(0 0 20px #fff);background:rgba(255,0,255,.35);transform:scale(1.2)}}
 .summary-wrap{margin-top:10px}
 .summary-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--card);border-radius:var(--radius-sm);margin-bottom:5px;border:1px solid var(--border)}
 .sum-av{width:26px;height:26px;border-radius:50%;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
@@ -320,6 +323,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .btn-primary{padding:7px 14px;border-radius:var(--radius-sm);border:none;background:var(--accent);color:#fff;font-size:11px;font-weight:700;cursor:pointer}
 .btn-ghost{padding:7px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer}
 .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+@keyframes superBlink{0%,100%{filter:drop-shadow(0 0 3px #b44fff);transform:scale(1)}50%{filter:drop-shadow(0 0 8px #b44fff) drop-shadow(0 0 14px #ff00ff);transform:scale(1.2)}}
 input[type=number]{-moz-appearance:textfield}
 input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 </style>
@@ -594,18 +598,54 @@ const FB_PATH='trek_dlut_50km';
 // ─── CHAPTERS / MONTHLY GOALS ─────────────────────────────────────────────
 // key = "YYYY-M" (M is 0-indexed JS month)
 const CHAPTERS={
-  '2026-0':{goal:20,name:'The Awakening',  god:'Poseidon',  emoji:'🌊',terrain:'Harbor of Athens',     color:'#1a6fa8',quote:'The sea calls to you, mortal.'},
-  '2026-1':{goal:22,name:'The Fields',     god:'Demeter',   emoji:'🌾',terrain:'Plains of Thessaly',   color:'#5a8a3a',quote:'The harvest rewards the persistent.'},
-  '2026-2':{goal:25,name:'The Bloom',      god:'Aphrodite', emoji:'🌸',terrain:'Gardens of Aphrodite', color:'#c0507a',quote:'Beauty is found in every stride.'},
-  '2026-3':{goal:27,name:'The Trial',      god:'Ares',      emoji:'⚔️',terrain:'Spartan War Grounds',  color:'#a03030',quote:'Only the strong reach Olympus.'},
-  '2026-4':{goal:30,name:'The Hunt',       god:'Artemis',   emoji:'🏹',terrain:'Forest of Artemis',    color:'#2d7a4a',quote:'Swift as an arrow, true as the moon.'},
-  '2026-5':{goal:32,name:'The Solstice',   god:'Apollo',    emoji:'☀️',terrain:'Temple of Apollo',     color:'#c8860a',quote:'Run toward the light, never away.'},
-  '2026-6':{goal:34,name:'The Forge',      god:'Hephaestus',emoji:'🔥',terrain:'Volcano of Hephaestus',color:'#b84010',quote:'Forged in fire, tempered by miles.'},
-  '2026-7':{goal:36,name:'The Ascent',     god:'Hermes',    emoji:'🦅',terrain:"Eagle's Ridge",        color:'#6a5acd',quote:'Wings on your feet, wind at your back.'},
-  '2026-8':{goal:38,name:'The Storm',      god:'Zeus',      emoji:'⚡',terrain:'Gates of Olympus',     color:'#4a90d9',quote:'Zeus watches. Do not disappoint.'},
-  '2026-9':{goal:40,name:'The Wisdom',     god:'Athena',    emoji:'🦉',terrain:'Temple of Athena',     color:'#7a6a2a',quote:'Wisdom is knowing your limits — then exceeding them.'},
-  '2026-10':{goal:44,name:'The Feast',     god:'Dionysus',  emoji:'🍇',terrain:'Dionysus Vineyard',    color:'#7a3a8a',quote:'The gods feast on your victories.'},
-  '2026-11':{goal:50,name:'The Ascension', god:'All Gods',  emoji:'👑',terrain:'Peak of Olympus',      color:'#c8a020',quote:'The summit awaits. Become legend.'},
+  '2026-0':{goal:20,name:'The Awakening',  god:'Poseidon',  godEmoji:'🔱',emoji:'🌊',terrain:'Harbor of Athens',      color:'#1a6fa8',act:'ACT I — THE CALLING',
+    challenge:'Rise from the depths, mortal. Your journey begins at the harbor. The sea does not wait.',
+    narrative:'Poseidon himself parts the waves as your club laces up for the first time. The harbor of Athens stretches before you — cold, vast, and indifferent. This is not a race. This is a calling. Those who answer will be remembered. Those who do not... the sea forgets quickly.',
+    verdict:'Poseidon nods slowly. "You did not drown. That is a start."'},
+  '2026-1':{goal:22,name:'The Fields',     god:'Demeter',   godEmoji:'🌾',emoji:'🌾',terrain:'Plains of Thessaly',    color:'#5a8a3a',act:'ACT I — THE CALLING',
+    challenge:'Tend your body like a field. Discipline is the seed of greatness. Miss a day and the weeds grow.',
+    narrative:'Demeter watches from the golden plains as your legs find their rhythm. The fields of Thessaly demand consistency — not brilliance. Every run is a seed planted. Every rest day is rain. By month\'s end, the harvest will reveal who truly tended their craft and who let the field go fallow.',
+    verdict:'Demeter smiles. "The soil remembers every footstep. Yours are many."'},
+  '2026-2':{goal:25,name:'The Bloom',      god:'Aphrodite', godEmoji:'💫',emoji:'🌸',terrain:'Gardens of Aphrodite',  color:'#c0507a',act:'ACT I — THE CALLING',
+    challenge:'Fall in love with the run. Beauty is found in every stride. Suffering and joy are the same thing here.',
+    narrative:'Aphrodite\'s gardens are in full bloom as spring arrives. She does not ask you to be fast. She asks you to be present. To feel the ground beneath your feet, the air in your lungs, the burn in your thighs — and to love all of it. The runners who reach Olympus are not the fastest. They are the ones who never stopped loving the journey.',
+    verdict:'Aphrodite laughs. "You are clumsy and sweaty. But you ran with your whole heart."'},
+  '2026-3':{goal:27,name:'The Trial',      god:'Ares',      godEmoji:'⚔️',emoji:'⚔️',terrain:'Spartan War Grounds',   color:'#a03030',act:'ACT II — THE TRIALS',
+    challenge:'War is won by those who never stop moving. Prove your worth on the field of battle. No excuses.',
+    narrative:'Ares does not believe in rest days. The Spartan war grounds are brutal — red dust, scorching sun, and the god of war watching every step with cold eyes. This month separates the committed from the comfortable. Pain is not the enemy. Stopping is. Those who push through the trial earn the right to continue. Those who don\'t... Ares has already forgotten their names.',
+    verdict:'Ares grunts. "You did not fall. I am... mildly impressed."'},
+  '2026-4':{goal:30,name:'The Hunt',       god:'Artemis',   godEmoji:'🏹',emoji:'🏹',terrain:'Forest of Artemis',     color:'#2d7a4a',act:'ACT II — THE TRIALS',
+    challenge:'The hunt demands patience, speed, and silence. Be the arrow. Be the hunter, not the hunted.',
+    narrative:'Deep in Artemis\'s forest, the rules change. Speed alone is not enough — you must be precise, patient, and relentless. The goddess of the hunt runs alongside you in the shadows, testing your instincts. She rewards those who find their pace and hold it. She has no mercy for those who sprint and collapse. The forest remembers every runner who passed through. Most never made it out.',
+    verdict:'Artemis emerges from the trees. "You ran like you meant it. The forest let you pass."'},
+  '2026-5':{goal:32,name:'The Solstice',   god:'Apollo',    godEmoji:'☀️',emoji:'☀️',terrain:'Temple of Apollo',      color:'#c8860a',act:'ACT II — THE TRIALS',
+    challenge:'At the solstice, the sun stands still. You must not. This is your peak — do not waste it.',
+    narrative:'Apollo\'s temple blazes at the height of summer. The longest days demand the longest runs. The sun god himself sets the pace — relentless, brilliant, unforgiving. This is the month of peak performance. Every km logged here is a verse in your legend. Apollo is the god of music, poetry, and prophecy — and right now, he is composing your story. Make it worth singing.',
+    verdict:'Apollo strums his lyre. "Your story has a good rhythm. Keep the tempo."'},
+  '2026-6':{goal:34,name:'The Forge',      god:'Hephaestus',godEmoji:'🔨',emoji:'🔥',terrain:'Volcano of Hephaestus', color:'#b84010',act:'ACT III — THE FORGE',
+    challenge:'I forge weapons in fire. You forge your body in sweat. Enter the volcano. Come out stronger.',
+    narrative:'Hephaestus works in silence beneath the volcano, and this month he turns his attention to you. The summer heat is his forge. Your legs are the metal. Every run in the scorching heat hammers out weakness and replaces it with something harder, something that will not break on the slopes of Olympus. The god of the forge does not speak much. He judges by what survives the fire.',
+    verdict:'Hephaestus holds up your progress like a finished blade. "Not bad. The fire did its work."'},
+  '2026-7':{goal:36,name:'The Ascent',     god:'Hermes',    godEmoji:'🪽',emoji:'🦅',terrain:"Eagle's Ridge",         color:'#6a5acd',act:'ACT III — THE FORGE',
+    challenge:'The messenger of gods runs without rest. Wings on your feet, wind at your back. Can you keep up?',
+    narrative:'Hermes is the fastest of all the gods — and he is done being patient. Eagle\'s Ridge rises sharply above the clouds, and the winged messenger darts ahead, glancing back with a grin. This is the month of speed, of finding your wings. The runners who reach this point have already proven their endurance. Now they must prove they can fly. Hermes will not slow down. The question is whether you will.',
+    verdict:'Hermes winks. "You almost kept up. Almost. See you at the gates."'},
+  '2026-8':{goal:38,name:'The Storm',      god:'Zeus',      godEmoji:'⚡',emoji:'⚡',terrain:'Gates of Olympus',      color:'#4a90d9',act:'ACT III — THE FORGE',
+    challenge:'You stand at the gates of Olympus. The storm is your final test. I am watching. Do not disappoint.',
+    narrative:'The gates of Olympus are wreathed in storm clouds as Zeus himself descends to observe. Lightning splits the sky with every km logged. This is the moment the entire year has been building toward. Eight months of training, sacrifice, and sweat have led here. The king of the gods does not offer encouragement — he offers a challenge. Cross the threshold. Prove you are worthy of standing among the immortals.',
+    verdict:'Zeus raises his hand. A bolt of lightning strikes the ground at your feet. "You have earned the right to continue."'},
+  '2026-9':{goal:40,name:'The Wisdom',     god:'Athena',    godEmoji:'🦉',emoji:'🦉',terrain:'Temple of Athena',      color:'#7a6a2a',act:'ACT IV — THE ASCENSION',
+    challenge:'Wisdom is knowing when to push and when to recover. The summit requires a clear mind, not just strong legs.',
+    narrative:'After the storm of Zeus, Athena\'s temple offers something unexpected: stillness. The goddess of wisdom knows that the final ascent to Olympus is won in the mind before it is won in the body. This month she teaches you to run smart — to pace yourself, to listen to your body, to understand that the greatest athletes are not the most reckless but the most intelligent. The summit is close. Do not waste yourself before you reach it.',
+    verdict:'Athena nods once. "You are beginning to understand. The peak is within reach."'},
+  '2026-10':{goal:44,name:'The Feast',     god:'Dionysus',  godEmoji:'🍇',emoji:'🍇',terrain:'Dionysus Vineyard',     color:'#7a3a8a',act:'ACT IV — THE ASCENSION',
+    challenge:'The feast awaits those who earn it. Run now, celebrate later. The wine tastes better after the miles.',
+    narrative:'Dionysus throws the greatest parties on Olympus — but only for those who have earned their place at the table. His vineyard stretches across the hillside, and the smell of celebration drifts down to the runners below. This is the penultimate chapter. The finish line is visible. The feast is prepared. But Dionysus will not let you in until you have completed your final km. Run now. The wine will wait.',
+    verdict:'Dionysus raises his cup. "The table is set. One more month and you feast with the gods."'},
+  '2026-11':{goal:50,name:'The Ascension', god:'All Gods',  godEmoji:'👑',emoji:'👑',terrain:'Peak of Olympus',       color:'#c8a020',act:'ACT IV — THE ASCENSION',
+    challenge:'The council of Olympus watches. All twelve gods stand witness. This is your ascension. Become legend.',
+    narrative:'At the peak of Olympus, all twelve gods have gathered. Poseidon, Demeter, Aphrodite, Ares, Artemis, Apollo, Hephaestus, Hermes, Zeus, Athena, Dionysus — and Hera, queen of the gods, who has watched in silence all year. This is the final chapter. 50km. The hardest goal. The greatest reward. Those who complete it will be inscribed in the Book of Olympus. Those who fall short will be welcomed back next year — for even the attempt is worthy of respect. Run, mortal. The gods are watching.',
+    verdict:'All twelve gods rise as one. The mountain shakes. "You are no longer mortal. Welcome to Olympus."'},
 };
 const MONTHS_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -870,7 +910,7 @@ function renderRace(st){
   if(msr)msr.innerHTML=[{p:25,l:`🏆W1<br>${g1}km`},{p:50,l:`🏆W2<br>${g2}km`},{p:75,l:`🏆W3<br>${g3}km`},{p:100,l:`🎯<br>${goal}km`}].map(m=>`<div class="ms-lbl" style="left:${m.p}%">${m.l}</div>`).join('');
   const wr2=document.getElementById('winnerRoad');
   if(wr2){
-    const mk=`${Y}-${Mo}`,f=fm[mk]||{};
+const mk=`${Y}-${Mo}`,f=fm[mk]||{};
     wr2.innerHTML=[{p:25,mi:f.w1,b:'🥇'},{p:50,mi:f.w2,b:'🥇'},{p:75,mi:f.w3,b:'🥇'},{p:100,mi:f.goal,b:'👑'}].map(s=>{
       const has=s.mi!==undefined&&s.mi!==null,mi=has?Number(s.mi):null;
       return`<div class="w-slot" style="left:${s.p}%"><div class="w-av" style="${has?'border-color:var(--gold)':''}">${has?avHtml(mi):'?'}${has?`<span class="w-badge">${s.b}</span>`:''}</div><div class="w-name">${has?(gm(mi).name||'?').split(' ')[0]:'?'}</div></div>`;
@@ -932,7 +972,7 @@ function renderMatrix(){
       const k2=dkey(Y,Mo,d),key=`mi${mi}_${k2}`,s=att[key]||0,kv=km[key]||'',lv=cellLevel(mi,k2);
       const fut=!past&&k2>td;
       const cc=s===1?(lv==='super'?'c-ssj3':lv==='strong'?'c-ssj':'c-present'):s===-1?'c-absent':'';
-      const ci=s===1?(lv==='super'?'🦸':lv==='strong'?'💪':'🏃'):s===-1?'💀':'⬜';
+      const ci=s===1?(lv==='super'?'<span class="ci-super">🏃</span>':lv==='strong'?'<span class="ci-strong">🏃</span>':'🏃'):s===-1?'💀':'⬜';
       const isT=k2===td;
       h+=`<td class="${cc}${isT?' c-today':''}" ${fut?'style="opacity:.2;cursor:default"':`onclick="_a.openBs(${mi},'${k2}')"`}><span class="cell-ico">${ci}</span>${kv?`<span class="cell-km">${kv}km</span>`:''}</td>`;
     }h+='</tr>';
@@ -1055,15 +1095,30 @@ function renderEpic(){
   olb.innerHTML=scores.map((s,i)=>{
     const re=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;
     const title=s.chapters>=12?'⚡ Olympian':s.chapters>=9?'🏔️ Climber':s.chapters>=6?'🌿 Wanderer':s.chapters>=3?'🌊 Initiate':'🏃 Mortal';
+    const ringPct=Math.round(s.chapters/12*100);
+    const ringR=18,ringC=22,ringCirc=Math.round(2*Math.PI*ringR);
+    const ringDash=Math.round(ringCirc*ringPct/100);
+    const ringColor=s.chapters>=12?'#f5c842':s.chapters>=9?'#7c6fff':s.chapters>=6?'#2ecc71':s.chapters>=3?'#3498db':'#8888aa';
     return`<div class="olympian-row">
       <div class="olympian-rank">${re}</div>
       <div class="olympian-av">${avHtml(s.mi)}</div>
       <div class="olympian-info">
         <div class="olympian-name">${gm(s.mi).name||'?'} <span style="font-size:9px;color:var(--text2)">${title}</span></div>
-        <div class="olympian-sub">${s.chapters}/12 chapters · ${s.totalKm}km total</div>
-        <div class="lb-bar"><div class="lb-fill" style="width:${Math.round(s.score/maxScore*100)}%"></div></div>
+        <div class="olympian-sub">${s.chapters}/12 chapters · ${s.totalKm}km · <span style="color:var(--gold)">${s.score} glory pts</span></div>
+        <div style="font-size:8px;color:var(--text2);margin-top:2px">${s.chapters}×100 chapters + ${s.totalKm}km = ${s.score}</div>
       </div>
-      <div class="olympian-score">${s.score}</div>
+      <div style="position:relative;width:44px;height:44px;flex-shrink:0">
+        <svg width="44" height="44" viewBox="0 0 44 44">
+          <circle cx="${ringC}" cy="${ringC}" r="${ringR}" fill="none" stroke="var(--border)" stroke-width="3.5"/>
+          <circle cx="${ringC}" cy="${ringC}" r="${ringR}" fill="none" stroke="${ringColor}" stroke-width="3.5"
+            stroke-dasharray="${ringDash} ${ringCirc}" stroke-dashoffset="${Math.round(ringCirc/4)}"
+            stroke-linecap="round" style="transition:stroke-dasharray .8s ease"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1">
+          <span style="font-size:11px;font-weight:800;color:${ringColor}">${ringPct}%</span>
+          <span style="font-size:7px;color:var(--text2)">${s.chapters}/12</span>
+        </div>
+      </div>
     </div>`;
   }).join('');
 }
